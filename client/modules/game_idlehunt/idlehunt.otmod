@@ -1,9 +1,0 @@
-Module
-  name: game_idlehunt
-  description: Exura IDLE Hunts System
-  author: Exura OT
-  website: https://exuraot.com
-  sandboxed: true
-  scripts: [ idlehunt ]
-  @onLoad: idleHuntController:init()
-  @onUnload: idleHuntController:terminate()

@@ -15,6 +15,7 @@
 | **OTClient Redemption** | `C:\Users\desig\OneDrive\Documentos\Tibia 15\ot client redemption` | - | **OTClient Redemption 4.1** (DirectX x64, Lua, OTUI, 15.24 Protobuf). |
 | **Editor de Mapa** | `C:\Users\desig\OneDrive\Documentos\Tibia 15\Mapa Editor` | - | **Canary Map Editor** (`canary-map-editor.exe`) com `datspr` compatível. |
 | **Editor de Sprites** | `C:\Users\desig\OneDrive\Documentos\Tibia 15\sprite editor` | - | **Assets Editor** (`Assets Editor.exe` Protobuf) para `appearances.dat` e `assets.json`. |
+| **Repositório GitHub (Monorepo)** | `C:\Users\desig\OneDrive\Documentos\Tibia 15\TIBIA-IDLE-OT` | `https://github.com/exuraot/TIBIA-IDLE-OT` | **TIBIA-IDLE-OT** contendo `/server`, `/site` e `/client` versionados com Git LFS (`world.otbm`). |
 
 > [!WARNING]
 > **REGRA DE OURO DAS PASTAS:**
@@ -140,4 +141,5 @@ Toda a lógica e runbooks avançados para desenvolvimento no servidor, cliente Q
 | 🔒 **Média** | **Domínio Próprio & Certificado SSL (HTTPS)** | Apontamento de DNS de domínio customizado para o IP `187.7.16.210` e emissão de certificado Let's Encrypt com Nginx. | 📋 **A Planejar** |
 | ⚔️ **Alta** | **Ativação do OTClient Redemption** | Executável nativo DirectX x64 integrado como `Exura Client.exe`, assets 15.24 vinculados em `data/things/1524`, métodos incompatíveis com a engine 4.1 protegidos (`setClickSound`/`addSound`), inicialização validada ponta a ponta (`loadModules` 100% limpo), apontando para `http://187.7.16.210/login.php` na porta 80 e protocolo 1524. | ✅ **Validado & Funcional** |
 | 🎮 **Alta** | **Build Dedicado de Jogador (Exura Client)** | Interface de login simplificada e limpa (removidos Servidor, Versão e HTTP Login), mantendo apenas Acc Name/Email, Senha, Lembrar e Auto-login. Adicionado botão direto "Create Account" para registro no site, ativação funcional do contador ao vivo de Players Online no topo, ativação dos painéis de Criatura e Boss Boosted diários no rodapé, e isolamento de ferramentas de desenvolvedor (Terminal, Debug Info, OTUI Editor, Sound Debug) com chave `DEV_MODE`. | ✅ **Concluído & Validado** |
+| 🌐 **Alta** | **Repositório Unificado GitHub (TIBIA-IDLE-OT)** | Repositório oficial monorepo criado em `https://github.com/exuraot/TIBIA-IDLE-OT` sincronizando `/server`, `/site` e `/client` com Git LFS configurado para arquivos grandes (`world.otbm` 185 MB) e `.gitignore` para descartar binários temporários/debug e zips. | ✅ **Publicado no GitHub** |
 | 🛡️ **Média** | **Rotina de Backup Automatizada** | Script cron diário no Linux para backup compactado do banco de dados MariaDB (`mysqldump`) e arquivos de casas/jogadores com retenção de 7 dias. | 📋 **A Planejar** |

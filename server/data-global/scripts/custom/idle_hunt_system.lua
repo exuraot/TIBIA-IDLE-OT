@@ -1,24 +1,16 @@
 --[[
     Exura OT - Sistema de Caçadas IDLE Instanciadas, Stamina IDLE & IDLE HUNT MENU
     - Hunts organizadas por faixas de nível (1-20 até 300+)
-    - Foco em EXP ou Loot
-    - Débito de suprimentos (poções/runas) direto do saldo bancário a preço de NPC
-    - Taxas: -20% de EXP (0.8x) e 100% de Loot
-    - Stamina IDLE: dreno 3x mais lento que a caçada normal
-    - Comparador de Requisitos:
-        * Cumpre 100% dos requisitos -> Ejeção de emergência (salvamento) com 10% de HP.
-        * Abaixo dos requisitos -> Risco real de morte normal.
-    - Combate Ativo no Mapa:
-        * O jogador ataca ativamente com armas, magias e projéteis.
-        * Monstros da hunt são gerados e engajados em combate real.
-    - Sistema de Loot e Vendas:
-        * Tabela de drops reais para cada uma das 14 hunts.
-        * Configuração de Manter (backpack) vs Vender (auto-venda 10m ou Venda Rápida).
-        * Auto-venda a cada 10 minutos com depósito direto no banco.
-        * Botão Venda Rápida com cooldown de 2 minutos.
-    - Teleportes Rápidos:
-        * House (teleporta para a casa própria se tiver).
-        * Temple (teleporta para o templo da cidade natal).
+    - Respawn natural do mapa (sem invocação artificial)
+    - Loot real adicionado diretamente na backpack do jogador
+    - Dinheiro dropado (gold/platinum) cai direto no saldo bancário
+    - Configuração de Loot:
+        * [Lock] Manter: item permanece na backpack e a auto-venda NÃO vende (padrão)
+        * [$] Vender: item é vendido do inventário a cada 10 min ou na Venda Rápida
+    - Auto-venda a cada 10 min com depósito direto no banco
+    - Botão Venda Rápida com cooldown de 2 minutos
+    - Encerrar Caçada: contagem de 5s, remove battle/infight e teleporta para o templo
+    - Teleportes rápidos para House e Temple
     - Opcode de Comunicação: 106 (OPCODE_IDLE_HUNT)
 ]]
 
@@ -26,10 +18,11 @@ _G.OnIdleHunt = _G.OnIdleHunt or {}
 _G.IdleLootPreferences = _G.IdleLootPreferences or {}
 
 local OPCODE_IDLE_HUNT = 106
-local STORAGE_IDLE_STAMINA = 95000     -- Armazena minutos restantes de Stamina IDLE
-local MAX_IDLE_STAMINA = 1440          -- 24 horas (em minutos)
+local OPCODE_BANK_BALANCE = 105
+local STORAGE_IDLE_STAMINA = 95000
+local MAX_IDLE_STAMINA = 1440
 
--- Tabela oficial de Hunts por Faixas de Nível (Tiers 1 a 7) com Loot Tables Reais
+-- Tabela oficial de Hunts com Drops Reais e Coordenadas do Mapa
 local IDLE_HUNTS = {
 	-- Tier 1: Level 1 a 20 (Iniciante)
 	{
@@ -38,7 +31,7 @@ local IDLE_HUNTS = {
 		tier = "1 - 20",
 		level = 8,
 		focus = "Balanceado",
-		desc = "Caçada clássica de Rotworms e Carrion Worms. Ideal para começar.",
+		desc = "Cacada classica de Rotworms e Carrion Worms. Ideal para comecar.",
 		monster = "Rotworm",
 		lookType = 26,
 		pos = Position(32797, 31560, 7),
@@ -53,7 +46,7 @@ local IDLE_HUNTS = {
 		damageMax = 18,
 		healAmount = 25,
 		lootTable = {
-			{ id = 3031, name = "Gold Coin", price = 1, chance = 85, countMin = 10, countMax = 45 },
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 85, countMin = 10, countMax = 45, isMoney = true },
 			{ id = 3492, name = "Worm", price = 1, chance = 45, countMin = 1, countMax = 5 },
 			{ id = 3577, name = "Meat", price = 2, chance = 35, countMin = 1, countMax = 2 },
 			{ id = 3286, name = "Mace", price = 30, chance = 18, countMin = 1, countMax = 1 },
@@ -82,7 +75,7 @@ local IDLE_HUNTS = {
 		damageMax = 30,
 		healAmount = 35,
 		lootTable = {
-			{ id = 3031, name = "Gold Coin", price = 1, chance = 85, countMin = 15, countMax = 60 },
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 85, countMin = 15, countMax = 60, isMoney = true },
 			{ id = 11444, name = "Protective Charm", price = 200, chance = 25, countMin = 1, countMax = 2 },
 			{ id = 3273, name = "Sabre", price = 12, chance = 30, countMin = 1, countMax = 1 },
 			{ id = 3267, name = "Dagger", price = 2, chance = 25, countMin = 1, countMax = 1 },
@@ -90,7 +83,7 @@ local IDLE_HUNTS = {
 		},
 	},
 
-	-- Tier 2: Level 20 a 40 (Básico)
+	-- Tier 2: Level 20 a 40 (Basico)
 	{
 		id = 3,
 		name = "Cyclopolis (Edron)",
@@ -112,7 +105,7 @@ local IDLE_HUNTS = {
 		damageMax = 65,
 		healAmount = 70,
 		lootTable = {
-			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 25, countMax = 90 },
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 25, countMax = 90, isMoney = true },
 			{ id = 9657, name = "Cyclops Toe", price = 55, chance = 35, countMin = 1, countMax = 2 },
 			{ id = 3413, name = "Battle Shield", price = 95, chance = 18, countMin = 1, countMax = 1 },
 			{ id = 3269, name = "Halberd", price = 400, chance = 12, countMin = 1, countMax = 1 },
@@ -140,7 +133,7 @@ local IDLE_HUNTS = {
 		damageMax = 75,
 		healAmount = 80,
 		lootTable = {
-			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 30, countMax = 110 },
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 30, countMax = 110, isMoney = true },
 			{ id = 5878, name = "Minotaur Leather", price = 80, chance = 35, countMin = 1, countMax = 2 },
 			{ id = 11472, name = "Minotaur Horn", price = 75, chance = 30, countMin = 1, countMax = 2 },
 			{ id = 3266, name = "Battle Axe", price = 80, chance = 20, countMin = 1, countMax = 1 },
@@ -148,14 +141,14 @@ local IDLE_HUNTS = {
 		},
 	},
 
-	-- Tier 3: Level 40 a 80 (Intermediário)
+	-- Tier 3: Level 40 a 80 (Intermediario)
 	{
 		id = 5,
 		name = "Yalahar Dragon Lair",
 		tier = "40 - 80",
 		level = 50,
 		focus = "Mais XP",
-		desc = "Dragons e Dragon Hatchlings. Rush de experiência clássico.",
+		desc = "Dragons e Dragon Hatchlings. Rush de experiencia classico.",
 		monster = "Dragon",
 		lookType = 34,
 		pos = Position(33078, 32168, 4),
@@ -170,7 +163,7 @@ local IDLE_HUNTS = {
 		damageMax = 160,
 		healAmount = 170,
 		lootTable = {
-			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 50, countMax = 180 },
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 50, countMax = 180, isMoney = true },
 			{ id = 3583, name = "Dragon Ham", price = 25, chance = 60, countMin = 1, countMax = 3 },
 			{ id = 11457, name = "Dragon's Tail", price = 100, chance = 30, countMin = 1, countMax = 2 },
 			{ id = 5877, name = "Green Dragon Leather", price = 100, chance = 25, countMin = 1, countMax = 1 },
@@ -199,7 +192,7 @@ local IDLE_HUNTS = {
 		damageMax = 210,
 		healAmount = 220,
 		lootTable = {
-			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 60, countMax = 220 },
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 60, countMax = 220, isMoney = true },
 			{ id = 5879, name = "Spider Silk", price = 1500, chance = 25, countMin = 1, countMax = 2 },
 			{ id = 3370, name = "Knight Armor", price = 5000, chance = 8, countMin = 1, countMax = 1 },
 			{ id = 3371, name = "Knight Legs", price = 5000, chance = 6, countMin = 1, countMax = 1 },
@@ -207,7 +200,7 @@ local IDLE_HUNTS = {
 		},
 	},
 
-	-- Tier 4: Level 80 a 130 (Avançado)
+	-- Tier 4: Level 80 a 130 (Avancado)
 	{
 		id = 7,
 		name = "Fenrock Dragon Lords",
@@ -229,7 +222,7 @@ local IDLE_HUNTS = {
 		damageMax = 380,
 		healAmount = 400,
 		lootTable = {
-			{ id = 3031, name = "Gold Coin", price = 1, chance = 95, countMin = 100, countMax = 300 },
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 95, countMin = 100, countMax = 300, isMoney = true },
 			{ id = 5882, name = "Red Dragon Scale", price = 200, chance = 30, countMin = 1, countMax = 2 },
 			{ id = 3280, name = "Fire Sword", price = 4000, chance = 10, countMin = 1, countMax = 1 },
 			{ id = 3428, name = "Tower Shield", price = 8000, chance = 7, countMin = 1, countMax = 1 },
@@ -243,7 +236,7 @@ local IDLE_HUNTS = {
 		tier = "80 - 130",
 		level = 110,
 		focus = "Mais Loot",
-		desc = "Criaturas aquáticas e Seacrests com pérolas e gemas preciosas.",
+		desc = "Criaturas aquaticas e Seacrests com perolas e gemas preciosas.",
 		monster = "Water Elemental",
 		lookType = 275,
 		pos = Position(31901, 30999, 9),
@@ -258,7 +251,7 @@ local IDLE_HUNTS = {
 		damageMax = 420,
 		healAmount = 450,
 		lootTable = {
-			{ id = 3035, name = "Platinum Coin", price = 100, chance = 85, countMin = 1, countMax = 5 },
+			{ id = 3035, name = "Platinum Coin", price = 100, chance = 85, countMin = 1, countMax = 5, isMoney = true },
 			{ id = 3029, name = "Small Sapphire", price = 250, chance = 35, countMin = 1, countMax = 3 },
 			{ id = 5895, name = "Fish Fin", price = 2000, chance = 20, countMin = 1, countMax = 1 },
 			{ id = 3051, name = "Energy Ring", price = 500, chance = 20, countMin = 1, countMax = 1 },
@@ -287,7 +280,7 @@ local IDLE_HUNTS = {
 		damageMax = 620,
 		healAmount = 650,
 		lootTable = {
-			{ id = 3035, name = "Platinum Coin", price = 100, chance = 90, countMin = 2, countMax = 8 },
+			{ id = 3035, name = "Platinum Coin", price = 100, chance = 90, countMin = 2, countMax = 8, isMoney = true },
 			{ id = 9694, name = "Snake Skin", price = 400, chance = 35, countMin = 1, countMax = 2 },
 			{ id = 3436, name = "Medusa Shield", price = 9000, chance = 8, countMin = 1, countMax = 1 },
 			{ id = 813, name = "Terra Boots", price = 2500, chance = 12, countMin = 1, countMax = 1 },
@@ -315,7 +308,7 @@ local IDLE_HUNTS = {
 		damageMax = 750,
 		healAmount = 780,
 		lootTable = {
-			{ id = 3035, name = "Platinum Coin", price = 100, chance = 90, countMin = 3, countMax = 10 },
+			{ id = 3035, name = "Platinum Coin", price = 100, chance = 90, countMin = 3, countMax = 10, isMoney = true },
 			{ id = 9647, name = "Demonic Skeletal Hand", price = 800, chance = 35, countMin = 1, countMax = 2 },
 			{ id = 8082, name = "Underworld Rod", price = 22000, chance = 7, countMin = 1, countMax = 1 },
 			{ id = 7418, name = "Nightmare Blade", price = 35000, chance = 4, countMin = 1, countMax = 1 },
@@ -344,7 +337,7 @@ local IDLE_HUNTS = {
 		damageMax = 980,
 		healAmount = 1020,
 		lootTable = {
-			{ id = 3035, name = "Platinum Coin", price = 100, chance = 95, countMin = 5, countMax = 15 },
+			{ id = 3035, name = "Platinum Coin", price = 100, chance = 95, countMin = 5, countMax = 15, isMoney = true },
 			{ id = 20199, name = "Frazzle Skin", price = 800, chance = 40, countMin = 1, countMax = 2 },
 			{ id = 20198, name = "Frazzle Tongue", price = 1000, chance = 35, countMin = 1, countMax = 2 },
 			{ id = 238, name = "Great Mana Potion", price = 120, chance = 50, countMin = 1, countMax = 4 },
@@ -357,7 +350,7 @@ local IDLE_HUNTS = {
 		tier = "200 - 250",
 		level = 230,
 		focus = "Mais Loot",
-		desc = "Glooth Bandits e Glooth Brigands. Máquina de fazer dinheiro.",
+		desc = "Glooth Bandits e Glooth Brigands. Maquina de fazer dinheiro.",
 		monster = "Glooth Bandit",
 		lookType = 600,
 		pos = Position(33554, 31923, 3),
@@ -372,7 +365,7 @@ local IDLE_HUNTS = {
 		damageMax = 1050,
 		healAmount = 1100,
 		lootTable = {
-			{ id = 3035, name = "Platinum Coin", price = 100, chance = 95, countMin = 5, countMax = 16 },
+			{ id = 3035, name = "Platinum Coin", price = 100, chance = 95, countMin = 5, countMax = 16, isMoney = true },
 			{ id = 21179, name = "Glooth Blade", price = 15000, chance = 8, countMin = 1, countMax = 1 },
 			{ id = 21180, name = "Glooth Axe", price = 18000, chance = 7, countMin = 1, countMax = 1 },
 			{ id = 238, name = "Great Mana Potion", price = 120, chance = 45, countMin = 2, countMax = 5 },
@@ -386,7 +379,7 @@ local IDLE_HUNTS = {
 		tier = "250 - 300+",
 		level = 260,
 		focus = "Mais XP",
-		desc = "Cobra Scouts e Assassins. Dano massivo com itens lendários.",
+		desc = "Cobra Scouts e Assassins. Dano massivo com itens lendarios.",
 		monster = "Cobra Assassin",
 		lookType = 1217,
 		pos = Position(33402, 32663, 0),
@@ -401,7 +394,7 @@ local IDLE_HUNTS = {
 		damageMax = 1350,
 		healAmount = 1400,
 		lootTable = {
-			{ id = 3035, name = "Platinum Coin", price = 100, chance = 98, countMin = 8, countMax = 25 },
+			{ id = 3035, name = "Platinum Coin", price = 100, chance = 98, countMin = 8, countMax = 25, isMoney = true },
 			{ id = 30398, name = "Cobra Sword", price = 50000, chance = 3, countMin = 1, countMax = 1 },
 			{ id = 3038, name = "Green Gem", price = 5000, chance = 15, countMin = 1, countMax = 1 },
 			{ id = 3041, name = "Blue Gem", price = 5000, chance = 12, countMin = 1, countMax = 1 },
@@ -413,7 +406,7 @@ local IDLE_HUNTS = {
 		tier = "250 - 300+",
 		level = 290,
 		focus = "Mais Loot",
-		desc = "Sphinx e Crypt Warden. O ápice de XP e itens valiosos do servidor.",
+		desc = "Sphinx e Crypt Warden. O apice de XP e itens valiosos do servidor.",
 		monster = "Sphinx",
 		lookType = 1188,
 		pos = Position(33883, 31437, 7),
@@ -428,7 +421,7 @@ local IDLE_HUNTS = {
 		damageMax = 1600,
 		healAmount = 1650,
 		lootTable = {
-			{ id = 3035, name = "Platinum Coin", price = 100, chance = 98, countMin = 10, countMax = 30 },
+			{ id = 3035, name = "Platinum Coin", price = 100, chance = 98, countMin = 10, countMax = 30, isMoney = true },
 			{ id = 31437, name = "Sphinx Feather", price = 1200, chance = 40, countMin = 1, countMax = 3 },
 			{ id = 3364, name = "Golden Legs", price = 30000, chance = 5, countMin = 1, countMax = 1 },
 			{ id = 3038, name = "Green Gem", price = 5000, chance = 18, countMin = 1, countMax = 1 },
@@ -437,7 +430,7 @@ local IDLE_HUNTS = {
 	},
 }
 
--- Funções Auxiliares de Stamina IDLE
+-- Funcoes Auxiliares de Stamina IDLE
 local function getPlayerIdleStamina(player)
 	local stamina = player:getStorageValue(STORAGE_IDLE_STAMINA)
 	if stamina < 0 then
@@ -468,7 +461,7 @@ local function formatNumber(n)
 	return left .. (num:reverse():gsub('(%d%d%d)', '%1,'):reverse()) .. right
 end
 
--- Cálculo de Requisitos do Jogador
+-- Calculo de Requisitos
 local function calculatePlayerStats(player)
 	local leftItem = player:getSlotItem(CONST_SLOT_LEFT)
 	local rightItem = player:getSlotItem(CONST_SLOT_RIGHT)
@@ -525,7 +518,6 @@ local function calculatePlayerStats(player)
 	}
 end
 
--- Avaliação de Requisitos
 local function evaluateHuntRequirements(player, hunt)
 	local stats = calculatePlayerStats(player)
 	local meetsLevel = stats.level >= hunt.reqLevel
@@ -544,38 +536,45 @@ local function evaluateHuntRequirements(player, hunt)
 	}
 end
 
--- Venda de Itens Pendentes (Auto 10m ou Venda Rápida)
-local function sellPendingLoot(player, session, reason)
-	local totalGold = 0
-	local totalCount = 0
-	local hunt = getHuntById(session.huntId)
+-- Venda de Itens Marcados com [$] direto da Backpack do Jogador
+local function sellPlayerLootFromInventory(player, huntId, reason)
+	local hunt = getHuntById(huntId)
 	if not hunt or not hunt.lootTable then
 		return 0, 0
 	end
 
-	local priceMap = {}
-	for _, l in ipairs(hunt.lootTable) do
-		priceMap[l.id] = l.price
-	end
+	local playerId = player:getId()
+	local session = _G.OnIdleHunt[playerId]
+	local prefs = session and session.lootRules or (_G.IdleLootPreferences[playerId] or {})
 
-	for itemId, count in pairs(session.pendingSale or {}) do
-		if count > 0 then
-			local price = priceMap[itemId] or 1
-			totalGold = totalGold + (count * price)
-			totalCount = totalCount + count
+	local totalGold = 0
+	local totalCount = 0
+
+	for _, item in ipairs(hunt.lootTable) do
+		-- Apenas itens marcados com 'sell' sao vendidos (itens com 'keep' ficam bloqueados na backpack)
+		if not item.isMoney and prefs[item.id] == "sell" then
+			local countInBag = player:getItemCount(item.id)
+			if countInBag > 0 then
+				player:removeItem(item.id, countInBag)
+				local earned = countInBag * item.price
+				totalGold = totalGold + earned
+				totalCount = totalCount + countInBag
+			end
 		end
 	end
 
 	if totalGold > 0 then
 		player:addMoneyBank(totalGold)
-		session.pendingSale = {}
-		session.totalLootGold = 0
+		-- Atualizar HUD bancario via opcode 105
+		if player:isUsingOtClient() then
+			player:sendExtendedOpcode(OPCODE_BANK_BALANCE, string.format('{"action":"balance","balance":%d}', player:getBankBalance()))
+		end
 
-		local prefix = (reason == "quick") and "💰 [VENDA RÁPIDA]" or "💰 [AUTO-VENDA 10M]"
+		local prefix = (reason == "quick") and "[VENDA RAPIDA]" or "[AUTO-VENDA 10M]"
 		player:sendTextMessage(
 			MESSAGE_EVENT_ADVANCE,
 			string.format(
-				"%s: %d itens foram vendidos por %s gold coins depositados diretamente no seu banco!",
+				"%s: %d itens da sua backpack foram vendidos por %s gold coins depositados no seu banco!",
 				prefix,
 				totalCount,
 				formatNumber(totalGold)
@@ -586,23 +585,40 @@ local function sellPendingLoot(player, session, reason)
 	return 0, 0
 end
 
--- Finalizar Caçada IDLE
+-- Finalizar Cacada IDLE (Remove Battle/Infight e Teleporta com Seguranca)
 local function stopIdleHunt(playerId, reason, isEmergency, skipTeleport)
 	local session = _G.OnIdleHunt[playerId]
+	local huntId = session and session.huntId or 1
+
 	if session then
 		if session.event then
 			stopEvent(session.event)
-		end
-		-- Se tiver itens pendentes ao encerrar, realizar venda automática para não perder loot
-		local player = Player(playerId)
-		if player and session.pendingSale then
-			sellPendingLoot(player, session, "auto")
 		end
 		_G.OnIdleHunt[playerId] = nil
 	end
 
 	local player = Player(playerId)
 	if player then
+		-- 1. Executa venda automatica de itens marcados com [$] antes de sair
+		sellPlayerLootFromInventory(player, huntId, "auto")
+
+		-- 2. Limpa aggro de todos os monstros ao redor
+		local pPos = player:getPosition()
+		if pPos then
+			local spectators = Game.getSpectators(pPos, false, false, 12, 12, 12, 12)
+			for _, spec in ipairs(spectators) do
+				if spec:isMonster() and spec:getTarget() == player then
+					spec:setTarget(nil)
+					spec:selectTarget(nil)
+				end
+			end
+		end
+
+		-- 3. Limpa condicoes de combate e PZ Lock (sem battle)
+		player:removeCondition(CONDITION_INFIGHT)
+		player:removeCondition(CONDITION_HUNTING)
+
+		-- 4. Teleporte seguro para o Templo
 		if not skipTeleport then
 			local templePos = player:getTown():getTemplePosition()
 			if templePos then
@@ -611,11 +627,15 @@ local function stopIdleHunt(playerId, reason, isEmergency, skipTeleport)
 			end
 		end
 
-		local msg = reason or "Caçada IDLE finalizada."
+		-- 5. Garante remocao definitiva de battle no destino
+		player:removeCondition(CONDITION_INFIGHT)
+		player:removeCondition(CONDITION_HUNTING)
+
+		local msg = reason or "Cacada IDLE finalizada."
 		if isEmergency then
 			player:sendTextMessage(
 				MESSAGE_EVENT_ADVANCE,
-				"🛡️ [RESGATE IDLE]: Sua vida caiu para 10%! Como cumpriu todos os requisitos, o sistema de emergência te resgatou com segurança para o Templo!"
+				"[RESGATE IDLE]: Sua vida caiu para 10%! Voce foi resgatado com seguranca para o Templo."
 			)
 		else
 			player:sendTextMessage(MESSAGE_STATUS_CONSOLE_BLUE, msg)
@@ -634,7 +654,7 @@ local function stopIdleHunt(playerId, reason, isEmergency, skipTeleport)
 	end
 end
 
--- Telemetria de Status da Caçada Ativa
+-- Telemetria de Status da Cacada Ativa
 local function sendHuntStatusOpcode(player, huntId, session, curStamina, maxHp)
 	local now = os.time()
 	local nextAutosell = math.max(0, 600 - (now - (session.lastAutoSell or now)))
@@ -647,14 +667,14 @@ local function sendHuntStatusOpcode(player, huntId, session, curStamina, maxHp)
 		session.xpGained or 0,
 		session.suppliesSpent or 0,
 		curStamina,
-		session.totalLootGold or 0,
+		session.goldEarned or 0,
 		nextAutosell,
 		quickCooldown
 	)
 	player:sendExtendedOpcode(OPCODE_IDLE_HUNT, statusJson)
 end
 
--- Ciclo de Combate IDLE (a cada 2 segundos)
+-- Ciclo IDLE (a cada 2 segundos)
 local function idleCombatLoop(playerId, huntId)
 	local session = _G.OnIdleHunt[playerId]
 	if not session then
@@ -669,30 +689,30 @@ local function idleCombatLoop(playerId, huntId)
 
 	local hunt = getHuntById(huntId)
 	if not hunt then
-		stopIdleHunt(playerId, "Hunt inválida.", false)
+		stopIdleHunt(playerId, "Hunt invalida.", false, false)
 		return
 	end
 
 	-- 1. Stamina IDLE
 	local curStamina = getPlayerIdleStamina(player)
 	if curStamina <= 0 then
-		stopIdleHunt(playerId, "Sua Stamina IDLE acabou! Caçada encerrada.", false)
+		stopIdleHunt(playerId, "Sua Stamina IDLE acabou! Cacada encerrada.", false, false)
 		return
 	end
 
-	-- 2. Dedução de Suprimentos diretamente do Banco
+	-- 2. Deducao de Suprimentos diretamente do Banco
 	local bankBalance = player:getBankBalance()
 	if bankBalance < hunt.supplyCostPerTurn then
 		player:sendTextMessage(
 			MESSAGE_FAILURE,
-			"Seu saldo bancário esgotou! Sem suprimentos para curar na caçada."
+			"Seu saldo bancario esgotou! Sem suprimentos para curar na cacada."
 		)
 	else
 		player:removeMoneyBank(hunt.supplyCostPerTurn)
 		session.suppliesSpent = session.suppliesSpent + hunt.supplyCostPerTurn
 	end
 
-	-- 3. Dano Recebido e Cura Automática
+	-- 3. Dano Recebido e Cura Automatica
 	local damage = math.random(hunt.damageMin, hunt.damageMax)
 	local curHealth = player:getHealth()
 	local maxHealth = player:getMaxHealth()
@@ -708,11 +728,11 @@ local function idleCombatLoop(playerId, huntId)
 	player:addHealth(-damage)
 	player:getPosition():sendMagicEffect(CONST_ME_HITAREA)
 
-	-- 4. Verificação de Saúde Crítica (10% HP)
+	-- 4. Verificacao de Saude Critica (10% HP)
 	local healthPercent = (player:getHealth() / maxHealth) * 100
 	if healthPercent <= 10 then
 		if session.meetsRequirements then
-			stopIdleHunt(playerId, "Ejeção de emergência aos 10% de HP.", true)
+			stopIdleHunt(playerId, "Ejecao de emergencia aos 10% de HP.", true, false)
 			return
 		else
 			if player:getHealth() <= 0 then
@@ -722,132 +742,64 @@ local function idleCombatLoop(playerId, huntId)
 		end
 	end
 
-	-- 5. COMBATE ATIVO NO MAPA (O personagem caça normalmente no mundo!)
-	local pPos = player:getPosition()
-	local spectators = Game.getSpectators(pPos, false, false, 7, 7, 5, 5)
-	local targetMonster = nil
-	local nearbyCount = 0
-
-	for _, spec in ipairs(spectators) do
-		if spec:isMonster() and not spec:isDead() then
-			nearbyCount = nearbyCount + 1
-			if not targetMonster then
-				targetMonster = spec
-			end
-		end
-	end
-
-	-- Se houver menos de 2 monstros por perto, invocar monstro da hunt em tile livre
-	if nearbyCount < 2 and hunt.monster then
-		local spawnOffsets = {
-			{x = 2, y = 1}, {x = -2, y = -1}, {x = 1, y = -2}, {x = -1, y = 2},
-			{x = 2, y = -2}, {x = -2, y = 2}
-		}
-		for _, off in ipairs(spawnOffsets) do
-			local sPos = Position(pPos.x + off.x, pPos.y + off.y, pPos.z)
-			local tile = Tile(sPos)
-			if tile and tile:isWalkable() and not tile:hasProperty(CONST_PROP_BLOCKSOLID) then
-				local spawned = Game.createMonster(hunt.monster, sPos, true, false)
-				if spawned then
-					sPos:sendMagicEffect(CONST_ME_TELEPORT)
-					if not targetMonster then
-						targetMonster = spawned
-					end
-					break
-				end
-			end
-		end
-	end
-
-	-- Ação Ativa de Ataque do Jogador contra o Monstro Alvo
-	if targetMonster and not targetMonster:isDead() then
-		local mPos = targetMonster:getPosition()
-		player:setDirection(pPos:getDirectionTo(mPos))
-
-		local voc = player:getVocation():getBaseId()
-		local atkDmg = math.random(hunt.damageMin * 2, hunt.damageMax * 3)
-
-		if voc == VOCATION_KNIGHT or voc == VOCATION_ELITE_KNIGHT then
-			mPos:sendMagicEffect(CONST_ME_HITAREA)
-			if math.random(1, 3) == 1 then
-				player:say("Exori!", TALKTYPE_MONSTER_SAY)
-				pPos:sendMagicEffect(CONST_ME_HITAREA)
-			end
-		elseif voc == VOCATION_PALADIN or voc == VOCATION_ROYAL_PALADIN then
-			pPos:sendDistanceEffect(mPos, CONST_ANI_ARROW)
-			mPos:sendMagicEffect(CONST_ME_HOLYDAMAGE)
-			if math.random(1, 3) == 1 then
-				player:say("Exori San!", TALKTYPE_MONSTER_SAY)
-			end
-		elseif voc == VOCATION_SORCERER or voc == VOCATION_MASTER_SORCERER then
-			pPos:sendDistanceEffect(mPos, CONST_ANI_FIRE)
-			mPos:sendMagicEffect(CONST_ME_FIREAREA)
-			if math.random(1, 3) == 1 then
-				player:say("Exori Flam!", TALKTYPE_MONSTER_SAY)
-			end
-		elseif voc == VOCATION_DRUID or voc == VOCATION_ELDER_DRUID then
-			pPos:sendDistanceEffect(mPos, CONST_ANI_ICE)
-			mPos:sendMagicEffect(CONST_ME_ICEAREA)
-			if math.random(1, 3) == 1 then
-				player:say("Exori Frigo!", TALKTYPE_MONSTER_SAY)
-			end
-		else
-			mPos:sendMagicEffect(CONST_ME_HITAREA)
-		end
-
-		doTargetCombatHealth(player, targetMonster, COMBAT_PHYSICALDAMAGE, -atkDmg, -atkDmg, CONST_ME_NONE)
-	end
-
-	-- 6. Ganho de Experiência (-20% XP)
+	-- 5. Ganho de Experiencia (-20% XP)
 	local expGained = math.floor(hunt.baseExp * 0.8)
 	player:addExperience(expGained, true)
 	session.xpGained = session.xpGained + expGained
 
-	-- 7. ROLAGEM DE LOOT REAL & PREFERÊNCIAS DO JOGADOR
+	-- 6. ROLAGEM DE LOOT REAL
 	if hunt.lootTable and #hunt.lootTable > 0 then
 		for _, lootItem in ipairs(hunt.lootTable) do
 			local roll = math.random(1, 100)
 			if roll <= lootItem.chance then
 				local count = math.random(lootItem.countMin or 1, lootItem.countMax or 1)
-				local rule = session.lootRules[lootItem.id] or "sell"
 
-				if rule == "keep" then
-					-- Guardado diretamente na backpack
-					player:addItem(lootItem.id, count)
-					session.keptDrops[lootItem.id] = (session.keptDrops[lootItem.id] or 0) + count
+				if lootItem.isMoney then
+					-- Dinheiro vai direto para o Banco!
+					local goldValue = count * lootItem.price
+					player:addMoneyBank(goldValue)
+					session.goldEarned = (session.goldEarned or 0) + goldValue
+					session.droppedCounts[lootItem.id] = (session.droppedCounts[lootItem.id] or 0) + count
+
+					-- Atualiza HUD de Saldo Bancario
+					if player:isUsingOtClient() then
+						player:sendExtendedOpcode(OPCODE_BANK_BALANCE, string.format('{"action":"balance","balance":%d}', player:getBankBalance()))
+					end
 					player:sendTextMessage(
 						MESSAGE_LOOT,
-						string.format("🎒 [Loot]: %dx %s guardado na backpack.", count, lootItem.name)
+						string.format("Loot: %s gps depositados diretamente no seu banco.", formatNumber(goldValue))
 					)
 				else
-					-- Acumulado para venda (auto 10m ou venda rápida)
-					session.pendingSale[lootItem.id] = (session.pendingSale[lootItem.id] or 0) + count
-					local itemTotalGold = count * lootItem.price
-					session.totalLootGold = session.totalLootGold + itemTotalGold
+					-- ITENS REAIS VAO DIRETO PARA A BACKPACK DO JOGADOR!
+					player:addItem(lootItem.id, count)
+					session.droppedCounts[lootItem.id] = (session.droppedCounts[lootItem.id] or 0) + count
+
+					local rule = session.lootRules[lootItem.id] or "keep"
+					local tag = (rule == "sell") and "[$ Vender]" or "[Lock Manter]"
 					player:sendTextMessage(
 						MESSAGE_LOOT,
-						string.format("💰 [Loot]: %dx %s acumulado para venda (+%d gp).", count, lootItem.name, itemTotalGold)
+						string.format("Loot: %dx %s guardado na backpack %s.", count, lootItem.name, tag)
 					)
 				end
 			end
 		end
 	end
 
-	-- 8. AUTO-VENDA RECORRENTE A CADA 10 MINUTOS (600 segundos)
+	-- 7. AUTO-VENDA RECORRENTE A CADA 10 MINUTOS (600 segundos)
 	local now = os.time()
 	if (now - session.lastAutoSell) >= 600 then
 		session.lastAutoSell = now
-		sellPendingLoot(player, session, "auto")
+		sellPlayerLootFromInventory(player, huntId, "auto")
 	end
 
-	-- 9. Consumo de Stamina IDLE (1 minuto a cada 3 minutos reais)
+	-- 8. Consumo de Stamina IDLE (1 minuto a cada 3 minutos reais)
 	session.turnCount = (session.turnCount or 0) + 1
 	if session.turnCount >= 90 then
 		session.turnCount = 0
 		curStamina = setPlayerIdleStamina(player, curStamina - 1)
 	end
 
-	-- 10. Telemetria via Opcode 106
+	-- 9. Telemetria via Opcode 106
 	if player:isUsingOtClient() and (session.turnCount % 2 == 0) then
 		sendHuntStatusOpcode(player, huntId, session, curStamina, maxHealth)
 	end
@@ -855,30 +807,28 @@ local function idleCombatLoop(playerId, huntId)
 	session.event = addEvent(idleCombatLoop, 2000, playerId, huntId)
 end
 
--- Iniciar Caçada IDLE
+-- Iniciar Cacada IDLE
 local function startIdleHunt(player, huntId)
 	local playerId = player:getId()
 
 	if _G.OnIdleHunt[playerId] then
-		player:sendTextMessage(MESSAGE_FAILURE, "Você já está em uma caçada IDLE.")
+		player:sendTextMessage(MESSAGE_FAILURE, "Voce ja esta em uma cacada IDLE.")
 		return false
 	end
 
 	local hunt = getHuntById(huntId)
 	if not hunt then
-		player:sendTextMessage(MESSAGE_FAILURE, "Hunt não encontrada.")
+		player:sendTextMessage(MESSAGE_FAILURE, "Hunt nao encontrada.")
 		return false
 	end
 
 	local curStamina = getPlayerIdleStamina(player)
 	if curStamina <= 0 then
-		player:sendTextMessage(MESSAGE_FAILURE, "Você não tem Stamina IDLE disponível.")
+		player:sendTextMessage(MESSAGE_FAILURE, "Voce nao tem Stamina IDLE disponivel.")
 		return false
 	end
 
 	local meetsAll = evaluateHuntRequirements(player, hunt)
-
-	-- Carregar preferências persistidas de loot do jogador
 	local savedPrefs = _G.IdleLootPreferences[playerId] or {}
 
 	_G.OnIdleHunt[playerId] = {
@@ -886,17 +836,16 @@ local function startIdleHunt(player, huntId)
 		meetsRequirements = meetsAll,
 		xpGained = 0,
 		suppliesSpent = 0,
-		totalLootGold = 0,
+		goldEarned = 0,
 		turnCount = 0,
 		lastAutoSell = os.time(),
 		lastQuickSell = 0,
-		pendingSale = {},
-		keptDrops = {},
+		droppedCounts = {},
 		lootRules = savedPrefs,
 		event = nil,
 	}
 
-	-- Teleportar jogador para o spawn real da caçada
+	-- Teleportar jogador para o spawn real da cacada
 	if hunt.pos then
 		local curPos = player:getPosition()
 		curPos:sendMagicEffect(CONST_ME_TELEPORT)
@@ -904,14 +853,21 @@ local function startIdleHunt(player, huntId)
 		hunt.pos:sendMagicEffect(CONST_ME_TELEPORT)
 		player:sendTextMessage(
 			MESSAGE_EVENT_ADVANCE,
-			string.format("🌀 [IDLE HUNT]: Você foi transportado para a área de caçada: %s!", hunt.name)
+			string.format("[IDLE HUNT]: Voce foi transportado para a area de cacada: %s!", hunt.name)
 		)
 	end
+
+	-- Ativar AutoLoot nativo do servidor para coletar corpses de monstros mortos
+	pcall(function()
+		if Features and Features.AutoLoot then
+			player:setFeature(Features.AutoLoot, 2)
+		end
+	end)
 
 	player:sendTextMessage(
 		MESSAGE_STATUS_CONSOLE_BLUE,
 		string.format(
-			"Caçada IDLE iniciada: %s. Proteção de Emergência 10%% HP: %s.",
+			"Cacada IDLE iniciada: %s. Protecao de Emergencia 10%% HP: %s.",
 			hunt.name,
 			meetsAll and "ATIVA" or "DESATIVADA (Abaixo dos Requisitos)"
 		)
@@ -921,10 +877,13 @@ local function startIdleHunt(player, huntId)
 		player:sendExtendedOpcode(
 			OPCODE_IDLE_HUNT,
 			string.format(
-				'{"action":"hunt_started","hunt_id":%d,"hunt_name":%q,"meets_req":%s}',
+				'{"action":"hunt_started","hunt_id":%d,"hunt_name":%q,"meets_req":%s,"spawn_x":%d,"spawn_y":%d,"spawn_z":%d}',
 				huntId,
 				hunt.name,
-				meetsAll and "true" or "false"
+				meetsAll and "true" or "false",
+				hunt.pos.x,
+				hunt.pos.y,
+				hunt.pos.z
 			)
 		)
 	end
@@ -943,7 +902,7 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 
 	local playerId = player:getId()
 
-	-- 1. CATÁLOGO GERAL DE HUNTS
+	-- 1. CATALOGO GERAL DE HUNTS
 	if buffer:find("get_hunts") then
 		local curStamina = getPlayerIdleStamina(player)
 		local huntsJsonParts = {}
@@ -993,15 +952,15 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 			player:sendExtendedOpcode(OPCODE_IDLE_HUNT, response)
 		end
 
-	-- 3. INICIAR / ENCERRAR CAÇADA
+	-- 3. INICIAR / ENCERRAR CACADA (COM REMOCAO DE BATTLE E TELEPORTE)
 	elseif buffer:find("start_hunt") then
 		local huntId = tonumber(buffer:match('"hunt_id"%s*:%s*(%d+)')) or 1
 		startIdleHunt(player, huntId)
 
 	elseif buffer:find("stop_hunt") then
-		stopIdleHunt(playerId, "Caçada IDLE encerrada pelo jogador.", false, false)
+		stopIdleHunt(playerId, "Cacada IDLE encerrada pelo jogador.", false, false)
 
-	-- 4. CONSULTAR DROPS E CONFIGURAÇÕES DE LOOT
+	-- 4. CONSULTAR DROPS E CONFIGURACOES DE LOOT
 	elseif buffer:find("get_hunt_loot") then
 		local huntId = tonumber(buffer:match('"hunt_id"%s*:%s*(%d+)'))
 		local session = _G.OnIdleHunt[playerId]
@@ -1015,16 +974,22 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 			local lootParts = {}
 			local userPrefs = session and session.lootRules or (_G.IdleLootPreferences[playerId] or {})
 
+			local pendingSaleGold = 0
 			for _, l in ipairs(hunt.lootTable) do
-				local rule = userPrefs[l.id] or "sell"
-				local droppedCount = (session and session.pendingSale and session.pendingSale[l.id]) or 0
-				local keptCount = (session and session.keptDrops and session.keptDrops[l.id]) or 0
+				-- Default: "keep" ([Lock] Manter)
+				local rule = userPrefs[l.id] or "keep"
+				local droppedCount = (session and session.droppedCounts and session.droppedCounts[l.id]) or 0
+
+				if not l.isMoney and rule == "sell" then
+					local inBag = player:getItemCount(l.id)
+					pendingSaleGold = pendingSaleGold + (inBag * l.price)
+				end
 
 				table.insert(
 					lootParts,
 					string.format(
-						'{"id":%d,"name":%q,"price":%d,"chance":%d,"rule":%q,"dropped":%d}',
-						l.id, l.name, l.price, l.chance, rule, (droppedCount + keptCount)
+						'{"id":%d,"name":%q,"price":%d,"chance":%d,"rule":%q,"dropped":%d,"is_money":%s}',
+						l.id, l.name, l.price, l.chance, rule, droppedCount, l.isMoney and "true" or "false"
 					)
 				)
 			end
@@ -1032,11 +997,10 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 			local now = os.time()
 			local nextAutosell = session and math.max(0, 600 - (now - (session.lastAutoSell or now))) or 600
 			local quickCooldown = session and math.max(0, 120 - (now - (session.lastQuickSell or 0))) or 0
-			local pendingGold = session and session.totalLootGold or 0
 
 			local response = string.format(
 				'{"action":"hunt_loot","hunt_id":%d,"hunt_name":%q,"pending_gold":%d,"next_autosell":%d,"quick_cooldown":%d,"loot":[%s]}',
-				hunt.id, hunt.name, pendingGold, nextAutosell, quickCooldown, table.concat(lootParts, ",")
+				hunt.id, hunt.name, pendingSaleGold, nextAutosell, quickCooldown, table.concat(lootParts, ",")
 			)
 			player:sendExtendedOpcode(OPCODE_IDLE_HUNT, response)
 		end
@@ -1044,7 +1008,7 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 	-- 5. DEFINIR REGRA DE LOOT (MANTER vs VENDER)
 	elseif buffer:find("set_loot_rule") then
 		local itemId = tonumber(buffer:match('"item_id"%s*:%s*(%d+)'))
-		local rule = buffer:match('"rule"%s*:%s*"(%a+)"') or "sell"
+		local rule = buffer:match('"rule"%s*:%s*"(%a+)"') or "keep"
 
 		if itemId then
 			_G.IdleLootPreferences[playerId] = _G.IdleLootPreferences[playerId] or {}
@@ -1056,21 +1020,19 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 			end
 		end
 
-	-- 6. BOTÃO DE VENDA RÁPIDA (COOLDOWN 2 MINUTOS)
+	-- 6. BOTAO DE VENDA RAPIDA (COOLDOWN 2 MINUTOS)
 	elseif buffer:find("quick_sell") then
 		local session = _G.OnIdleHunt[playerId]
-		if not session then
-			player:sendTextMessage(MESSAGE_FAILURE, "Você não está em uma caçada IDLE com itens para vender.")
-			return
-		end
+		local huntId = session and session.huntId or 1
 
 		local now = os.time()
-		local elapsed = now - (session.lastQuickSell or 0)
+		local lastQ = session and session.lastQuickSell or 0
+		local elapsed = now - lastQ
 		if elapsed < 120 then
 			local remaining = 120 - elapsed
 			player:sendTextMessage(
 				MESSAGE_FAILURE,
-				string.format("A Venda Rápida está em recarga. Aguarde mais %d segundos.", remaining)
+				string.format("A Venda Rapida esta em recarga. Aguarde mais %d segundos.", remaining)
 			)
 			player:sendExtendedOpcode(
 				OPCODE_IDLE_HUNT,
@@ -1079,8 +1041,10 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 			return
 		end
 
-		local gold, count = sellPendingLoot(player, session, "quick")
-		session.lastQuickSell = now
+		local gold, count = sellPlayerLootFromInventory(player, huntId, "quick")
+		if session then
+			session.lastQuickSell = now
+		end
 
 		player:sendExtendedOpcode(
 			OPCODE_IDLE_HUNT,
@@ -1090,11 +1054,11 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 			)
 		)
 
-	-- 7. TELEPORTE RÁPIDO PARA A CASA (HOUSE)
+	-- 7. TELEPORTE RAPIDO PARA A CASA (HOUSE)
 	elseif buffer:find("teleport_house") then
 		local house = player:getHouse()
 		if not house then
-			player:sendTextMessage(MESSAGE_FAILURE, "❌ [HOUSE]: Você não possui uma casa própria.")
+			player:sendTextMessage(MESSAGE_FAILURE, "[HOUSE]: Voce nao possui uma casa propria.")
 			return
 		end
 
@@ -1102,19 +1066,22 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 			stopIdleHunt(playerId, "Teleportado para a casa pelo IDLE Hunt Menu.", false, true)
 		end
 
+		player:removeCondition(CONDITION_INFIGHT)
+		player:removeCondition(CONDITION_HUNTING)
+
 		local exitPos = house:getExitPosition()
 		if exitPos then
 			player:getPosition():sendMagicEffect(CONST_ME_TELEPORT)
 			player:teleportTo(exitPos)
 			exitPos:sendMagicEffect(CONST_ME_TELEPORT)
-			player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "🏠 [HOUSE]: Você foi teleportado para a sua casa com sucesso!")
+			player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "[HOUSE]: Voce foi teleportado para a sua casa com sucesso!")
 		end
 
-	-- 8. TELEPORTE RÁPIDO PARA O TEMPLO (TEMPLE)
+	-- 8. TELEPORTE RAPIDO PARA O TEMPLO (TEMPLE)
 	elseif buffer:find("teleport_temple") then
 		local templePos = player:getTown():getTemplePosition()
 		if not templePos then
-			player:sendTextMessage(MESSAGE_FAILURE, "❌ [TEMPLE]: Templo da sua cidade não encontrado.")
+			player:sendTextMessage(MESSAGE_FAILURE, "[TEMPLE]: Templo da sua cidade nao encontrado.")
 			return
 		end
 
@@ -1122,10 +1089,13 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 			stopIdleHunt(playerId, "Teleportado para o templo pelo IDLE Hunt Menu.", false, true)
 		end
 
+		player:removeCondition(CONDITION_INFIGHT)
+		player:removeCondition(CONDITION_HUNTING)
+
 		player:getPosition():sendMagicEffect(CONST_ME_TELEPORT)
 		player:teleportTo(templePos)
 		templePos:sendMagicEffect(CONST_ME_TELEPORT)
-		player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "🏛️ [TEMPLE]: Você foi teleportado para o templo de sua cidade com sucesso!")
+		player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "[TEMPLE]: Voce foi teleportado para o templo com sucesso!")
 	end
 end
 
@@ -1139,8 +1109,7 @@ function idleLogoutEvent.onLogout(player)
 		if _G.OnIdleHunt[playerId].event then
 			stopEvent(_G.OnIdleHunt[playerId].event)
 		end
-		-- Auto-venda do loot pendente para não perder
-		sellPendingLoot(player, _G.OnIdleHunt[playerId], "auto")
+		sellPlayerLootFromInventory(player, _G.OnIdleHunt[playerId].huntId, "auto")
 		_G.OnIdleHunt[playerId] = nil
 	end
 	return true

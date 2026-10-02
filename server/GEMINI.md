@@ -12,7 +12,8 @@
 | **Website (AAC)** | `C:\xampp\htdocs` | `C:\Users\desig\OneDrive\Documentos\Tibia 15\site` | **MyAAC 0.8.25** integrado ao MySQL e ao client web login. |
 | **Web Server & Banco** | `C:\xampp` | - | Apache (`httpd.exe`), MySQL/MariaDB (`mysqld.exe`), phpMyAdmin. |
 | **Cliente Oficial** | `C:\Users\desig\OneDrive\Documentos\Tibia 15\client` | - | **Tibia 15.24** (`client.exe` + Qt6 / WebEngine + Protobuf assets). |
-| **OTClient Redemption** | `C:\Users\desig\OneDrive\Documentos\Tibia 15\ot client redemption` | - | **OTClient Redemption 4.1** (DirectX x64, Lua, OTUI, 15.24 Protobuf). |
+| **OTClient Redemption (Prod)** | `C:\Users\desig\OneDrive\Documentos\Tibia 15\ot client redemption` | - | **Build Estável de Jogador** (DirectX x64, Lua, OTUI, 15.24 Protobuf). |
+| **OTClient Redemption (DEV)** | `C:\Users\desig\OneDrive\Documentos\Tibia 15\ot client redemption (dev)` | - | **Ambiente DEV / Testes** com novos módulos (Caçadas IDLE, HUD Banco) para validação. |
 | **Editor de Mapa** | `C:\Users\desig\OneDrive\Documentos\Tibia 15\Mapa Editor` | - | **Canary Map Editor** (`canary-map-editor.exe`) com `datspr` compatível. |
 | **Editor de Sprites** | `C:\Users\desig\OneDrive\Documentos\Tibia 15\sprite editor` | - | **Assets Editor** (`Assets Editor.exe` Protobuf) para `appearances.dat` e `assets.json`. |
 | **Repositório GitHub (Monorepo)** | `C:\Users\desig\OneDrive\Documentos\Tibia 15\TIBIA-IDLE-OT` | `https://github.com/exuraot/TIBIA-IDLE-OT` | **TIBIA-IDLE-OT** contendo `/server`, `/site` e `/client` versionados com Git LFS (`world.otbm`). |

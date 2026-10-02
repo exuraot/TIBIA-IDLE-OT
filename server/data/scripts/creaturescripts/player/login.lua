@@ -159,6 +159,13 @@ function playerLoginGlobal.onLogin(player)
 		player:setTraining(false)
 	end
 
+	if _G.OnClassicDummyTraining and _G.OnClassicDummyTraining[player:getId()] then
+		if _G.OnClassicDummyTraining[player:getId()].event then
+			stopEvent(_G.OnClassicDummyTraining[player:getId()].event)
+		end
+		_G.OnClassicDummyTraining[player:getId()] = nil
+	end
+
 	local playerId = player:getId()
 	_G.NextUseStaminaTime[playerId] = 1
 	_G.NextUseXpStamina[playerId] = 1

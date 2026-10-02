@@ -25,6 +25,13 @@ function playerLogout.onLogout(player)
 		_G.OnExerciseTraining[playerId] = nil
 		player:setTraining(false)
 	end
+
+	if _G.OnClassicDummyTraining and _G.OnClassicDummyTraining[playerId] then
+		if _G.OnClassicDummyTraining[playerId].event then
+			stopEvent(_G.OnClassicDummyTraining[playerId].event)
+		end
+		_G.OnClassicDummyTraining[playerId] = nil
+	end
 	return true
 end
 

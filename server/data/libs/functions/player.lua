@@ -69,6 +69,15 @@ function Player.sendExtendedOpcode(self, opcode, buffer)
 	return true
 end
 
+OPCODE_BANK_BALANCE = 105
+
+function Player.sendBankBalance(self)
+	if not self:isUsingOtClient() then
+		return false
+	end
+	return self:sendExtendedOpcode(OPCODE_BANK_BALANCE, string.format('{"balance":%d}', self:getBankBalance()))
+end
+
 APPLY_SKILL_MULTIPLIER = true
 local addSkillTriesFunc = Player.addSkillTries
 function Player.addSkillTries(...)
@@ -179,7 +188,9 @@ function Player.removeFamePoints(self, amount)
 end
 
 function Player.depositMoney(self, amount)
-	return Bank.deposit(self, amount)
+	local ret = Bank.deposit(self, amount)
+	self:sendBankBalance()
+	return ret
 end
 
 function Player.transferMoneyTo(self, target, amount)
@@ -190,15 +201,19 @@ function Player.transferMoneyTo(self, target, amount)
 		return false
 	end
 
+	self:sendBankBalance()
 	local targetPlayer = Player(target)
 	if targetPlayer then
+		targetPlayer:sendBankBalance()
 		targetPlayer:sendTextMessage(MESSAGE_LOOK, self:getName() .. " has transferred " .. FormatNumber(amount) .. " gold coins to you.")
 	end
 	return true
 end
 
 function Player.withdrawMoney(self, amount)
-	return Bank.withdraw(self, amount)
+	local ret = Bank.withdraw(self, amount)
+	self:sendBankBalance()
+	return ret
 end
 
 function Player.removeMoneyBank(self, amount)
@@ -224,6 +239,7 @@ function Player.removeMoneyBank(self, amount)
 		Bank.debit(self, remainingAmount)
 
 		self:setBankBalance(bankBalance - remainingAmount)
+		self:sendBankBalance()
 		self:sendTextMessage(MESSAGE_TRADE, ("Paid %s from inventory and %s gold from bank account. Your account balance is now %s gold."):format(FormatNumber(amount - remainingAmount), FormatNumber(remainingAmount), FormatNumber(self:getBankBalance())))
 		return true
 	end

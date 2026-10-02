@@ -202,6 +202,16 @@ function playerLoginGlobal.onLogin(player)
 	player:registerEvent("DropLoot")
 	player:registerEvent("BossParticipation")
 	player:registerEvent("UpdatePlayerOnAdvancedLevel")
+	player:registerEvent("ExtendedOpcode")
+
+	if player:isUsingOtClient() then
+		addEvent(function(pid)
+			local p = Player(pid)
+			if p then
+				p:sendBankBalance()
+			end
+		end, 500, player:getId())
+	end
 	return true
 end
 

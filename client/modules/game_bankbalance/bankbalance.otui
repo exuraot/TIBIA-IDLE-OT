@@ -1,0 +1,39 @@
+PhantomMiniWindow
+  id: bankBalanceWindow
+  height: 24
+  &panelHeight: 24
+  on: true
+  phantom: false
+  draggable: false
+
+  Panel
+    id: bankBox
+    anchors.fill: parent
+    margin-left: 8
+    margin-right: 8
+    image-source: /images/ui/containerslot
+    image-border: 2
+    padding: 2
+    tooltip: tr('Total Bank Balance\nAuto-debited during IDLE hunts.\nClick to refresh.')
+    @onClick: bankBalanceController:requestBalance()
+
+    UIItem
+      id: goldIcon
+      item-id: 3031
+      size: 14 14
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      margin-left: 4
+      phantom: true
+
+    Label
+      id: balanceText
+      !text: 'Bank: 0 gp'
+      font: cipsoftFont
+      color: #ffe680
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: goldIcon.right
+      anchors.right: parent.right
+      margin-left: 6
+      text-align: left
+      phantom: true

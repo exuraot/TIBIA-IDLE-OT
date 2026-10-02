@@ -1,0 +1,196 @@
+EnterGameWindow < MainWindow
+  !text: tr('Enter Game')
+  size: 330 240
+
+EnterGameButton < Button
+  width: 64
+
+EnterGameWindow
+  id: enterGame
+  &authenticatorEnabled: false
+  &authenticatorHeight: 44
+  &stayLoggedBoxEnabled: false
+  &stayLoggedBoxHeight: 24
+  size: 330 240
+  @onEnter: EnterGame.doLogin()
+
+  Label
+    id: emailLabel
+    !text: tr('Email / Account:') 
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-top: 6
+    width: 95
+    text-align: left
+    opacity: 0.9
+
+  HiddenTextQtToggleEdit
+    id: accountNameTextEdit
+    anchors.left: emailLabel.right
+    anchors.right: parent.right
+    anchors.verticalCenter: emailLabel.verticalCenter
+    margin-left: 6
+
+  Label
+    id: passwordLabel
+    !text: tr('Password:')
+    anchors.left: parent.left
+    anchors.top: emailLabel.bottom
+    margin-top: 12
+    width: 95
+    text-align: left
+    opacity: 0.9
+
+  HiddenTextQtEdit
+    id: accountPasswordTextEdit
+    anchors.left: emailLabel.right
+    anchors.right: parent.right
+    anchors.verticalCenter: passwordLabel.verticalCenter
+    margin-left: 6
+
+  QtCheckBox
+    id: rememberEmailBox
+    !text: tr('Remember password')
+    !tooltip: tr('Remember account and password when starts client')
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: passwordLabel.bottom
+    margin-top: 14
+    opacity: 0.9
+    @onCheckChange: |
+      self:getParent():getChildById('autoLoginBox'):setEnabled(self:isChecked())
+      self:getParent():getChildById('rememberEmailTip'):setOn(self:isChecked())
+
+  UIWidget
+    id: rememberEmailTip
+    image-source: /images/icons/show_gui_help_grey
+    !specialtooltip: 'Be aware that your email address will be stored on your configuration file "config.otml" if you activate this option.'
+    anchors.right: accountPasswordTextEdit.right
+    anchors.verticalCenter: rememberEmailBox.verticalCenter
+    visible: false
+
+    $on:
+      visible: true
+
+    $!on:
+      visible: false
+
+  QtCheckBox
+    id: autoLoginBox
+    enabled: false
+    !text: tr('Auto login')
+    !tooltip: tr('Open charlist automatically when starting client')
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: rememberEmailBox.bottom
+    margin-top: 5
+    opacity: 0.9
+
+  UIButton
+    !text: tr('Forgot password and/or email')
+    id: Forgot_password_email
+    font: verdana-11px-monochrome-underline
+    text-align: left
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: autoLoginBox.bottom
+    opacity: 0.9
+    margin-top: 5
+    @onClick: g_platform.openUrl(Services.websites or "http://187.7.16.210/?subtopic=accountmanagement")
+
+  HorizontalSeparator
+    id: bottomSeparator
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: loginButton.top
+    margin-bottom: 8
+
+  QtButton
+    id: btnCreateNewAccount
+    !text: tr('Create Account')
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    size: 110 24
+    @onClick: g_platform.openUrl(Services.createAccount or "http://187.7.16.210/?subtopic=createaccount")
+
+  QtButton
+    id: loginButton
+    !text: tr('Entrar')
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 86 24
+    @onClick: EnterGame.doLogin()
+
+  Label
+    id: serverInfoLabel
+    font: verdana-11px-rounded
+    anchors.top: parent.top
+    anchors.left: parent.left
+    color: green
+    text-auto-resize: true
+    visible: false
+
+  TextEdit
+    id: serverHostTextEdit
+    visible: false
+    size: 0 0
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  TextEdit
+    id: serverPortTextEdit
+    text: 80
+    visible: false
+    size: 0 0
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  Label
+    id: serverLabel
+    visible: false
+    size: 0 0
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  Label
+    id: portLabel
+    visible: false
+    size: 0 0
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  Label
+    id: clientLabel
+    visible: false
+    size: 0 0
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  ComboBox
+    id: clientComboBox
+    visible: false
+    size: 0 0
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  QtCheckBox
+    id: httpLoginBox
+    checked: true
+    visible: false
+    size: 0 0
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  UIButton
+    id: serverListButton
+    visible: false
+    size: 0 0
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  QtCheckBox
+    id: stayLoggedBox
+    visible: false
+    size: 0 0
+    anchors.top: parent.top
+    anchors.left: parent.left

@@ -1,0 +1,39 @@
+﻿# OS / IDE files
+Thumbs.db
+desktop.ini
+.DS_Store
+*.swp
+*.bak
+*.tmp
+.vscode/
+.idea/
+
+# Archives & Large Zips (host downloads on releases or web server)
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Debug / Symbols / C++ Build artifacts
+*.pdb
+*.ilk
+*.exp
+*.obj
+*.o
+*.lib
+*.a
+*.map
+build/
+
+# Logs
+*.log
+logs/
+/server/logs/*
+/client/otclient.log
+/client/terminal.log
+
+# Site Cache
+/site/cache/*
+!/site/cache/.gitkeep
+/site/system/cache/*
+/site/install/

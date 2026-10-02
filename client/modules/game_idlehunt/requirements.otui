@@ -1,0 +1,86 @@
+MainWindow
+  id: requirementsWindow
+  !text: tr('Comparador de Requisitos da Hunt')
+  size: 460 380
+  @onEscape: self:hide()
+
+  Panel
+    id: statusBanner
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 38
+    image-source: /images/ui/containerslot
+    image-border: 3
+    padding: 4
+
+    Label
+      id: statusText
+      !text: tr('Status: Calculando...')
+      font: verdana-11px-antialised
+      anchors.centerIn: parent
+      text-auto-resize: true
+
+  Panel
+    id: checklistPanel
+    anchors.top: statusBanner.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: closeReqButton.top
+    margin-top: 8
+    margin-bottom: 8
+    image-source: /images/ui/containerslot
+    image-border: 3
+    padding: 8
+    layout:
+      type: verticalBox
+      spacing: 8
+
+    Label
+      id: lvlLabel
+      font: verdana-11px-antialised
+      text-auto-resize: true
+
+    Label
+      id: atkLabel
+      font: verdana-11px-antialised
+      text-auto-resize: true
+
+    Label
+      id: defLabel
+      font: verdana-11px-antialised
+      text-auto-resize: true
+
+    Label
+      id: bankLabel
+      font: verdana-11px-antialised
+      text-auto-resize: true
+
+    Label
+      id: potionsLabel
+      font: verdana-11px-antialised
+      color: #ffd700
+      text-auto-resize: true
+
+    Label
+      id: ruleNotice
+      font: cipsoftFont
+      color: #d0d0d0
+      text-wrap: true
+      margin-top: 10
+      !text: tr('Regra: Se você cumprir 100% dos requisitos recomendados, o sistema possui salvamento automático aos 10% de HP. Caso contrário, você corre risco real de morte!')
+
+  Button
+    id: startFromReqButton
+    !text: tr('Iniciar Esta Caçada')
+    width: 150
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+
+  Button
+    id: closeReqButton
+    !text: tr('Fechar')
+    width: 90
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    @onClick: self:getParent():hide()

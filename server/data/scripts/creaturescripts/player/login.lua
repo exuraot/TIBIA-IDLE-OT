@@ -203,6 +203,8 @@ function playerLoginGlobal.onLogin(player)
 	player:registerEvent("BossParticipation")
 	player:registerEvent("UpdatePlayerOnAdvancedLevel")
 	player:registerEvent("ExtendedOpcode")
+	player:registerEvent("IdleHuntExtendedOpcode")
+	player:registerEvent("IdleHuntLogout")
 
 	if player:isUsingOtClient() then
 		addEvent(function(pid)

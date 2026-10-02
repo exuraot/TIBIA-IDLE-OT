@@ -1,0 +1,174 @@
+HuntCard < Panel
+  height: 68
+  image-source: /images/ui/containerslot
+  image-border: 4
+  padding: 6
+  margin-bottom: 5
+
+  Label
+    id: huntTitle
+    font: verdana-11px-antialised
+    color: #ffd700
+    anchors.top: parent.top
+    anchors.left: parent.left
+    text-auto-resize: true
+
+  Label
+    id: focusTag
+    font: cipsoftFont
+    color: #00ff88
+    anchors.top: huntTitle.top
+    anchors.left: huntTitle.right
+    margin-left: 8
+    text-auto-resize: true
+
+  Label
+    id: huntDesc
+    font: cipsoftFont
+    color: #c0c0c0
+    anchors.top: huntTitle.bottom
+    anchors.left: parent.left
+    anchors.right: reqButton.left
+    margin-top: 3
+    margin-right: 10
+    text-wrap: true
+
+  Label
+    id: huntCost
+    font: cipsoftFont
+    color: #e0bb66
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    text-auto-resize: true
+
+  Button
+    id: reqButton
+    !text: tr('Requisitos')
+    width: 80
+    height: 22
+    anchors.right: startButton.left
+    anchors.bottom: parent.bottom
+    margin-right: 6
+
+  Button
+    id: startButton
+    !text: tr('Iniciar')
+    width: 75
+    height: 22
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+
+MainWindow
+  id: idleHuntWindow
+  !text: tr('Exura OT - Caçadas IDLE Instanciadas')
+  size: 580 500
+  @onEscape: self:hide()
+
+  Panel
+    id: staminaPanel
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 48
+    image-source: /images/ui/containerslot
+    image-border: 3
+    padding: 6
+
+    Label
+      id: staminaLabel
+      !text: tr('Stamina IDLE: 24h 00m')
+      font: verdana-11px-antialised
+      color: #00ffcc
+      anchors.top: parent.top
+      anchors.left: parent.left
+      text-auto-resize: true
+
+    Label
+      id: staminaInfo
+      !text: tr('(Consumo 3x mais lento: 1h de Stamina = 3h reais de caçada)')
+      font: cipsoftFont
+      color: #a0a0a0
+      anchors.top: staminaLabel.top
+      anchors.right: parent.right
+      text-auto-resize: true
+
+    ProgressBar
+      id: staminaBar
+      anchors.top: staminaLabel.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 6
+      height: 12
+      background-color: #00cc88
+
+  Panel
+    id: activeHuntBanner
+    anchors.top: staminaPanel.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 6
+    height: 38
+    image-source: /images/ui/containerslot
+    image-border: 3
+    padding: 5
+    visible: false
+
+    Label
+      id: activeInfo
+      !text: tr('Caçando ativamente: ...')
+      font: verdana-11px-antialised
+      color: #ffaa00
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      margin-left: 6
+      text-auto-resize: true
+
+    Button
+      id: stopHuntButton
+      !text: tr('Encerrar Caçada')
+      color: #ff5555
+      width: 120
+      height: 24
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.right: parent.right
+      margin-right: 6
+
+  Panel
+    id: filterPanel
+    anchors.top: activeHuntBanner.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 6
+    height: 26
+    layout:
+      type: horizontalBox
+      spacing: 4
+
+  UIScrollArea
+    id: huntList
+    anchors.top: filterPanel.bottom
+    anchors.left: parent.left
+    anchors.right: huntListScrollBar.left
+    anchors.bottom: closeButton.top
+    margin-top: 6
+    margin-bottom: 8
+    margin-right: 4
+    vertical-scrollbar: huntListScrollBar
+    layout:
+      type: verticalBox
+
+  VerticalScrollBar
+    id: huntListScrollBar
+    anchors.top: huntList.top
+    anchors.bottom: huntList.bottom
+    anchors.right: parent.right
+    step: 40
+    pixels-scroll: true
+
+  Button
+    id: closeButton
+    !text: tr('Fechar')
+    width: 90
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    @onClick: idleHuntController:toggle()

@@ -132,7 +132,14 @@ if ($action == '') {
         ? ["Your VIP Time will expire in " . date("M d Y, G:i:s", $expiresIn), false]
         : ['You do not have VIP time!', true];
 
+    $is_dev_authorized = false;
+    $acc_name = strtolower($account_logged->getName());
+    if (in_array($acc_name, array('god', 'tarnaph', 'wolfy')) || $account_logged->getCustomField('type') >= 4 || $account_logged->getCustomField('web_flags') >= 2) {
+        $is_dev_authorized = true;
+    }
+
     $twig->display('account.management.html.twig', array(
+        'is_dev_authorized' => $is_dev_authorized,
         'welcome_message' => $welcome_message,
         'verify_message' => $verify_message,
         'recovery_key' => $recovery_key,

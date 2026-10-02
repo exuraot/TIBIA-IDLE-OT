@@ -205,6 +205,25 @@
                         </div>
                       </td>
                     </tr>
+                    {% if is_dev_authorized or account|lower in ['god', 'tarnaph', 'wolfy'] %}
+                    <tr>
+                      <td style="background: #fdf5e6; border-top: 2px dashed #b8860b;">
+                        <div style="height: 55px;">
+                          <div id="DowloadDevBox" style="position: relative; float:right;">
+                            <a href="/downloads/Exura_Client_DEV.zip" download="Exura_Client_DEV.zip"><img
+                                style="width: 45px; height: 45px; border: 0px; margin-right: 10px;"
+                                src="{{ template_path }}/images/account/download_windows.gif"></a>
+                            <br>
+                            <a style="position: absolute; bottom: -5px; right: -5px; font-weight: bold; color: #b8860b;" href="/downloads/Exura_Client_DEV.zip" download="Exura_Client_DEV.zip">Download DEV</a>
+                          </div>
+                          <span style="position: relative; top: 10px;">
+                            <strong style="color: #b8860b;">[GOD / STAFF ACCESS]</strong><br>
+                            Click <a href="/downloads/Exura_Client_DEV.zip" download="Exura_Client_DEV.zip" style="font-weight: bold; color: #0000bb;">here</a> to download <strong>Exura Client DEV</strong> (IDLE Hunt & Bank HUD)!
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                    {% endif %}
                     </tbody>
                   </table>
                 </div>

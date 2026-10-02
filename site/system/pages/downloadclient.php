@@ -57,6 +57,33 @@ if (empty($getpage_download)) {
                                                     </a>
                                                 </td>
                                             </tr>
+                                            <?php
+                                            $is_dev_authorized = false;
+                                            if (isset($account_logged) && $account_logged) {
+                                                $acc_name = strtolower($account_logged->getName());
+                                                if (in_array($acc_name, array('god', 'tarnaph', 'wolfy')) || $account_logged->getCustomField('type') >= 4 || $account_logged->getCustomField('web_flags') >= 2) {
+                                                    $is_dev_authorized = true;
+                                                }
+                                            }
+                                            if ($is_dev_authorized):
+                                            ?>
+                                            <tr>
+                                                <td style="text-align: center; padding: 1.5rem; background: #fdf5e6; border-top: 2px dashed #b8860b;">
+                                                    <span style="display: inline-block; background: #b8860b; color: #fff; font-weight: bold; padding: 2px 10px; border-radius: 3px; font-size: 9pt; margin-bottom: 8px;">EXCLUSIVO GOD / STAFF</span>
+                                                    <h2 style="margin: 4px 0 10px 0; color: #b8860b;">Exura Client (DEV / Testes)</h2>
+                                                    <a href="/downloads/Exura_Client_DEV.zip" target="_new" download="Exura_Client_DEV.zip">
+                                                        <img alt="Exura Client DEV"
+                                                             style="width: 80px; height: 80px; border: 0;"
+                                                             src="<?= $template_path ?>/images/download_windows.gif">
+                                                        <br>
+                                                        <span style="font-size: 12pt; font-weight: bold; color: #b8860b;">Download Client DEV (Testes)<br>
+                                                        <span style="font-size: 10pt; color: #555;">Cacadas IDLE & HUD Bancario</span></span>
+                                                        <br>
+                                                        <small style="color: #888;">Build DEV (ot client redemption)</small>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <?php endif; ?>
                                             </tbody>
                                         </table>
                                     </div>

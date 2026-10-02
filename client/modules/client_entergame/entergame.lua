@@ -4,8 +4,15 @@ function safeDecrypt(text)
     if not text or text == '' then
         return ''
     end
+    -- If text is not valid base64 or has non-base64 chars (like @ or .), it is already plaintext
+    if not text:match('^[A-Za-z0-9+/]+={0,2}$') or #text < 8 or (#text % 4 ~= 0) then
+        return text
+    end
     local success, result = pcall(g_crypt.decrypt, text)
-    return success and result or ''
+    if success and result and #result > 0 then
+        return result
+    end
+    return text
 end
 
 -- private variables
@@ -590,13 +597,23 @@ end
 
 function EnterGame.setAccountName(account)
     local decrypted = safeDecrypt(account or '')
-    enterGame:getChildById('accountNameTextEdit'):setText(decrypted)
-    enterGame:getChildById('accountNameTextEdit'):setCursorPos(-1)
-    enterGame:getChildById('rememberEmailBox'):setChecked(#decrypted > 0)
+    local w = enterGame:getChildById('accountNameTextEdit')
+    if w then
+        w:setText(decrypted)
+        w:setCursorPos(-1)
+    end
+    local rem = enterGame:getChildById('rememberEmailBox')
+    if rem then
+        rem:setChecked(#decrypted > 0)
+    end
 end
 
 function EnterGame.setPassword(password)
-    enterGame:getChildById('accountPasswordTextEdit'):setText(safeDecrypt(password or ''))
+    local decrypted = safeDecrypt(password or '')
+    local w = enterGame:getChildById('accountPasswordTextEdit')
+    if w then
+        w:setText(decrypted)
+    end
 end
 
 function EnterGame.setHttpLogin(httpLogin)
@@ -981,8 +998,8 @@ function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeig
     local servers = g_settings.getNode("ServerList") or {}
     local serverData = servers[host] or {}
     if serverData and serverData.account and #serverData.account > 0 then
-        EnterGame.setAccountName(safeDecrypt(serverData.account))
-        EnterGame.setPassword(safeDecrypt(serverData.password))
+        EnterGame.setAccountName(serverData.account)
+        EnterGame.setPassword(serverData.password)
         enterGame:getChildById('rememberEmailBox'):setChecked(true)
         enterGame:getChildById('autoLoginBox'):setEnabled(true)
         enterGame:getChildById('autoLoginBox'):setChecked(serverData.autologin == true)
@@ -1001,10 +1018,6 @@ function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeig
     local server = Servers_init[host]
     enterGame.disableToken = not (server and server.useAuthenticator)
 
-    -- preload the assets
-    -- this is for the client_bottommenu module
-    -- it needs images of outfits
-    -- so it can display the boosted creature
     g_game.setClientVersion(clientVersion)
     g_game.setProtocolVersion(g_game.getClientProtocolVersion(clientVersion))
 end

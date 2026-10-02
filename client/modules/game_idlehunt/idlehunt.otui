@@ -144,6 +144,16 @@ MainWindow
       type: horizontalBox
       spacing: 4
 
+  VerticalScrollBar
+    id: huntListScrollBar
+    anchors.top: filterPanel.bottom
+    anchors.bottom: closeButton.top
+    anchors.right: parent.right
+    margin-top: 6
+    margin-bottom: 8
+    step: 40
+    pixels-scroll: true
+
   UIScrollArea
     id: huntList
     anchors.top: filterPanel.bottom
@@ -156,14 +166,6 @@ MainWindow
     vertical-scrollbar: huntListScrollBar
     layout:
       type: verticalBox
-
-  VerticalScrollBar
-    id: huntListScrollBar
-    anchors.top: huntList.top
-    anchors.bottom: huntList.bottom
-    anchors.right: parent.right
-    step: 40
-    pixels-scroll: true
 
   Button
     id: closeButton

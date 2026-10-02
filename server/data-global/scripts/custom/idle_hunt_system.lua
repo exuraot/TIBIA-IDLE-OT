@@ -28,6 +28,8 @@ local IDLE_HUNTS = {
 		focus = "Balanceado",
 		desc = "Caçada clássica de Rotworms e Carrion Worms. Ideal para começar.",
 		monster = "Rotworm",
+		lookType = 26,
+		pos = Position(32797, 31560, 7),
 		baseExp = 40,
 		supplyCostPerTurn = 10,
 		reqLevel = 8,
@@ -47,6 +49,8 @@ local IDLE_HUNTS = {
 		focus = "Mais Loot",
 		desc = "Amazons e Valkyries com drop frequente de Protective Charms.",
 		monster = "Valkyrie",
+		lookType = 137,
+		pos = Position(32355, 31645, 1),
 		baseExp = 85,
 		supplyCostPerTurn = 15,
 		reqLevel = 15,
@@ -68,6 +72,8 @@ local IDLE_HUNTS = {
 		focus = "Mais XP",
 		desc = "Cyclops e Cyclops Drones em grande densidade. Excelente EXP.",
 		monster = "Cyclops",
+		lookType = 22,
+		pos = Position(32616, 31414, 2),
 		baseExp = 150,
 		supplyCostPerTurn = 35,
 		reqLevel = 25,
@@ -87,6 +93,8 @@ local IDLE_HUNTS = {
 		focus = "Mais Loot",
 		desc = "Minotaur Guards e Archers. Alto retorno em Minotaur Leather.",
 		monster = "Minotaur Guard",
+		lookType = 29,
+		pos = Position(32465, 31952, 4),
 		baseExp = 160,
 		supplyCostPerTurn = 40,
 		reqLevel = 30,
@@ -108,6 +116,8 @@ local IDLE_HUNTS = {
 		focus = "Mais XP",
 		desc = "Dragons e Dragon Hatchlings. Rush de experiência clássico.",
 		monster = "Dragon",
+		lookType = 34,
+		pos = Position(33078, 32168, 4),
 		baseExp = 700,
 		supplyCostPerTurn = 90,
 		reqLevel = 50,
@@ -127,6 +137,8 @@ local IDLE_HUNTS = {
 		focus = "Mais Loot",
 		desc = "Giant Spiders agressivas com chances de Spider Silk e Knight Set.",
 		monster = "Giant Spider",
+		lookType = 38,
+		pos = Position(32784, 31097, 1),
 		baseExp = 750,
 		supplyCostPerTurn = 110,
 		reqLevel = 65,
@@ -148,6 +160,8 @@ local IDLE_HUNTS = {
 		focus = "Mais XP",
 		desc = "Dragon Lords furiosos. Foco absoluto em rush de nível.",
 		monster = "Dragon Lord",
+		lookType = 39,
+		pos = Position(32797, 31558, 3),
 		baseExp = 2100,
 		supplyCostPerTurn = 200,
 		reqLevel = 90,
@@ -167,6 +181,8 @@ local IDLE_HUNTS = {
 		focus = "Balanceado",
 		desc = "Sea Serpents e Young Sea Serpents. Ótima XP e lucro constante.",
 		monster = "Sea Serpent",
+		lookType = 275,
+		pos = Position(31901, 30999, 9),
 		baseExp = 2300,
 		supplyCostPerTurn = 220,
 		reqLevel = 110,
@@ -188,6 +204,8 @@ local IDLE_HUNTS = {
 		focus = "Mais Loot",
 		desc = "Medusas e Serpent Spawns. Fartura em joias, rares e itens caros.",
 		monster = "Medusa",
+		lookType = 330,
+		pos = Position(32868, 32826, 2),
 		baseExp = 3800,
 		supplyCostPerTurn = 380,
 		reqLevel = 140,
@@ -207,6 +225,8 @@ local IDLE_HUNTS = {
 		focus = "Mais XP",
 		desc = "Ceifadores implacáveis. Taxa altíssima de experiência por hora.",
 		monster = "Grim Reaper",
+		lookType = 300,
+		pos = Position(32784, 31025, 8),
 		baseExp = 5500,
 		supplyCostPerTurn = 450,
 		reqLevel = 160,
@@ -228,6 +248,8 @@ local IDLE_HUNTS = {
 		focus = "Mais Loot",
 		desc = "Frazzlemaws e Silencers. Alto risco e lucros gigantescos em Clusters.",
 		monster = "Frazzlemaw",
+		lookType = 594,
+		pos = Position(33533, 32490, 5),
 		baseExp = 6800,
 		supplyCostPerTurn = 650,
 		reqLevel = 200,
@@ -247,6 +269,8 @@ local IDLE_HUNTS = {
 		focus = "Mais XP",
 		desc = "Quaras, Devourers e Glooth Golems. Ritmo frenético de caça.",
 		monster = "Glooth Golem",
+		lookType = 600,
+		pos = Position(33554, 31923, 3),
 		baseExp = 7200,
 		supplyCostPerTurn = 700,
 		reqLevel = 220,
@@ -268,6 +292,8 @@ local IDLE_HUNTS = {
 		focus = "Balanceado",
 		desc = "Cobras de elite. Desafio supremo com itens raros de endgame.",
 		monster = "Cobra Assassin",
+		lookType = 1217,
+		pos = Position(33402, 32663, 0),
 		baseExp = 9500,
 		supplyCostPerTurn = 900,
 		reqLevel = 270,
@@ -287,6 +313,8 @@ local IDLE_HUNTS = {
 		focus = "Mais XP",
 		desc = "Sphinxes e Crypt Wardens em Issavi. A experiência máxima do servidor.",
 		monster = "Sphinx",
+		lookType = 1188,
+		pos = Position(33883, 31437, 7),
 		baseExp = 12000,
 		supplyCostPerTurn = 1100,
 		reqLevel = 300,
@@ -581,7 +609,18 @@ local function startIdleHunt(player, huntId)
 		event = nil,
 	}
 
-	local pzPos = player:getPosition()
+	-- Teleportar jogador para a coordenada real da caçada
+	if hunt.pos then
+		local curPos = player:getPosition()
+		curPos:sendMagicEffect(CONST_ME_TELEPORT)
+		player:teleportTo(hunt.pos)
+		hunt.pos:sendMagicEffect(CONST_ME_TELEPORT)
+		player:sendTextMessage(
+			MESSAGE_EVENT_ADVANCE,
+			string.format("🌀 [IDLE HUNT]: Você foi transportado para a área de caçada: %s!", hunt.name)
+		)
+	end
+
 	player:sendTextMessage(
 		MESSAGE_STATUS_CONSOLE_BLUE,
 		string.format(
@@ -644,8 +683,8 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 			table.insert(
 				huntsJsonParts,
 				string.format(
-					'{"id":%d,"name":%q,"tier":%q,"level":%d,"focus":%q,"desc":%q,"cost":%d,"req_lvl":%d,"req_atk":%d,"req_def":%d,"req_bank":%d,"potions":%q}',
-					h.id, h.name, h.tier, h.level, h.focus, h.desc, h.supplyCostPerTurn, h.reqLevel, h.reqAttack, h.reqDefense, h.reqBank, h.reqPotions
+					'{"id":%d,"name":%q,"tier":%q,"level":%d,"focus":%q,"desc":%q,"cost":%d,"req_lvl":%d,"req_atk":%d,"req_def":%d,"req_bank":%d,"potions":%q,"looktype":%d}',
+					h.id, h.name, h.tier, h.level, h.focus, h.desc, h.supplyCostPerTurn, h.reqLevel, h.reqAttack, h.reqDefense, h.reqBank, h.reqPotions, h.lookType or 0
 				)
 			)
 		end

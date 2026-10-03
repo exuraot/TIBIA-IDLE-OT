@@ -56,7 +56,8 @@ function Player.isUsingOtClient(self)
 end
 
 function Player.sendExtendedOpcode(self, opcode, buffer)
-	if not self:isUsingOtClient() then
+	local client = self:getClient()
+	if not client then
 		return false
 	end
 
@@ -72,11 +73,30 @@ end
 OPCODE_BANK_BALANCE = 105
 
 function Player.sendBankBalance(self)
-	if not self:isUsingOtClient() then
+	local balance = self:getBankBalance()
+	self:sendExtendedOpcode(OPCODE_BANK_BALANCE, string.format('{"balance":%d}', balance))
+	pcall(function()
+		self:sendResourceBalance(RESOURCE_BANK, balance)
+	end)
+	return true
+end
+
+-- Hook Player.setBankBalance to automatically sync balance across all systems in real time
+local originalSetBankBalance = Player.setBankBalance
+function Player.setBankBalance(self, balance)
+	local ret = originalSetBankBalance(self, balance)
+	self:sendBankBalance()
+	return ret
+end
+
+function Player.addMoneyBank(self, amount)
+	if not amount or amount <= 0 then
 		return false
 	end
-	return self:sendExtendedOpcode(OPCODE_BANK_BALANCE, string.format('{"balance":%d}', self:getBankBalance()))
+	self:setBankBalance(self:getBankBalance() + amount)
+	return true
 end
+
 
 APPLY_SKILL_MULTIPLIER = true
 local addSkillTriesFunc = Player.addSkillTries

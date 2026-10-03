@@ -166,17 +166,28 @@ end
 
 -- Toggles mute without discarding the user's previously saved master volume
 local function toggleMute()
-    local current = getOption('soundMaster')
+    local current = getOption('soundMaster') or 100
     if current <= 1 then
-        local restoreVolume = options.soundMaster.lastVolume or g_settings.getNumber('soundMasterLastVolume', 25)
+        local restoreVolume = (options.soundMaster and options.soundMaster.lastVolume) or g_settings.getNumber('soundMasterLastVolume', 50)
         if not restoreVolume or restoreVolume <= 1 then
-            restoreVolume = 25
+            restoreVolume = 50
         end
         setOption('soundMaster', restoreVolume)
+        if extraWidgets.audioButton then
+            extraWidgets.audioButton:setChecked(false)
+            extraWidgets.audioButton:setIcon('/images/topbuttons/button_mute_up')
+        end
     else
-        options.soundMaster.lastVolume = current
-        g_settings.setNumber('soundMasterLastVolume', current)
+        if options.soundMaster then
+            options.soundMaster.lastVolume = current
+        end
+        g_settings.set('soundMasterLastVolume', current)
+        g_settings.save()
         setOption('soundMaster', 1)
+        if extraWidgets.audioButton then
+            extraWidgets.audioButton:setChecked(true)
+            extraWidgets.audioButton:setIcon('/images/topbuttons/audio_mute')
+        end
     end
 end
 

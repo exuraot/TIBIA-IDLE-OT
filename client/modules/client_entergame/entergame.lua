@@ -1,11 +1,13 @@
 EnterGame = {}
 
+local enterGame = nil
+
 function safeDecrypt(text)
     if not text or text == '' then
         return ''
     end
-    -- If text is not valid base64 or has non-base64 chars (like @ or .), it is already plaintext
-    if not text:match('^[A-Za-z0-9+/]+={0,2}$') or #text < 8 or (#text % 4 ~= 0) then
+    -- Se contem caracteres fora de base64 (como @, ., espacos), ja e plaintext
+    if text:find('[^%w%+/=]') or (#text % 4 ~= 0) or (#text < 4) then
         return text
     end
     local success, result = pcall(g_crypt.decrypt, text)
@@ -13,6 +15,86 @@ function safeDecrypt(text)
         return result
     end
     return text
+end
+
+function EnterGame.saveAccount(account, password, remember, autologin)
+    local host = G.host or g_settings.get('host') or "http://187.7.16.210/login.php"
+    if remember and account and #account > 0 then
+        local encAcc = g_crypt.encrypt(account)
+        local encPass = g_crypt.encrypt(password or '')
+
+        g_settings.set('account', encAcc)
+        g_settings.set('password', encPass)
+        g_settings.set('autologin', autologin and true or false)
+
+        if ServerList then
+            ServerList.setServerAccount(host, account)
+            ServerList.setServerPassword(host, password)
+            ServerList.setServerAutologin(host, autologin and true or false)
+            ServerList.save()
+        else
+            local servers = g_settings.getNode("ServerList") or {}
+            servers[host] = servers[host] or {}
+            servers[host].account = encAcc
+            servers[host].password = encPass
+            servers[host].autologin = autologin and true or false
+            g_settings.setNode("ServerList", servers)
+        end
+        g_configs.saveSettings()
+    else
+        g_settings.remove('account')
+        g_settings.remove('password')
+        g_settings.set('autologin', false)
+
+        if ServerList then
+            ServerList.setServerAccount(host, '')
+            ServerList.setServerPassword(host, '')
+            ServerList.setServerAutologin(host, false)
+            ServerList.save()
+        end
+        g_configs.saveSettings()
+    end
+end
+
+function EnterGame.loadSavedAccount()
+    if not enterGame then return end
+    local host = g_settings.get('host') or "http://187.7.16.210/login.php"
+    local servers = g_settings.getNode("ServerList") or {}
+    local serverData = servers[host] or servers["http://187.7.16.210/login.php"] or {}
+
+    local rawAcc = (serverData.account and #serverData.account > 0 and serverData.account) or g_settings.get('account')
+    local rawPass = (serverData.password and #serverData.password > 0 and serverData.password) or g_settings.get('password')
+    local isAutologin = (serverData.autologin == true) or g_settings.getBoolean('autologin')
+
+    if rawAcc and #rawAcc > 0 then
+        local decAcc = safeDecrypt(rawAcc)
+        local decPass = safeDecrypt(rawPass or '')
+
+        local accEdit = enterGame:getChildById('accountNameTextEdit')
+        local passEdit = enterGame:getChildById('accountPasswordTextEdit')
+        local remBox = enterGame:getChildById('rememberEmailBox')
+        local autoBox = enterGame:getChildById('autoLoginBox')
+
+        if accEdit then
+            accEdit:setText(decAcc)
+            accEdit:setCursorPos(-1)
+        end
+        if passEdit then
+            passEdit:setText(decPass)
+        end
+        if remBox then
+            remBox:setChecked(true)
+        end
+        if autoBox then
+            autoBox:setEnabled(true)
+            autoBox:setChecked(isAutologin)
+        end
+    else
+        local remBox = enterGame:getChildById('rememberEmailBox')
+        if remBox then
+            remBox:setChecked(false)
+        end
+    end
 end
 
 -- private variables
@@ -82,26 +164,9 @@ local function onCharacterList(protocol, characters, account, otui)
     g_settings.set('staylogged', enterGame:getChildById('stayLoggedBox'):isChecked())
     g_settings.set('httpLogin', httpLogin)
 
-    if enterGame:getChildById('rememberEmailBox'):isChecked() then
-        local account = g_crypt.encrypt(G.account)
-        local password = g_crypt.encrypt(G.password)
-
-        g_settings.set('account', account)
-        g_settings.set('password', password)
-
-        ServerList.setServerAccount(G.host, G.account)
-        ServerList.setServerPassword(G.host, G.password)
-        ServerList.setServerAutologin(G.host, enterGame:getChildById('autoLoginBox'):isChecked())
-
-        g_settings.set('autologin', enterGame:getChildById('autoLoginBox'):isChecked())
-        ServerList.save()
-    else
-        -- reset server list account/password
-        ServerList.setServerAccount(G.host, '')
-        ServerList.setServerPassword(G.host, '')
-
-        EnterGame.clearAccountFields()
-    end
+    local remember = enterGame:getChildById('rememberEmailBox'):isChecked()
+    local autoLogin = enterGame:getChildById('autoLoginBox'):isChecked()
+    EnterGame.saveAccount(G.account, G.password, remember, autoLogin)
 
     if loadBox then
         loadBox:destroy()
@@ -200,19 +265,7 @@ function EnterGame.init()
         port = 80
     end
 
-    local servers = g_settings.getNode("ServerList") or {}
-    local serverData = servers[host] or {}
-    if serverData and serverData.account then
-        EnterGame.setAccountName(serverData.account)
-        EnterGame.setPassword(serverData.password)
-        enterGame:getChildById('rememberEmailBox'):setChecked(true)
-    else
-        EnterGame.setAccountName('')
-        EnterGame.setPassword('')
-        enterGame:getChildById('rememberEmailBox'):setChecked(false)
-    end
-    
-    enterGame:getChildById('autoLoginBox'):setChecked(serverData.autologin == true)
+    EnterGame.loadSavedAccount()
     enterGame:getChildById('serverHostTextEdit'):setText(host)
     enterGame:getChildById('serverPortTextEdit'):setText(port)
     enterGame:getChildById('stayLoggedBox'):setChecked(stayLogged)
@@ -259,24 +312,27 @@ function EnterGame.init()
 
     connect(enterGame:getChildById('rememberEmailBox'), {
         onCheckChange = function(self, checked)
-            local host = enterGame:getChildById('serverHostTextEdit'):getText()
             local account = enterGame:getChildById('accountNameTextEdit'):getText()
             local password = enterGame:getChildById('accountPasswordTextEdit'):getText()
-
-            if ServerList then
-                if checked and #account > 0 then
-                    ServerList.setServerAccount(host, account)
-                    ServerList.setServerPassword(host, password)
-                    ServerList.setServerAutologin(host, enterGame:getChildById('autoLoginBox'):isChecked() or false)
-                else
-                    ServerList.setServerAccount(host, '')
-                    ServerList.setServerPassword(host, '')
-                    ServerList.setServerAutologin(host, false)
+            local autoLogin = enterGame:getChildById('autoLoginBox'):isChecked()
+            if checked then
+                if #account > 0 then
+                    EnterGame.saveAccount(account, password, true, autoLogin)
                 end
-                ServerList.save()
+            else
+                EnterGame.saveAccount('', '', false, false)
             end
-            g_settings.set('host', host)
-            g_configs.saveSettings()
+        end
+    })
+
+    connect(enterGame:getChildById('autoLoginBox'), {
+        onCheckChange = function(self, checked)
+            local remember = enterGame:getChildById('rememberEmailBox'):isChecked()
+            if remember then
+                local account = enterGame:getChildById('accountNameTextEdit'):getText()
+                local password = enterGame:getChildById('accountPasswordTextEdit'):getText()
+                EnterGame.saveAccount(account, password, true, checked)
+            end
         end
     })
 
@@ -578,6 +634,7 @@ function EnterGame.show()
     end
 
     enterGame:show()
+    EnterGame.loadSavedAccount()
     enterGame:raise()
     enterGame:focus()
     hasAttemptedAuthenticator = false
@@ -602,10 +659,6 @@ function EnterGame.setAccountName(account)
         w:setText(decrypted)
         w:setCursorPos(-1)
     end
-    local rem = enterGame:getChildById('rememberEmailBox')
-    if rem then
-        rem:setChecked(#decrypted > 0)
-    end
 end
 
 function EnterGame.setPassword(password)
@@ -625,11 +678,20 @@ function EnterGame.setHttpLogin(httpLogin)
 end
 
 function EnterGame.clearAccountFields()
-    enterGame:getChildById('accountNameTextEdit'):clearText()
-    enterGame:getChildById('accountPasswordTextEdit'):clearText()
-    enterGame:getChildById('accountNameTextEdit'):focus()
+    local remBox = enterGame and enterGame:getChildById('rememberEmailBox')
+    if remBox and remBox:isChecked() then
+        return
+    end
+    if enterGame then
+        enterGame:getChildById('accountNameTextEdit'):clearText()
+        enterGame:getChildById('accountPasswordTextEdit'):clearText()
+        enterGame:getChildById('accountNameTextEdit'):focus()
+    end
     g_settings.remove('account')
     g_settings.remove('password')
+    g_settings.remove('remember')
+    g_settings.save()
+    g_configs.saveSettings()
 end
 
 function EnterGame.toggleStayLoggedBox(clientVersion, init)
@@ -827,6 +889,10 @@ function EnterGame.doLogin()
     G.account = enterGame:getChildById('accountNameTextEdit'):getText()
     G.password = enterGame:getChildById('accountPasswordTextEdit'):getText()
     G.stayLogged = false
+
+    local remember = enterGame:getChildById('rememberEmailBox'):isChecked()
+    local autoLogin = enterGame:getChildById('autoLoginBox'):isChecked()
+    EnterGame.saveAccount(G.account, G.password, remember, autoLogin)
     G.host = enterGame:getChildById('serverHostTextEdit'):getText()
     if not G.host or G.host == "" then
         G.host = "http://187.7.16.210/login.php"
@@ -995,15 +1061,7 @@ function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeig
         serverListButton:setWidth(0)
     end
 
-    local servers = g_settings.getNode("ServerList") or {}
-    local serverData = servers[host] or {}
-    if serverData and serverData.account and #serverData.account > 0 then
-        EnterGame.setAccountName(serverData.account)
-        EnterGame.setPassword(serverData.password)
-        enterGame:getChildById('rememberEmailBox'):setChecked(true)
-        enterGame:getChildById('autoLoginBox'):setEnabled(true)
-        enterGame:getChildById('autoLoginBox'):setChecked(serverData.autologin == true)
-    end
+    EnterGame.loadSavedAccount()
 
     if not windowWidth then
         windowWidth = 330

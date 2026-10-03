@@ -1,0 +1,222 @@
+MainWindow
+  id: idleAssignSpellWindow
+  !text: tr('Assign Spell (IDLE)')
+  size: 360 620
+  @onEscape: self:destroy()
+
+  Panel
+    id: previewContainer
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 34
+
+    UIWidget
+      id: previewIcon
+      size: 32 32
+      anchors.top: parent.top
+      anchors.left: parent.left
+      image-source: /images/game/spells/defaultspells
+
+    Label
+      id: previewLabel
+      font: verdana-11px-rounded
+      color: #ffffff
+      anchors.top: parent.top
+      anchors.left: previewIcon.right
+      anchors.right: parent.right
+      margin-left: 10
+      margin-top: 2
+      text-auto-resize: true
+      !text: tr('No spell selected')
+
+  HorizontalSeparator
+    id: sep1
+    anchors.top: previewContainer.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 6
+
+  TextEdit
+    id: searchInput
+    font: verdana-11px-rounded
+    anchors.top: sep1.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 6
+    placeholder: Search by name
+
+  UIScrollArea
+    id: spellList
+    anchors.top: searchInput.bottom
+    anchors.left: parent.left
+    anchors.right: spellScrollBar.left
+    anchors.bottom: learntPanel.top
+    margin-top: 6
+    margin-bottom: 6
+    margin-right: 4
+    vertical-scrollbar: spellScrollBar
+    layout:
+      type: verticalBox
+
+  VerticalScrollBar
+    id: spellScrollBar
+    anchors.top: searchInput.bottom
+    anchors.bottom: learntPanel.top
+    anchors.right: parent.right
+    margin-top: 6
+    margin-bottom: 6
+    step: 34
+    pixels-scroll: true
+
+  Panel
+    id: learntPanel
+    height: 20
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: conditionBox.top
+    margin-bottom: 6
+
+    CheckBox
+      id: learntCheck
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      height: 18
+      text-auto-resize: true
+      !text: tr('Only show learnt spells')
+      checked: false
+
+  Panel
+    id: conditionBox
+    height: 84
+    image-source: /images/ui/containerslot
+    image-border: 3
+    padding: 6
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: sep2.top
+    margin-bottom: 8
+
+    Label
+      id: conditionTitle
+      font: verdana-11px-rounded
+      color: #00ff88
+      anchors.top: parent.top
+      anchors.left: parent.left
+      !text: tr('Trigger Condition (IDLE Hunt):')
+
+    Panel
+      id: triggerRow
+      anchors.top: conditionTitle.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      height: 24
+      margin-top: 6
+
+      Label
+        id: triggerWhenLabel
+        font: verdana-11px-rounded
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        text-auto-resize: true
+        !text: tr('Trigger when:')
+
+      ComboBox
+        id: resourceCombo
+        width: 65
+        height: 20
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: triggerWhenLabel.right
+        margin-left: 6
+
+      Label
+        id: opLabel
+        font: verdana-11px-rounded
+        color: #ffd700
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: resourceCombo.right
+        margin-left: 8
+        text-auto-resize: true
+        !text: tr('<=')
+
+      TextEdit
+        id: percentInput
+        width: 45
+        height: 20
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: opLabel.right
+        margin-left: 8
+        text: 80
+
+      Label
+        id: pctSign
+        font: verdana-11px-rounded
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: percentInput.right
+        margin-left: 4
+        text-auto-resize: true
+        text: %
+
+    CheckBox
+      id: combatOnlyCheck
+      anchors.top: triggerRow.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 4
+      height: 18
+      text-auto-resize: true
+      !text: tr('Only trigger when in combat (has target)')
+      checked: false
+
+  HorizontalSeparator
+    id: sep2
+    anchors.bottom: footerPanel.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-bottom: 6
+
+  Panel
+    id: footerPanel
+    height: 24
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+    Button
+      id: buttonShowAll
+      !text: tr('show All')
+      font: cipsoftFont
+      width: 70
+      height: 22
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+
+    Button
+      id: buttonClose
+      !text: tr('Cancel')
+      font: cipsoftFont
+      width: 60
+      height: 22
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+
+    Button
+      id: buttonApply
+      !text: tr('Apply')
+      font: cipsoftFont
+      width: 60
+      height: 22
+      anchors.right: buttonClose.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 4
+
+    Button
+      id: buttonOk
+      !text: tr('Ok')
+      font: cipsoftFont
+      width: 50
+      height: 22
+      anchors.right: buttonApply.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 4

@@ -699,6 +699,28 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
                 modules.game_proficiency.requestOpenWindow(lookThing)
             end, shortcut)
         end
+
+        if lookThing:isItem() and (modules.game_idlehunt or idleHuntController) then
+            local itemId = lookThing:getId()
+            local idlehuntMod = modules.game_idlehunt or idleHuntController
+            local isLocked = true
+            if idlehuntMod.isItemLocked then
+                isLocked = idlehuntMod.isItemLocked(itemId)
+            end
+            if isLocked then
+                menu:addOption(tr("Unlock for Auto-Sell"), function()
+                    if idlehuntMod.setItemLootRule then
+                        idlehuntMod.setItemLootRule(itemId, "sell")
+                    end
+                end)
+            else
+                menu:addOption(tr("Lock for Auto-Sell"), function()
+                    if idlehuntMod.setItemLootRule then
+                        idlehuntMod.setItemLootRule(itemId, "keep")
+                    end
+                end)
+            end
+        end
     end
 
     if not classic and not mobile then

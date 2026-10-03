@@ -214,14 +214,22 @@
   --text-auto-resize: true;
 }
 .close-button {
-  margin-left: 5px;
   float: right;
+  width: 68px;
+  height: 22px;
+  margin-top: 10px;
+  margin-left: 6px;
   text-align: center;
-  vertical-align: center;
+  font: verdana-11px-rounded;
 }
 .history-button {
   float: right;
-  margin-right: 10px;
+  width: 68px;
+  height: 22px;
+  margin-top: 10px;
+  margin-right: 6px;
+  text-align: center;
+  font: verdana-11px-rounded;
 }
 
 .imgBonusesCss {

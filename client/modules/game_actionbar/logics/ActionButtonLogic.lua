@@ -803,6 +803,22 @@ function configureButtonMouseRelease(button)
     button.onMouseRelease = function(button, mousePos, mouseButton)
         button.cache = getButtonCache(button)
         if mouseButton == MouseRightButton then
+            if modules.game_actionbar and modules.game_actionbar.isIdleMode then
+                local menu = g_ui.createWidget('PopupMenu')
+                menu:setGameMenu(true)
+                menu:addOption(tr('Assign Spell (IDLE)'), function()
+                    modules.game_actionbar.openIdleSpellWindow(button)
+                end)
+                menu:addOption(tr('Assign Object (IDLE)'), function()
+                    modules.game_actionbar.openIdleObjectWindow(button)
+                end)
+                menu:addSeparator()
+                menu:addOption(tr('Clear IDLE Action'), function()
+                    modules.game_actionbar.clearIdleSlot(button)
+                end)
+                menu:display(mousePos)
+                return true
+            end
             local menu = g_ui.createWidget('PopupMenu')
             menu:setGameMenu(true)
             menu:addOption(button.cache.isSpell and tr('Edit Spell') or tr('Assign Spell'), function()
@@ -885,6 +901,10 @@ end
 -- =============================================*/
 --- Updates the button's visual representation
 function updateButton(button)
+    if modules.game_actionbar and modules.game_actionbar.isIdleMode then
+        modules.game_actionbar.renderIdleButton(button)
+        return true
+    end
     local startUpdate = g_clock.millis()
     if not player then
         player = g_game.getLocalPlayer()

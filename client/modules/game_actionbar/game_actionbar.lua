@@ -1,4 +1,5 @@
 ApiJson = dofile('logics/ApiJson.lua')
+dofile('logics/IdleActionBar.lua')
 
 player = nil --localplayer
 -- @array

@@ -212,11 +212,31 @@ Panel
     margin-left: 1
     margin-top: -1
 
+  UIButton
+    id: idleModeButton
+    size: 34 34
+    anchors.left: prevPanel.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 2
+    !text: tr('IDLE')
+    font: verdana-11px-rounded
+    color: #00ff88
+    image-source: /images/ui/button
+    image-clip: 0 0 22 23
+    image-border: 3
+    $pressed:
+      image-clip: 0 46 22 23
+    $on:
+      image-clip: 0 46 22 23
+      color: #00ffff
+    tooltip: tr('Toggle IDLE Hotkeys Mode (Configure automated tactical triggers for IDLE Hunts)')
+    @onClick: modules.game_actionbar.toggleIdleMode()
+
   ScrollablePanel
     id: tabBar
     anchors.top: parent.top
     anchors.bottom: parent.bottom
-    anchors.left: prev.right
+    anchors.left: idleModeButton.right
     anchors.right: nextPanel.left
     //margin-left: 1
     margin-right: 4

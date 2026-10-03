@@ -1,0 +1,271 @@
+MainWindow
+  id: idleHuntWindow
+  !text: tr('IDLE HUNT MENU')
+  size: 680 570
+  @onEscape: self:hide()
+
+  Panel
+    id: topActionBar
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 28
+    layout:
+      type: horizontalBox
+      spacing: 6
+
+    Button
+      id: navHuntsButton
+      !text: tr('Hunts')
+      font: verdana-11px-rounded
+      width: 90
+      color: #ffd700
+
+    Button
+      id: navLootButton
+      !text: tr('Loot & Sell')
+      font: verdana-11px-rounded
+      width: 105
+
+    Button
+      id: teleportHouseButton
+      !text: tr('House')
+      font: verdana-11px-rounded
+      width: 75
+      tooltip: tr('Teleport to your house')
+
+    Button
+      id: teleportTempleButton
+      !text: tr('Temple')
+      font: verdana-11px-rounded
+      width: 75
+      tooltip: tr('Teleport to temple')
+
+    Button
+      id: quickSellButton
+      !text: tr('Quick Sell')
+      font: verdana-11px-rounded
+      width: 140
+      color: #00ff88
+      tooltip: tr('Instantly sell backpack loot marked with [$] (Cooldown 2 min)')
+
+  Panel
+    id: staminaPanel
+    anchors.top: topActionBar.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 6
+    height: 44
+    image-source: /images/ui/containerslot
+    image-border: 3
+    padding: 6
+
+    Label
+      id: staminaLabel
+      !text: tr('IDLE Stamina: 24h 00m')
+      font: verdana-11px-rounded
+      color: #00ffcc
+      anchors.top: parent.top
+      anchors.left: parent.left
+      text-auto-resize: true
+
+    Label
+      id: staminaInfo
+      !text: tr('(3x slower consumption: 1h Stamina = 3h real)')
+      font: verdana-11px-rounded
+      color: #a0a0a0
+      anchors.top: staminaLabel.top
+      anchors.right: parent.right
+      text-auto-resize: true
+
+    ProgressBar
+      id: staminaBar
+      anchors.top: staminaLabel.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 5
+      height: 10
+      background-color: #00cc88
+
+  Panel
+    id: activeHuntBanner
+    anchors.top: staminaPanel.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 6
+    height: 50
+    image-source: /images/ui/containerslot
+    image-border: 3
+    padding: 5
+    visible: false
+
+    UICreature
+      id: activeCreature
+      size: 40 40
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 2
+      phantom: true
+
+    Label
+      id: activeTitle
+      !text: tr('Hunting: ...')
+      font: verdana-11px-rounded
+      color: #ffaa00
+      anchors.top: parent.top
+      anchors.left: activeCreature.right
+      margin-left: 8
+      margin-top: 2
+      text-auto-resize: true
+
+    Label
+      id: activeStats
+      !text: tr('XP: +0 | Supplies: 0 gp | Pending Loot: 0 gp')
+      font: verdana-11px-rounded
+      color: #e0e0e0
+      anchors.bottom: parent.bottom
+      anchors.left: activeCreature.right
+      margin-left: 8
+      margin-bottom: 2
+      text-auto-resize: true
+
+    Button
+      id: stopHuntButton
+      !text: tr('Stop Hunt')
+      font: verdana-11px-rounded
+      color: #ff5555
+      width: 140
+      height: 24
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.right: parent.right
+      margin-right: 6
+
+  Panel
+    id: huntsContentPanel
+    anchors.top: activeHuntBanner.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: closeButton.top
+    margin-top: 6
+    margin-bottom: 6
+
+    Panel
+      id: filterPanel
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      height: 26
+      layout:
+        type: horizontalBox
+        spacing: 4
+
+    VerticalScrollBar
+      id: huntListScrollBar
+      anchors.top: filterPanel.bottom
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      margin-top: 6
+      step: 40
+      pixels-scroll: true
+
+    UIScrollArea
+      id: huntList
+      anchors.top: filterPanel.bottom
+      anchors.left: parent.left
+      anchors.right: huntListScrollBar.left
+      anchors.bottom: parent.bottom
+      margin-top: 6
+      margin-right: 4
+      vertical-scrollbar: huntListScrollBar
+      layout:
+        type: verticalBox
+
+  Panel
+    id: lootContentPanel
+    anchors.top: activeHuntBanner.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: closeButton.top
+    margin-top: 6
+    margin-bottom: 6
+    visible: false
+
+    Label
+      id: lootHeaderLabel
+      !text: tr('Hunt Drop Settings')
+      font: verdana-11px-rounded
+      color: #ffd700
+      anchors.top: parent.top
+      anchors.left: parent.left
+      text-auto-resize: true
+
+    Label
+      id: lootHeaderInfo
+      !text: tr('Items with [Lock] stay in backpack. [$] Sell are auto-sold every 10m or via Quick Sell.')
+      font: verdana-11px-rounded
+      color: #aaaaaa
+      anchors.top: lootHeaderLabel.bottom
+      anchors.left: parent.left
+      margin-top: 2
+      text-auto-resize: true
+
+    Panel
+      id: lootSummaryBox
+      anchors.top: lootHeaderInfo.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 6
+      height: 28
+      image-source: /images/ui/containerslot
+      image-border: 2
+      padding: 4
+
+      Label
+        id: pendingGoldText
+        !text: tr('Loot ready to sell: 0 gp')
+        font: verdana-11px-rounded
+        color: #00ff88
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        margin-left: 6
+        text-auto-resize: true
+
+      Label
+        id: nextAutosellText
+        !text: tr('Next auto-sell in: 10m 00s')
+        font: verdana-11px-rounded
+        color: #e0bb66
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 6
+        text-auto-resize: true
+
+    VerticalScrollBar
+      id: lootListScrollBar
+      anchors.top: lootSummaryBox.bottom
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      margin-top: 6
+      step: 40
+      pixels-scroll: true
+
+    UIScrollArea
+      id: lootList
+      anchors.top: lootSummaryBox.bottom
+      anchors.left: parent.left
+      anchors.right: lootListScrollBar.left
+      anchors.bottom: parent.bottom
+      margin-top: 6
+      margin-right: 4
+      vertical-scrollbar: lootListScrollBar
+      layout:
+        type: verticalBox
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    font: verdana-11px-rounded
+    width: 90
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    @onClick: idleHuntController:toggle()

@@ -1,0 +1,50 @@
+MainWindow
+  id: huntDropsWindow
+  !text: tr('Hunt Drops Preview')
+  size: 440 400
+  @onEscape: self:destroy()
+
+  Label
+    id: huntTitleLabel
+    font: verdana-11px-rounded
+    color: #ffd700
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-align: center
+    margin-top: 2
+    !text: tr('Drops Available in this Hunt')
+
+  ScrollablePanel
+    id: dropsPanel
+    anchors.top: huntTitleLabel.bottom
+    anchors.left: parent.left
+    anchors.right: dropsScrollBar.left
+    anchors.bottom: closeBtn.top
+    margin-top: 10
+    margin-bottom: 10
+    margin-right: 4
+    vertical-scrollbar: dropsScrollBar
+    layout:
+      type: grid
+      cell-size: 82 86
+      flow: true
+      cell-spacing: 6
+
+  VerticalScrollBar
+    id: dropsScrollBar
+    anchors.top: dropsPanel.top
+    anchors.bottom: dropsPanel.bottom
+    anchors.right: parent.right
+    step: 40
+    pixels-scroll: true
+
+  Button
+    id: closeBtn
+    !text: tr('Close')
+    font: verdana-11px-rounded
+    width: 90
+    height: 22
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    @onClick: self:getParent():destroy()

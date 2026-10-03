@@ -115,7 +115,7 @@ EnterGameWindow
 
   QtButton
     id: loginButton
-    !text: tr('Entrar')
+    !text: tr('Login')
     anchors.right: parent.right
     anchors.bottom: parent.bottom
     size: 86 24

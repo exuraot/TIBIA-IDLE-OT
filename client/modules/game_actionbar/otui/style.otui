@@ -87,3 +87,53 @@ PassivePreview < UICheckBox
     phantom: true
     padding: 1
     size: 34 34
+
+ObjectPreview < UICheckBox
+  height: 38
+  text-wrap: false
+  focusable: true
+  text-offset: 42 4
+
+  $hover !disabled:
+    color: #ffffff
+
+  $!checked:
+    background-color: alpha
+
+  $checked:
+    background-color: #585858
+    color: #f4f4f4
+
+  $disabled:
+    image-color: #dfdfdf88
+    color: #dfdfdf88
+    opacity: 0.8
+
+  UIItem
+    id: itemWidget
+    size: 32 32
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 4
+    virtual: true
+    phantom: true
+
+  Label
+    id: costLabel
+    anchors.top: parent.top
+    anchors.right: parent.right
+    margin-top: 4
+    margin-right: 8
+    font: verdana-11px-rounded
+    color: #ffd700
+    text-auto-resize: true
+
+  Label
+    id: typeLabel
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin-bottom: 4
+    margin-right: 8
+    font: verdana-11px-rounded
+    color: #88ccee
+    text-auto-resize: true

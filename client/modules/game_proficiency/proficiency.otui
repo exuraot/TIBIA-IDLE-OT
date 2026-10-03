@@ -222,6 +222,7 @@ MainWindow
   id: weaponProficiencyWindow
   !text: tr('Weapon Proficiency')
   size: 1000 572
+  text-offset: 0 8
   @onEscape: modules.game_proficiency.WeaponProficiency:onCloseWindow()
 
   Panel
@@ -461,7 +462,7 @@ MainWindow
 
       UIWidget
         id: vocationWarning
-        size: 754 17
+        size: 754 22
         anchors.top: prev.top
         anchors.left: prev.left
         margin-top: 1
@@ -469,7 +470,9 @@ MainWindow
         background-color: #ff9854
         text-align: center
         text: Perks are inactive because you don't meet the requirements to use this weapon.
-        text-offset: 7 3
+        text-offset: 0 4
+        font: verdana-11px-rounded
+        color: #ffffff
         visible: false
 
       Panel

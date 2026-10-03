@@ -51,7 +51,7 @@ Panel
 
     Label
       id: showOffWindowText
-      !text: tr('Exura Dicas')
+      !text: tr('Featured Articles')
       font: verdana-11px-antialised
       text-offset: 0 2
       text-align: top

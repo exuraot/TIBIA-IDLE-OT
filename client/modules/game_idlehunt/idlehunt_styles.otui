@@ -1,0 +1,247 @@
+DropSlotItem < Panel
+  size: 82 86
+  image-source: /images/ui/containerslot
+  image-border: 3
+  padding: 2
+
+  UIItem
+    id: itemWidget
+    size: 34 34
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 4
+    virtual: true
+    phantom: false
+
+  Label
+    id: chanceLabel
+    font: verdana-11px-rounded
+    color: #00ff88
+    anchors.top: itemWidget.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 2
+    text-auto-resize: true
+
+  Label
+    id: priceLabel
+    font: verdana-11px-rounded
+    color: #ffd700
+    anchors.top: chanceLabel.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 1
+    text-auto-resize: true
+
+HuntCard < Panel
+  height: 64
+  image-source: /images/ui/containerslot
+  image-border: 3
+  padding: 4
+  margin-bottom: 4
+
+  Panel
+    id: monsterFrame
+    size: 48 48
+    image-source: /images/ui/containerslot
+    image-border: 2
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 2
+
+    UICreature
+      id: monsterCreature
+      size: 44 44
+      anchors.centerIn: parent
+      phantom: true
+
+  Label
+    id: huntTitle
+    font: verdana-11px-rounded
+    color: #ffd700
+    anchors.top: parent.top
+    anchors.left: monsterFrame.right
+    margin-top: 2
+    margin-left: 8
+    text-auto-resize: true
+
+  Label
+    id: focusTag
+    font: verdana-11px-rounded
+    color: #00ff88
+    anchors.top: huntTitle.top
+    anchors.left: huntTitle.right
+    margin-left: 8
+    text-auto-resize: true
+
+  Button
+    id: lootBagButton
+    size: 26 26
+    image-source: /images/ui/containerslot
+    image-border: 2
+    anchors.verticalCenter: huntTitle.verticalCenter
+    anchors.left: focusTag.right
+    margin-left: 8
+    tooltip: tr('Click to view creature drops & detailed stats')
+
+    UIItem
+      id: lootBagIcon
+      item-id: 2853
+      size: 20 20
+      virtual: true
+      phantom: true
+      anchors.centerIn: parent
+
+  Label
+    id: huntDesc
+    font: verdana-11px-rounded
+    color: #c0c0c0
+    anchors.top: huntTitle.bottom
+    anchors.left: monsterFrame.right
+    anchors.right: reqButton.left
+    margin-top: 3
+    margin-left: 8
+    margin-right: 10
+    text-wrap: true
+
+  Label
+    id: huntCost
+    font: verdana-11px-rounded
+    color: #e0bb66
+    anchors.bottom: parent.bottom
+    anchors.left: monsterFrame.right
+    margin-left: 8
+    text-auto-resize: true
+
+  Button
+    id: reqButton
+    !text: tr('Requirements')
+    font: verdana-11px-rounded
+    width: 95
+    height: 22
+    anchors.right: startButton.left
+    anchors.bottom: parent.bottom
+    margin-right: 6
+
+  Button
+    id: startButton
+    !text: tr('Start')
+    font: verdana-11px-rounded
+    width: 75
+    height: 22
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+
+LootCard < Panel
+  height: 48
+  image-source: /images/ui/containerslot
+  image-border: 3
+  padding: 4
+  margin-bottom: 4
+
+  UIItem
+    id: itemIcon
+    size: 34 34
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 4
+    virtual: true
+
+  Label
+    id: itemName
+    font: verdana-11px-rounded
+    color: #ffffff
+    anchors.top: parent.top
+    anchors.left: itemIcon.right
+    margin-left: 10
+    margin-top: 2
+    text-auto-resize: true
+
+  Label
+    id: statusLabel
+    font: verdana-11px-rounded
+    color: #00ff88
+    anchors.bottom: parent.bottom
+    anchors.left: itemIcon.right
+    margin-left: 10
+    margin-bottom: 2
+    text-auto-resize: true
+
+  Button
+    id: lockButton
+    font: verdana-11px-rounded
+    width: 140
+    height: 24
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 8
+
+IdleSpellRow < Panel
+  height: 36
+  image-source: /images/ui/containerslot
+  image-border: 2
+  padding: 2
+  margin-bottom: 2
+
+  Label
+    id: spellNameLabel
+    font: verdana-11px-rounded
+    color: #ffffff
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 2
+    margin-left: 6
+    text-auto-resize: true
+
+  Label
+    id: spellWordsLabel
+    font: verdana-11px-rounded
+    color: #00ff88
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    margin-bottom: 2
+    margin-left: 6
+    text-auto-resize: true
+
+  Label
+    id: spellManaLabel
+    font: verdana-11px-rounded
+    color: #33aaff
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    margin-right: 8
+    text-auto-resize: true
+
+IdleObjectRow < Panel
+  height: 38
+  image-source: /images/ui/containerslot
+  image-border: 2
+  padding: 2
+  margin-bottom: 2
+
+  UIItem
+    id: objectIcon
+    size: 32 32
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 2
+    virtual: true
+    phantom: true
+
+  Label
+    id: objectNameLabel
+    font: verdana-11px-rounded
+    color: #ffffff
+    anchors.top: parent.top
+    anchors.left: objectIcon.right
+    margin-top: 2
+    margin-left: 8
+    text-auto-resize: true
+
+  Label
+    id: objectCostLabel
+    font: verdana-11px-rounded
+    color: #ffd700
+    anchors.bottom: parent.bottom
+    anchors.left: objectIcon.right
+    margin-bottom: 2
+    margin-left: 8
+    text-auto-resize: true

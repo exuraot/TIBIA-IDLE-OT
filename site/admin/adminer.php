@@ -1,4 +1,11 @@
 <?php
+require_once __DIR__ . '/../common.php';
+require_once SYSTEM . 'functions.php';
+require_once SYSTEM . 'init.php';
+require_once SYSTEM . 'login.php';
+if (!admin()) { http_response_code(403); die('Acesso negado: apenas administradores autenticados podem acessar o Adminer.'); }
+?>
+<?php
 /** Adminer - Compact database management
 * @link https://www.adminer.org/
 * @author Jakub Vrana, https://www.vrana.cz/

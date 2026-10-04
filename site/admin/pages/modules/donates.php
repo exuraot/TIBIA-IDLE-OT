@@ -1,4 +1,5 @@
 <?php
+defined('MYAAC') or die('Direct access not allowed!');
 global $db, $twig;
 /**
  * Automatic PagSeguro payment system gateway.

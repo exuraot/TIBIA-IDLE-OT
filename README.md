@@ -55,5 +55,8 @@ git lfs pull
 
 ---
 
+## 📖 Wiki
+Documentação do monorepo: [wiki/Home.md](wiki/Home.md).
+
 ## 🔒 Regras de Branch e Desenvolvimento
 * Todos os novos módulos (Caçadas IDLE, Treiners Livres, Modais) devem ser desenvolvidos em branches de feature e submetidos via Pull Request.

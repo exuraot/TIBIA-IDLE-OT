@@ -12,10 +12,20 @@ global $config, $twig, $logged;
 defined('MYAAC') or die('Direct access not allowed!');
 
 require_once(PLUGINS . 'pagseguro/config.php');
+if (file_exists(PLUGINS . 'mercadopago/config.php')) {
+    require_once(PLUGINS . 'mercadopago/config.php');
+}
 $twig->addGlobal('config', $config);
 
-if (!isset($config['pagSeguro']) || !count($config['pagSeguro']) || !count($config['pagSeguro']['donates'])) {
-    echo "PagSeguro is disabled. If you're an admin please configure this script in config.local.php.";
+$hasPagseguro = isset($config['pagSeguro']) && count($config['pagSeguro']) && count($config['pagSeguro']['donates'] ?? []);
+$hasMercadopago = isset($config['mercadoPago']) && count($config['mercadoPago']);
+
+if (!$hasPagseguro) {
+    if ($hasMercadopago) {
+        header('Location: ' . getLink('?subtopic=pix'));
+        exit;
+    }
+    echo "Payment system is disabled. If you're an admin please configure PagSeguro or Mercado Pago in config.";
     return;
 }
 

@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS `mercadopago_transactions` (
+    `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `payment_id` VARCHAR(100) NOT NULL UNIQUE,
+    `account_id` INT(11) UNSIGNED NOT NULL,
+    `transaction_type` VARCHAR(20) NOT NULL DEFAULT 'coins',
+    `item_code` VARCHAR(50) NOT NULL,
+    `item_name` VARCHAR(100) NOT NULL,
+    `coins_amount` INT(11) NOT NULL DEFAULT 0,
+    `price` DECIMAL(10, 2) NOT NULL,
+    `status` VARCHAR(50) NOT NULL DEFAULT 'pending',
+    `delivered` TINYINT(1) NOT NULL DEFAULT 0,
+    `qr_code` TEXT DEFAULT NULL,
+    `qr_code_base64` LONGTEXT DEFAULT NULL,
+    `ticket_url` TEXT DEFAULT NULL,
+    `request` LONGTEXT DEFAULT NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME DEFAULT NULL,
+    INDEX `idx_mp_account` (`account_id`),
+    INDEX `idx_mp_status` (`status`),
+    INDEX `idx_mp_delivered` (`delivered`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

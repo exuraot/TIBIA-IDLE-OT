@@ -29,6 +29,9 @@ Onde mexer. Datapack ativo = `data-global`.
 | Visual | `site/templates/tibiacom/` |
 | Páginas | `site/system/pages/` |
 | Login do client | `site/login.php` |
+| Doações PIX (Mercado Pago) | `site/plugins/mercadopago/` + `site/system/pages/pix.php` |
+| Doações PagSeguro | `site/plugins/pagseguro/` + `site/system/pages/pagsegurodonate.php` |
+| Webhooks de Pagamento | `site/payments/` (`mercadopago.php`, `donate.php`, `buybox.php`) |
 | Admin | `site/admin/` |
 
 ## Client

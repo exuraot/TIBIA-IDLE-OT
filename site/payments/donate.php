@@ -9,8 +9,6 @@
  * @copyright 2023 MyAAC
  */
 
-//https://dev.pagbank.uol.com.br/v1/docs/api-notificacao-v1
-
 global $db;
 require_once '../common.php';
 require_once SYSTEM . 'functions.php';
@@ -31,10 +29,16 @@ header('access-control-allow-origin: https://pagseguro.uol.com.br');
 
 $method = $_SERVER['REQUEST_METHOD'];
 if ('post' == strtolower($method)) {
-  $type = $_POST['notificationType'];
-  $notificationCode = $_POST['notificationCode'];
+  $type = $_POST['notificationType'] ?? null;
+  $notificationCode = $_POST['notificationCode'] ?? null;
 
-  if ($type === 'transaction') {
+  if ($type === 'transaction' && !empty($notificationCode)) {
+    // Validate notification code pattern to prevent URL manipulation / SSRF
+    if (!preg_match('/^[A-Za-z0-9\-]+$/', $notificationCode)) {
+      log_append('pagseguro_donate_errors.log', date('Y-m-d H:i:s') . ': Invalid notificationCode format: ' . $notificationCode);
+      die('Invalid notification code.');
+    }
+
     try {
       $credentials = PagSeguroConfig::getAccountCredentials();
       $transaction = PagSeguroNotificationService::checkTransaction(
@@ -42,116 +46,115 @@ if ('post' == strtolower($method)) {
         $notificationCode
       );
 
+      if (!$transaction) {
+        die('Transaction not found.');
+      }
+
       $transaction_code = $transaction->getCode();
       $account_id = (int) $transaction->getReference();
-      $payment_method = $transaction->getPaymentMethod()->getType()->getTypeFromValue();
-      $payment_status = $transaction->getStatus()->getTypeFromValue();
+      if ($account_id <= 0) {
+        die('Invalid account reference.');
+      }
+
+      $payment_method = $transaction->getPaymentMethod() ? $transaction->getPaymentMethod()->getType()->getTypeFromValue() : 'UNKNOWN';
+      $payment_status = $transaction->getStatus() ? $transaction->getStatus()->getTypeFromValue() : 'UNKNOWN';
+      $status_value = $transaction->getStatus() ? (int)$transaction->getStatus()->getValue() : 0;
       $request = json_encode($_POST);
 
-      $transactionDB = $db
-        ->query(
-          "SELECT * FROM `pagseguro_transactions` WHERE `transaction_code` = {$db->quote(
-            $transaction_code
-          )} AND `account_id` = {$account_id}"
-        )
-        ->fetch();
-      if (
-        !($donateSelected =
-          $config['pagSeguro']['donates'][$transaction->getItems()[0]->getId()] ?? null)
-      ) {
+      $items = $transaction->getItems();
+      $itemId = (!empty($items) && isset($items[0])) ? $items[0]->getId() : null;
+      if (!$itemId || !isset($config['pagSeguro']['donates'][$itemId])) {
+        log_append('pagseguro_donate_errors.log', date('Y-m-d H:i:s') . ": Unknown item id {$itemId} for tx {$transaction_code}");
         return false;
       }
+      $donateSelected = $config['pagSeguro']['donates'][$itemId];
 
-      if (!($id = $transactionDB['id'] ?? null)) {
-        $createdAt = date('Y-m-d H:i:s');
-        $bought = (int) $donateSelected['coins'];
-        $extra = (int) $donateSelected['extra'];
-        $is_doubled =
-          (int) ($config['pagSeguro']['doubleCoins'] &&
-            $bought >= (int) $config['pagSeguro']['doubleCoinsStart']);
-        $coins_amount = ($is_doubled === 1 ? $bought * 2 : $bought) + $extra;
-        $values = "{$db->quote($transaction_code)}, {$account_id}, {$db->quote(
-          $payment_method
-        )}, {$db->quote($payment_status)}, {$db->quote(
-          $donateSelected['id']
-        )}, {$coins_amount}, {$bought}, {$is_doubled}, {$db->quote($request)}, {$db->quote(
-          $createdAt
-        )}";
-        $db->exec(
-          "INSERT INTO `pagseguro_transactions` (`transaction_code`, `account_id`, `payment_method`, `payment_status`, `code`, `coins_amount`, `bought`, `in_double`, `request`, `created_at`) VALUES ({$values})"
-        );
-        $transactionDB = $db
-          ->query("SELECT * FROM `pagseguro_transactions` WHERE `id` = {$db->lastInsertId()}")
-          ->fetch();
-        $id = $transactionDB['id'];
-      }
+      $stmt = $db->prepare("SELECT * FROM `pagseguro_transactions` WHERE `transaction_code` = :code AND `account_id` = :acc LIMIT 1");
+      $stmt->execute([':code' => $transaction_code, ':acc' => $account_id]);
+      $transactionDB = $stmt->fetch();
 
-      $request = $transactionDB['request'] . $request . PHP_EOL;
-      $bought = (int) $transactionDB['bought'];
+      $createdAt = date('Y-m-d H:i:s');
       $updateAt = date('Y-m-d H:i:s');
 
-      if (
-        $transactionDB['delivered'] == '0' &&
-        (($payment_method == 'CREDIT_CARD' && $payment_status == 'PAID') ||
-          ($payment_method == 'PIX' && $payment_status == 'AVAILABLE'))
-      ) {
-        $coins_amount = $transactionDB['coins_amount'];
+      if (!$transactionDB) {
+        $bought = (int) $donateSelected['coins'];
+        $extra = (int) ($donateSelected['extra'] ?? 0);
+        $is_doubled = (int) ($config['pagSeguro']['doubleCoins'] && $bought >= (int) $config['pagSeguro']['doubleCoinsStart']);
+        $coins_amount = ($is_doubled === 1 ? $bought * 2 : $bought) + $extra;
 
-        if ($account_id) {
-          $field = strtolower($config['pagSeguro']['donationType']) ?? 'coins_transferable';
-          $db->exec(
-            "UPDATE `accounts` SET {$field} = {$field} + {$coins_amount} WHERE `id` = {$account_id}"
-          );
-          $db->exec(
-            "UPDATE `pagseguro_transactions` SET `delivered` = 1, `request` = {$db->quote(
-              $request
-            )}, `updated_at` = {$db->quote($updateAt)} WHERE `id` = {$id}"
-          );
+        $ins = $db->prepare("INSERT INTO `pagseguro_transactions` (`transaction_code`, `account_id`, `payment_method`, `payment_status`, `code`, `coins_amount`, `bought`, `in_double`, `request`, `created_at`) VALUES (:tcode, :acc, :pmethod, :pstatus, :code, :coins, :bought, :indouble, :req, :created)");
+        $ins->execute([
+          ':tcode' => $transaction_code,
+          ':acc' => $account_id,
+          ':pmethod' => $payment_method,
+          ':pstatus' => $payment_status,
+          ':code' => $donateSelected['id'],
+          ':coins' => $coins_amount,
+          ':bought' => $bought,
+          ':indouble' => $is_doubled,
+          ':req' => $request,
+          ':created' => $createdAt
+        ]);
+        $id = (int)$db->lastInsertId();
+        $isDelivered = 0;
+      } else {
+        $id = (int)$transactionDB['id'];
+        $coins_amount = (int)$transactionDB['coins_amount'];
+        $isDelivered = (int)$transactionDB['delivered'];
+      }
 
-          // if you want to activate win items when buy above amount coins
-          /*if ($bought >= 16500) {
-                        $itemId    = xxxxx; // put item id
-                        $count     = $bought < 35000 ? 1 : 3;
-                        $status    = 1; //approved
-                        $createdAt = date('Y-m-d H:i:s');
-                        $valuesIt  = "{$db->quote($transaction_code)}, {$db->quote($itemId)}, {$db->quote('ITEM NAME')}, {$count}, {$account_id}, {$db->quote($payment_method)}, {$db->quote($payment_status)}, {$db->quote($status)}, {$db->quote($request)}, {$db->quote($createdAt)}";
-                        $db->exec("INSERT INTO `myaac_send_items` (`transaction_code`, `item_id`, `item_name`, `coins_amount`, `account_id`, `payment_method`, `payment_status`, `status`, `request`, `created_at`) VALUES ({$valuesIt})");
-                    }*/
+      // Check if payment is confirmed: Status 3 (PAID) or Status 4 (AVAILABLE)
+      $isPaid = ($payment_status === 'PAID' || $payment_status === 'AVAILABLE' || $status_value === 3 || $status_value === 4);
 
-          $values = "{$account_id}, 1, {$coins_amount}, {$db->quote('Donate')}, {$db->quote(
-            $updateAt
-          )}, 3";
-          $db->exec(
-            "INSERT INTO `coins_transactions` (`account_id`, `type`, `amount`, `description`, `timestamp`, `coin_type`) VALUES ({$values})"
-          );
+      if ($isPaid && $isDelivered === 0) {
+        // Atomic lock against race conditions: only the request that updates delivered from 0 to 1 will credit the coins
+        $lockStmt = $db->prepare("UPDATE `pagseguro_transactions` SET `delivered` = '1', `payment_status` = :pstatus, `payment_method` = :pmethod, `updated_at` = :updated WHERE `id` = :id AND `delivered` = '0'");
+        $lockStmt->execute([
+          ':pstatus' => $payment_status,
+          ':pmethod' => $payment_method,
+          ':updated' => $updateAt,
+          ':id' => $id
+        ]);
+
+        if ($lockStmt->rowCount() > 0) {
+          $field = (strtolower($config['pagSeguro']['donationType'] ?? '') === 'coins') ? 'coins' : 'coins_transferable';
+          $db->exec("UPDATE `accounts` SET `{$field}` = `{$field}` + {$coins_amount} WHERE `id` = {$account_id}");
+
+          $stmtLog = $db->prepare("INSERT INTO `coins_transactions` (`account_id`, `type`, `amount`, `description`, `timestamp`, `coin_type`) VALUES (:acc, 1, :amount, 'Donate PagSeguro', :tstamp, 3)");
+          $stmtLog->execute([
+            ':acc' => $account_id,
+            ':amount' => $coins_amount,
+            ':tstamp' => $updateAt
+          ]);
 
           $timestamp = strtotime($updateAt);
-          $values2 = "{$account_id}, 0, {$db->quote(
-            'Donate'
-          )}, 3, {$coins_amount}, {$timestamp}, 0, 0";
-          $db->exec(
-            "INSERT INTO `store_history` (`account_id`, `mode`, `description`, `coin_type`, `coin_amount`, `time`, `timestamp`, `coins`) VALUES ({$values2})"
-          );
+          $stmtStore = $db->prepare("INSERT INTO `store_history` (`account_id`, `mode`, `description`, `coin_type`, `coin_amount`, `time`, `timestamp`, `coins`) VALUES (:acc, 0, 'Donate PagSeguro', 3, :amount, :tstamp, 0, 0)");
+          $stmtStore->execute([
+            ':acc' => $account_id,
+            ':amount' => $coins_amount,
+            ':tstamp' => $timestamp
+          ]);
+
+          log_append('pagseguro_donate_success.log', date('Y-m-d H:i:s') . ": Account {$account_id} received {$coins_amount} coins (tx: {$transaction_code})");
         }
       } else {
-        $db->exec(
-          "UPDATE `pagseguro_transactions` SET `request` = {$db->quote(
-            $request
-          )}, `updated_at` = {$db->quote($updateAt)} WHERE `id` = {$id}"
-        );
-        if ($transactionDB['delivered'] == '1' && $payment_status == 'CANCELLED') {
-          if ($account_id) {
-            $now = time();
-            $banAt = $now + 86400 * 30;
-            $values = "({$account_id}, 3, 22, {$now}, {$banAt}, {$account_id})";
-            $db->exec(
-              "INSERT INTO `account_bans` (`account_id`, `type`, `reason`, `banned_at`, `expired_at`, `banned_by`) VALUES {$values};"
-            );
-          }
+        $upd = $db->prepare("UPDATE `pagseguro_transactions` SET `payment_status` = :pstatus, `payment_method` = :pmethod, `updated_at` = :updated WHERE `id` = :id");
+        $upd->execute([
+          ':pstatus' => $payment_status,
+          ':pmethod' => $payment_method,
+          ':updated' => $updateAt,
+          ':id' => $id
+        ]);
+
+        if ($payment_status === 'CANCELLED' || $status_value === 7) {
+          log_append('pagseguro_cancellations.log', date('Y-m-d H:i:s') . ": Transaction {$transaction_code} for Account {$account_id} was cancelled. Status: {$payment_status}");
         }
       }
+
+      echo "OK";
     } catch (PagSeguroServiceException | \Exception $e) {
       log_append('pagseguro_donate_errors.log', date('Y-m-d H:i:s') . ': ' . $e->getMessage());
+      http_response_code(500);
       die($e->getMessage());
     }
   }

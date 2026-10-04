@@ -88,7 +88,8 @@ defined('MYAAC') or die('Direct access not allowed!'); ?>
                     ),
                     'Items' => 'items',
                     'Tools' => array(
-                        'Donates' => 'pag_transactions',
+                        'Donates PIX (MP)' => 'mp_transactions',
+                        'Donates PagSeguro' => 'pag_transactions',
                         'Premium/VIP Updater' => 'premiumvipupdater',
                         'Notepad' => 'notepad',
                         'phpinfo' => 'phpinfo',

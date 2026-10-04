@@ -1,0 +1,258 @@
+<style>
+.pix-container {
+    text-align: center;
+    padding: 20px;
+}
+.pix-qr {
+    max-width: 250px;
+    margin: 15px auto;
+    border: 3px solid #009ee3;
+    border-radius: 8px;
+    display: block;
+    background: #fff;
+    padding: 5px;
+}
+.pix-copia-cola {
+    width: 90%;
+    max-width: 550px;
+    font-size: 11px;
+    padding: 8px;
+    background: #f7f7f7;
+    border: 1px solid #ccc;
+    font-family: monospace;
+    margin-bottom: 10px;
+    word-break: break-all;
+}
+.btn-pix {
+    background-color: #009ee3;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+}
+.btn-pix:hover {
+    background-color: #007eb7;
+}
+.pix-status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    margin: 10px 0;
+}
+.pix-status-approved {
+    background: #d4edda !important;
+    color: #155724 !important;
+    border: 1px solid #c3e6cb !important;
+}
+.pulse-spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #856404;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+
+<div class="TableContainer">
+    <div class="CaptionContainer">
+        <div class="CaptionInnerContainer">
+            <span class="CaptionEdgeLeftTop" style="background-image:url({{ template_path }}/images/content/box-frame-edge.gif);"></span>
+            <span class="CaptionEdgeRightTop" style="background-image:url({{ template_path }}/images/content/box-frame-edge.gif);"></span>
+            <span class="CaptionBorderTop" style="background-image:url({{ template_path }}/images/content/table-headline-border.gif);"></span>
+            <span class="CaptionVerticalLeft" style="background-image:url({{ template_path }}/images/content/box-frame-vertical.gif);"></span>
+            <div class="Text">Doação Instantânea via PIX (Mercado Pago)</div>
+            <span class="CaptionVerticalRight" style="background-image:url({{ template_path }}/images/content/box-frame-vertical.gif);"></span>
+            <span class="CaptionBorderBottom" style="background-image:url({{ template_path }}/images/content/table-headline-border.gif);"></span>
+            <span class="CaptionEdgeLeftBottom" style="background-image:url({{ template_path }}/images/content/box-frame-edge.gif);"></span>
+            <span class="CaptionEdgeRightBottom" style="background-image:url({{ template_path }}/images/content/box-frame-edge.gif);"></span>
+        </div>
+    </div>
+
+    <table class="Table3" width="100%" cellpadding="0" cellspacing="0">
+        <tbody>
+            <tr>
+                <td>
+                    <div class="InnerTableContainer">
+                        <table style="width:100%;">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <p>O PIX é processado de forma <b>automática e instantânea</b>. Assim que o pagamento for concluído no aplicativo do seu banco, seus Tibia Coins serão creditados imediatamente em sua conta.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<br/>
+
+{% if action == 'payment' %}
+    <div class="TableContainer" id="pixPaymentBox">
+        <div class="CaptionContainer">
+            <div class="CaptionInnerContainer">
+                <span class="CaptionEdgeLeftTop" style="background-image:url({{ template_path }}/images/content/box-frame-edge.gif);"></span>
+                <span class="CaptionEdgeRightTop" style="background-image:url({{ template_path }}/images/content/box-frame-edge.gif);"></span>
+                <span class="CaptionBorderTop" style="background-image:url({{ template_path }}/images/content/table-headline-border.gif);"></span>
+                <span class="CaptionVerticalLeft" style="background-image:url({{ template_path }}/images/content/box-frame-vertical.gif);"></span>
+                <div class="Text">Pagar com PIX - R$ {{ payment.amount|number_format(2, ',', '.') }}</div>
+                <span class="CaptionVerticalRight" style="background-image:url({{ template_path }}/images/content/box-frame-vertical.gif);"></span>
+                <span class="CaptionBorderBottom" style="background-image:url({{ template_path }}/images/content/table-headline-border.gif);"></span>
+                <span class="CaptionEdgeLeftBottom" style="background-image:url({{ template_path }}/images/content/box-frame-edge.gif);"></span>
+                <span class="CaptionEdgeRightBottom" style="background-image:url({{ template_path }}/images/content/box-frame-edge.gif);"></span>
+            </div>
+        </div>
+
+        <table class="Table3" width="100%" cellpadding="0" cellspacing="0">
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="InnerTableContainer pix-container">
+                            <div id="statusBadge" class="pix-status-badge">
+                                <span class="pulse-spinner"></span> Aguardando confirmação do pagamento...
+                            </div>
+
+                            <div id="approvedMessage" style="display:none; padding: 20px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; margin: 15px 0;">
+                                <h3 style="color: #155724; margin: 0 0 10px 0;">✅ Pagamento Confirmado com Sucesso!</h3>
+                                <p style="color: #155724; margin: 0;">Seus <b>{{ payment.coins }} Tibia Coins</b> foram creditados na sua conta!</p>
+                                <br/>
+                                <a href="?subtopic=accountmanagement" class="btn-pix" style="text-decoration:none; display:inline-block;">Ir para Painel da Conta</a>
+                            </div>
+
+                            <div id="paymentDetailsArea">
+                                <p>Abra o aplicativo do seu banco, escolha <b>PIX</b> e escaneie o QR Code abaixo:</p>
+
+                                {% if payment.qr_code_base64 %}
+                                    <img src="data:image/png;base64,{{ payment.qr_code_base64 }}" alt="QR Code PIX" class="pix-qr" />
+                                {% endif %}
+
+                                <p>Ou use o <b>PIX Copia e Cola</b>:</p>
+                                <textarea id="pixCodeText" class="pix-copia-cola" rows="4" readonly>{{ payment.qr_code }}</textarea>
+                                <br/>
+                                <button type="button" class="btn-pix" onclick="copyPixCode()">📋 Copiar Código PIX</button>
+                                <span id="copyFeedback" style="display:none; color: green; font-weight: bold; margin-left: 10px;">Copiado!</span>
+
+                                <br/><br/>
+                                <small style="color: #666;">ID da Transação: #{{ payment.id }} | Conta: {{ account_logged.getName() }}</small>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+    function copyPixCode() {
+        var copyText = document.getElementById("pixCodeText");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+        var fb = document.getElementById("copyFeedback");
+        fb.style.display = "inline";
+        setTimeout(function() { fb.style.display = "none"; }, 3000);
+    }
+
+    var pollInterval = setInterval(function() {
+        fetch('?subtopic=pix&action=check&payment_id={{ payment.id }}')
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.approved) {
+                    clearInterval(pollInterval);
+                    document.getElementById('statusBadge').className = 'pix-status-badge pix-status-approved';
+                    document.getElementById('statusBadge').innerHTML = '✅ Pagamento Aprovado!';
+                    document.getElementById('paymentDetailsArea').style.display = 'none';
+                    document.getElementById('approvedMessage').style.display = 'block';
+                }
+            })
+            .catch(function(err) {
+                console.error("Erro ao verificar status PIX:", err);
+            });
+    }, 3000);
+    </script>
+{% else %}
+    <table width="100%" border="0" cellpadding="4" cellspacing="1">
+        <tbody>
+            <tr bgcolor="{{ config.vdarkborder }}" class="white">
+                <td colspan="3"><span class="style4">Tabela de Pacotes de Doação</span></td>
+            </tr>
+            <tr bgcolor="{{ config.vdarkborder }}" class="white">
+                <td width="30%"><b>Valor</b></td>
+                <td><b>Recompensa em Tibia Coins</b></td>
+            </tr>
+            {% set i = 1 %}
+            {% for item in config.mercadoPago.donates %}
+                <tr bgcolor="{{ getStyle(i) }}">
+                    <td><b>R$ {{ item.value|number_format(2, ',', '.') }}</b></td>
+                    <td>
+                        <img alt="" src="images/content/bullet.gif">
+                        {% if is_double and item.coins >= double_start %}
+                            <span style="text-decoration: line-through;">{{ item.coins }}</span>
+                            <strong>{{ item.coins * 2 }}</strong> Coins <strong>(DOUBLE COINS)</strong>
+                        {% else %}
+                            <strong>{{ item.coins }}</strong> Coins
+                        {% endif %}
+                        {% if item.extra > 0 %} (+{{ item.extra }} bônus){% endif %}
+                    </td>
+                </tr>
+                {% set i = i + 1 %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br/>
+
+    <form method="post" action="?subtopic=pix&action=create">
+        <table border="0" cellpadding="4" cellspacing="1" width="100%">
+            <tbody>
+                <tr bgcolor="{{ config.vdarkborder }}" class="white">
+                    <th colspan="2"><strong>Escolha o pacote que deseja adquirir via PIX</strong></th>
+                </tr>
+                <tr bgcolor="{{ config.darkborder }}">
+                    <td width="25%">Nome da Conta:</td>
+                    <td><strong>{{ account_logged.getName() }}</strong></td>
+                </tr>
+                <tr bgcolor="{{ config.darkborder }}">
+                    <td width="25%">Pacote de Doação:</td>
+                    <td>
+                        <select name="code" required style="width: 300px; padding: 4px;">
+                            {% for item in config.mercadoPago.donates %}
+                                <option value="{{ item.id }}">
+                                    R$ {{ item.value|number_format(2, ',', '.') }} - {{ item.coins }} Coins
+                                    {% if item.extra > 0 %} (+{{ item.extra }} bônus){% endif %}
+                                    {% if is_double and item.coins >= double_start %} (DOUBLE){% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr bgcolor="{{ config.darkborder }}">
+                    <td colspan="2" style="text-align: center; padding: 15px;">
+                        <button type="submit" class="btn-pix" style="font-size: 14px; padding: 10px 24px;">
+                            ⚡ Gerar QR Code PIX Instantâneo
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+{% endif %}

@@ -38,23 +38,26 @@ $donates = $db->query("SELECT * FROM `pagseguro_transactions` ORDER BY `id` DESC
                         <th style="width: 160px;">Donatado em</th>
                     </tr>
                     <?php foreach ($donates as $k => $donate) {
-                        $account = $db->query("SELECT `id`, `email` FROM `accounts` WHERE `id` = {$donate['account_id']} LIMIT 1;")->fetch();
-                        $players = getPlayerByAccountId($donate['account_id']);
+                        $accId = (int)$donate['account_id'];
+                        $account = $db->query("SELECT `id`, `email` FROM `accounts` WHERE `id` = {$accId} LIMIT 1;")->fetch();
+                        $players = getPlayerByAccountId($accId);
+                        $bg = ($donate['payment_status'] === 'CANCELLED') ? 'style="background-color: #502a2a"' : '';
+                        $codeVal = $config['pagSeguro']['donates'][$donate['code']]['value'] ?? 0;
                         ?>
-                        <tr style="background-color: <?= $donate['payment_status'] == 'CANCELLED' ? '#502a2a' : '' ?>">
+                        <tr <?= $bg ?>>
                             <td><?= $k + 1 ?></td>
-                            <td><?= $donate['id'] ?></td>
-                            <td><small><?= $donate['transaction_code'] ?></small></td>
-                            <td><?= $account['email'] ?> (<?= $players ?>)</td>
+                            <td><?= (int)$donate['id'] ?></td>
+                            <td><small><?= htmlspecialchars($donate['transaction_code'] ?? '', ENT_QUOTES, 'UTF-8') ?></small></td>
+                            <td><?= htmlspecialchars($account['email'] ?? 'Unknown', ENT_QUOTES, 'UTF-8') ?> (<?= htmlspecialchars($players ?? '', ENT_QUOTES, 'UTF-8') ?>)</td>
                             <td style="text-align: center">
-                                R$ <?= number_format($config['pagSeguro']['donates'][$donate['code']]['value'], 2, ',', '.') ?>
-                                (<?= $donate['coins_amount'] ?> TC)
+                                R$ <?= number_format((float)$codeVal, 2, ',', '.') ?>
+                                (<?= (int)$donate['coins_amount'] ?> TC)
                             </td>
-                            <td style="text-align: center"><?= $donate['payment_method'] ?? 'PIX' ?></td>
+                            <td style="text-align: center"><?= htmlspecialchars($donate['payment_method'] ?? 'PIX', ENT_QUOTES, 'UTF-8') ?></td>
                             <td style="text-align: center"><?= $donate['in_double'] ? 'Sim' : 'Não' ?></td>
-                            <td style="text-align: center"><?= $donate['payment_status'] ?></td>
+                            <td style="text-align: center"><?= htmlspecialchars($donate['payment_status'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
                             <td style="text-align: center"><?= $donate['delivered'] ? 'Sim' : 'Não' ?></td>
-                            <td><?= date("d/m/Y H:i:s", strtotime($donate['created_at'])) ?></td>
+                            <td><?= htmlspecialchars(date("d/m/Y H:i:s", strtotime($donate['created_at'])), ENT_QUOTES, 'UTF-8') ?></td>
                         </tr>
                     <?php } ?>
                     </tbody>

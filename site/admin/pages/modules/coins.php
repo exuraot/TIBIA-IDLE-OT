@@ -1,4 +1,5 @@
 <?php
+defined('MYAAC') or die('Direct access not allowed!');
 
 $result = 0;
 if ($db->hasColumn('accounts', 'coins')) {

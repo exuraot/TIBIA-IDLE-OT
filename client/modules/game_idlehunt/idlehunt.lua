@@ -961,8 +961,7 @@ function idleHuntController:switchView(viewName, param, paramTier)
 		self:updateDashboardState()
 	elseif viewName == "catalog" then
 		self:filterHunts()
-	elseif viewName == "details" then
-		self:showDetails(param or selectedHuntId, paramTier or activeDifficulty)
+	elseif viewName == "details" then self:renderDetails(param or selectedHuntId, paramTier or activeDifficulty)
 	end
 end
 
@@ -1134,6 +1133,10 @@ function idleHuntController:setupDetailsUI()
 end
 
 function idleHuntController:showDetails(themeOrHuntId, tier)
+	self:switchView("details", themeOrHuntId, tier)
+end
+
+function idleHuntController:renderDetails(themeOrHuntId, tier)
 	local theme = nil
 	local currentTier = tier or activeDifficulty or "easy"
 
@@ -1162,55 +1165,67 @@ function idleHuntController:showDetails(themeOrHuntId, tier)
 	local dtView = self.ui and self.ui.detailsView
 	if not dtView then return end
 
-	self:switchView("details")
-
 	-- Header
-	if dtView.detailsTopBar and dtView.detailsTopBar.detailsTitle then
-		dtView.detailsTopBar.detailsTitle:setText(string.format("Configurar Cacada: %s", theme.name))
+	local topBarTitle = dtView:recursiveGetChildById('detailsTitle')
+	if topBarTitle then
+		topBarTitle:setText(string.format("Configurar Cacada: %s", theme.name))
 	end
 
-	if dtView.detailsTopBar and dtView.detailsTopBar.detailRecordLabel then
+	local topBarRecord = dtView:recursiveGetChildById('detailRecordLabel')
+	if topBarRecord then
 		if (hunt.record_exp or 0) > 0 then
-			dtView.detailsTopBar.detailRecordLabel:setText(string.format("Recorde: %s XP/h | %s GP/h", formatNumber(hunt.record_exp), formatNumber(hunt.record_gp or 0)))
-			dtView.detailsTopBar.detailRecordLabel:setColor("#00ddff")
+			topBarRecord:setText(string.format("Recorde: %s XP/h | %s GP/h", formatNumber(hunt.record_exp), formatNumber(hunt.record_gp or 0)))
+			topBarRecord:setColor("#00ddff")
 		else
-			dtView.detailsTopBar.detailRecordLabel:setText("Recorde: Sem registro ainda (10m)")
-			dtView.detailsTopBar.detailRecordLabel:setColor("#777777")
+			topBarRecord:setText("Recorde: Sem registro ainda (10m)")
+			topBarRecord:setColor("#777777")
 		end
 	end
 
-	local header = dtView.detailCreatureHeader
-	if header then
-		if header.detailCreatureFrame and header.detailCreatureFrame.detailCreature then
-			if theme.looktype and theme.looktype > 0 then
-				header.detailCreatureFrame.detailCreature:setOutfit({ type = theme.looktype })
-				local cr = header.detailCreatureFrame.detailCreature:getCreature()
-				if cr then cr:setStaticWalking(1000) end
-			end
-		end
-		header.detailHuntName:setText(string.format("%s (%s)", theme.name, currentTier == "easy" and "Facil" or (currentTier == "medium" and "Medio" or "Dificil")))
-		header.detailFocusTag:setText(theme.focus)
-		header.detailHuntDesc:setText(hunt.desc or theme.desc)
+	local creatureWidget = dtView:recursiveGetChildById('detailCreature')
+	if creatureWidget and theme.looktype and theme.looktype > 0 then
+		creatureWidget:setOutfit({ type = theme.looktype })
+		local cr = creatureWidget:getCreature()
+		if cr then cr:setStaticWalking(1000) end
+	end
+
+	local huntNameLabel = dtView:recursiveGetChildById('detailHuntName')
+	if huntNameLabel then
+		huntNameLabel:setText(string.format("%s (%s)", theme.name, currentTier == "easy" and "Facil" or (currentTier == "medium" and "Medio" or "Dificil")))
+	end
+
+	local focusTagLabel = dtView:recursiveGetChildById('detailFocusTag')
+	if focusTagLabel then
+		focusTagLabel:setText(theme.focus)
+	end
+
+	local huntDescLabel = dtView:recursiveGetChildById('detailHuntDesc')
+	if huntDescLabel then
+		huntDescLabel:setText(hunt.desc or theme.desc)
 	end
 
 	-- Painel Esquerdo: Dificuldade (3 Botoes)
-	local leftPanel = dtView.leftConfigPanel
-	if leftPanel and leftPanel.diffButtonsRow then
-		local bEasy = leftPanel.diffButtonsRow.diffEasyBtn
-		local bMed = leftPanel.diffButtonsRow.diffMediumBtn
-		local bHard = leftPanel.diffButtonsRow.diffHardBtn
+	local bEasy = dtView:recursiveGetChildById('diffEasyBtn')
+	local bMed = dtView:recursiveGetChildById('diffMediumBtn')
+	local bHard = dtView:recursiveGetChildById('diffHardBtn')
 
+	if bEasy then
 		bEasy:setColor(currentTier == "easy" and "#00ff88" or "#888888")
+		bEasy.onClick = function() self:renderDetails(theme.id, "easy") end
+	end
+	if bMed then
 		bMed:setColor(currentTier == "medium" and "#ffd700" or "#888888")
+		bMed.onClick = function() self:renderDetails(theme.id, "medium") end
+	end
+	if bHard then
 		bHard:setColor(currentTier == "hard" and "#ff5555" or "#888888")
-
-		bEasy.onClick = function() self:showDetails(theme.id, "easy") end
-		bMed.onClick = function() self:showDetails(theme.id, "medium") end
-		bHard.onClick = function() self:showDetails(theme.id, "hard") end
+		bHard.onClick = function() self:renderDetails(theme.id, "hard") end
 	end
 
 	-- Painel Esquerdo: Criaturas da Onda e Custos
-	if leftPanel and leftPanel.wavesBox then
+	local wavesLabel = dtView:recursiveGetChildById('wavesSummaryLabel')
+	local suppliesLabel = dtView:recursiveGetChildById('suppliesLabel')
+	if wavesLabel then
 		local waveSummary = {}
 		if hunt.waves then
 			for _, w in ipairs(hunt.waves) do
@@ -1218,12 +1233,14 @@ function idleHuntController:showDetails(themeOrHuntId, tier)
 			end
 		end
 		local summaryText = #waveSummary > 0 and table.concat(waveSummary, " + ") or hunt.monster or "Criaturas"
-		leftPanel.wavesBox.wavesSummaryLabel:setText(string.format("Onda: %s", summaryText))
-		leftPanel.wavesBox.suppliesLabel:setText(string.format("Suprimentos: ~%d gp / turno", tonumber(hunt.cost) or 10))
+		wavesLabel:setText(string.format("Onda: %s", summaryText))
+	end
+	if suppliesLabel then
+		suppliesLabel:setText(string.format("Suprimentos: ~%d gp / turno", tonumber(hunt.cost) or 10))
 	end
 
 	-- Painel Esquerdo: Fraquezas e Resistencias Elementais (7 Elementos - Sem Mojibake)
-	local elemGrid = leftPanel and leftPanel.elementsGrid
+	local elemGrid = dtView:recursiveGetChildById('elementsGrid')
 	if elemGrid then
 		elemGrid:destroyChildren()
 		local ELEM_DEFS = {
@@ -1266,8 +1283,7 @@ function idleHuntController:showDetails(themeOrHuntId, tier)
 	end
 
 	-- Painel Direito: Loot Possivel com Checkboxes (SEM MOEDAS!)
-	local rightPanel = dtView.rightLootPanel
-	local dropsList = rightPanel and rightPanel.detailDropsList
+	local dropsList = dtView:recursiveGetChildById('detailDropsList')
 	if dropsList then
 		dropsList:destroyChildren()
 		local hasDrops = false
@@ -1329,8 +1345,9 @@ function idleHuntController:showDetails(themeOrHuntId, tier)
 	self:requestRequirements(hunt.id)
 
 	-- Botao Iniciar Cacada
-	if dtView.startHuntButton then
-		dtView.startHuntButton.onClick = function()
+	local startBtn = dtView:recursiveGetChildById('startHuntButton')
+	if startBtn then
+		startBtn.onClick = function()
 			self:startHunt(hunt.id, "bold")
 		end
 	end

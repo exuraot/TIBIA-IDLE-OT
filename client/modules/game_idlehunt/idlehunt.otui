@@ -115,7 +115,10 @@ MainWindow
   id: idleHuntWindow
   !text: tr('IDLE HUNT - SISTEMA DE CACADAS')
   size: 720 620
-  padding: 12
+  padding-top: 38
+  padding-left: 14
+  padding-right: 14
+  padding-bottom: 14
   @onEscape: idleHuntController:toggle()
 
   Panel

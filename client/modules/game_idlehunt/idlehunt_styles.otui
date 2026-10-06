@@ -82,6 +82,7 @@ HuntCard < Panel
     margin-top: 3
     margin-left: 8
     margin-right: 10
+    height: 26
     text-wrap: true
 
   Label
@@ -116,7 +117,7 @@ HuntCard < Panel
     margin-right: 6
 
 ElementBadge < Panel
-  size: 88 36
+  size: 80 30
   image-source: /images/ui/containerslot
   image-border: 2
   padding: 2
@@ -127,7 +128,7 @@ ElementBadge < Panel
     color: #e0e0e0
     anchors.top: parent.top
     anchors.horizontalCenter: parent.horizontalCenter
-    margin-top: 2
+    margin-top: 1
     text-auto-resize: true
 
   Label
@@ -136,8 +137,59 @@ ElementBadge < Panel
     color: #00ff88
     anchors.bottom: parent.bottom
     anchors.horizontalCenter: parent.horizontalCenter
-    margin-bottom: 2
+    margin-bottom: 1
     text-auto-resize: true
+
+DropRowCheckItem < Panel
+  height: 42
+  image-source: /images/ui/containerslot
+  image-border: 2
+  padding: 3
+  margin-bottom: 3
+
+  UIItem
+    id: itemWidget
+    size: 32 32
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 2
+    virtual: true
+
+  Label
+    id: itemNameLabel
+    font: verdana-11px-rounded
+    color: #ffffff
+    anchors.top: parent.top
+    anchors.left: itemWidget.right
+    anchors.right: keepCheckBox.left
+    margin-left: 8
+    margin-top: 3
+    margin-right: 6
+    text-auto-resize: true
+
+  Label
+    id: itemInfoLabel
+    font: verdana-11px-rounded
+    color: #ffd700
+    anchors.bottom: parent.bottom
+    anchors.left: itemWidget.right
+    anchors.right: keepCheckBox.left
+    margin-left: 8
+    margin-bottom: 3
+    margin-right: 6
+    text-auto-resize: true
+
+  CheckBox
+    id: keepCheckBox
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 62
+
+  CheckBox
+    id: sellCheckBox
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 18
 
 DropRowItem < Panel
   height: 40

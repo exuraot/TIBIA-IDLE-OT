@@ -1,5 +1,5 @@
 ElementBadge < Panel
-  size: 92 32
+  size: 74 30
   image-source: /images/ui/containerslot
   image-border: 2
   padding: 2
@@ -7,138 +7,74 @@ ElementBadge < Panel
   Label
     id: elementLabel
     font: verdana-11px-rounded
+    color: #e0e0e0
     anchors.top: parent.top
     anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 1
     text-auto-resize: true
 
   Label
     id: valueLabel
     font: verdana-11px-rounded
+    color: #00ff88
     anchors.bottom: parent.bottom
     anchors.horizontalCenter: parent.horizontalCenter
+    margin-bottom: 1
     text-auto-resize: true
 
-DropRowItem < Panel
-  height: 38
-  margin-top: 4
+DropRowCheckItem < Panel
+  height: 40
   image-source: /images/ui/containerslot
   image-border: 2
-  padding: 4
+  padding: 2
+  margin-bottom: 3
 
   UIItem
     id: itemWidget
     size: 32 32
     anchors.left: parent.left
     anchors.verticalCenter: parent.verticalCenter
+    margin-left: 2
     virtual: true
 
   Label
     id: itemNameLabel
     font: verdana-11px-rounded
-    color: #ffd700
+    color: #ffffff
     anchors.top: parent.top
     anchors.left: itemWidget.right
+    anchors.right: keepCheckBox.left
     margin-left: 8
+    margin-top: 2
+    margin-right: 4
     text-auto-resize: true
 
   Label
     id: itemInfoLabel
     font: verdana-11px-rounded
-    color: #a0a0a0
+    color: #ffd700
     anchors.bottom: parent.bottom
     anchors.left: itemWidget.right
+    anchors.right: keepCheckBox.left
     margin-left: 8
+    margin-bottom: 2
+    margin-right: 4
     text-auto-resize: true
 
-  Button
-    id: lockButton
-    font: verdana-11px-rounded
-    size: 150 24
+  CheckBox
+    id: keepCheckBox
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
+    margin-right: 64
 
-HuntCard < Panel
-  height: 74
-  margin-top: 4
-  margin-bottom: 2
-  image-source: /images/ui/containerslot
-  image-border: 2
-  padding: 6
-
-  Panel
-    id: monsterFrame
-    size: 48 48
-    anchors.left: parent.left
-    anchors.verticalCenter: parent.verticalCenter
-    image-source: /images/ui/containerslot
-    image-border: 2
-
-    UICreature
-      id: monsterCreature
-      size: 44 44
-      anchors.centerIn: parent
-      phantom: true
-
-  Button
-    id: configButton
-    !text: tr('Configurar')
-    font: verdana-11px-rounded
-    color: #00ff88
-    width: 90
-    height: 26
+  CheckBox
+    id: sellCheckBox
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
-
-  Label
-    id: huntTitle
-    font: verdana-11px-rounded
-    color: #ffd700
-    anchors.top: parent.top
-    anchors.left: monsterFrame.right
-    margin-left: 8
-    text-auto-resize: true
-
-  Label
-    id: focusTag
-    font: verdana-11px-rounded
-    anchors.top: parent.top
-    anchors.left: huntTitle.right
-    margin-left: 8
-    text-auto-resize: true
-
-  Label
-    id: huntDesc
-    font: verdana-11px-rounded
-    color: #c0c0c0
-    anchors.top: huntTitle.bottom
-    anchors.left: monsterFrame.right
-    anchors.right: configButton.left
-    margin-top: 3
-    margin-left: 8
-    margin-right: 8
-    height: 26
-    text-wrap: true
-
-  Label
-    id: huntCost
-    font: verdana-11px-rounded
-    color: #888888
-    anchors.bottom: parent.bottom
-    anchors.left: monsterFrame.right
-    margin-left: 8
-    text-auto-resize: true
-
-  Label
-    id: recordLabel
-    font: verdana-11px-rounded
-    color: #00ddff
-    anchors.bottom: parent.bottom
-    anchors.left: huntCost.right
-    margin-left: 12
-    text-auto-resize: true
+    margin-right: 18
 
 TipBox < Panel
-  height: 36
+  height: 42
   image-source: /images/ui/containerslot
   image-border: 2
   padding: 4
@@ -167,23 +103,24 @@ TipBox < Panel
     color: #99ddff
     anchors.left: tipTitle.right
     anchors.right: parent.right
-    anchors.verticalCenter: parent.verticalCenter
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
     margin-left: 6
     margin-right: 6
+    margin-top: 3
+    margin-bottom: 3
     text-wrap: true
 
 MainWindow
   id: idleHuntWindow
   !text: tr('IDLE HUNT - SISTEMA DE CACADAS')
   size: 720 620
-  @onEscape: self:hide()
+  padding: 12
+  @onEscape: idleHuntController:toggle()
 
   Panel
     id: dashboardView
-    anchors.top: parent.top
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.bottom: parent.bottom
+    anchors.fill: parent
     visible: true
 
     Panel
@@ -191,87 +128,43 @@ MainWindow
       anchors.top: parent.top
       anchors.left: parent.left
       anchors.right: parent.right
-      height: 44
+      height: 38
       image-source: /images/ui/containerslot
-      image-border: 3
-      padding: 6
+      image-border: 2
+      padding: 4
 
       Label
         id: staminaLabel
         !text: tr('Stamina IDLE: 24h 00m')
         font: verdana-11px-rounded
-        color: #00ffcc
+        color: #00ff88
         anchors.top: parent.top
         anchors.left: parent.left
+        margin-left: 4
+        margin-top: 2
         text-auto-resize: true
 
       Label
-        id: staminaInfo
+        id: staminaDesc
         !text: tr('(Consumo 3x mais lento: 1h Stamina = 3h reais)')
         font: verdana-11px-rounded
-        color: #a0a0a0
-        anchors.top: staminaLabel.top
+        color: #888888
+        anchors.top: parent.top
         anchors.right: parent.right
+        margin-right: 4
+        margin-top: 2
         text-auto-resize: true
 
       ProgressBar
         id: staminaBar
-        anchors.top: staminaLabel.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        margin-top: 5
         height: 10
-        background-color: #00cc88
-
-    Panel
-      id: dashboardBottomBar
-      anchors.left: parent.left
-      anchors.right: parent.right
-      anchors.bottom: parent.bottom
-      height: 28
-
-      Button
-        id: quickSellButton
-        !text: tr('Quick Sell')
-        font: verdana-11px-rounded
-        width: 140
-        height: 26
-        color: #00ff88
         anchors.left: parent.left
-        anchors.verticalCenter: parent.verticalCenter
-        tooltip: tr('Vender imediatamente itens da backpack marcados como [UNLOCKED]')
-
-      Button
-        id: teleportTempleButton
-        !text: tr('Templo')
-        font: verdana-11px-rounded
-        width: 80
-        height: 26
-        anchors.left: quickSellButton.right
-        anchors.verticalCenter: parent.verticalCenter
-        margin-left: 6
-        tooltip: tr('Teleportar para o Templo')
-
-      Button
-        id: teleportHouseButton
-        !text: tr('Casa')
-        font: verdana-11px-rounded
-        width: 80
-        height: 26
-        anchors.left: teleportTempleButton.right
-        anchors.verticalCenter: parent.verticalCenter
-        margin-left: 6
-        tooltip: tr('Teleportar para a sua casa')
-
-      Button
-        id: closeButton
-        !text: tr('Fechar')
-        font: verdana-11px-rounded
-        width: 80
-        height: 26
         anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
-        @onClick: idleHuntController:toggle()
+        anchors.bottom: parent.bottom
+        margin-left: 4
+        margin-right: 4
+        margin-bottom: 2
+        background-color: #00cc66
 
     Panel
       id: idleModeCard
@@ -298,7 +191,7 @@ MainWindow
 
       Label
         id: idleDesc
-        !text: tr('Escolha uma das 21 hunts disponiveis divididas em Facil, Medio e Dificil.\nConfigure sua intensidade de Pull, analise os elementos das criaturas e avance continuamente!')
+        !text: tr('Escolha uma das 21 hunts disponiveis divididas em Facil, Medio e Dificil.\nConfigure seus suprimentos, analise as fraquezas das criaturas e avance continuamente!')
         font: verdana-11px-rounded
         color: #c0c0c0
         anchors.top: idleTitle.bottom
@@ -307,7 +200,7 @@ MainWindow
         margin-top: 14
         margin-left: 20
         margin-right: 20
-        height: 34
+        height: 54
         text-align: center
         text-wrap: true
 
@@ -318,17 +211,19 @@ MainWindow
         color: #00ff88
         size: 240 38
         anchors.centerIn: parent
-        tooltip: tr('Abrir o catalogo de hunts para escolher onde cacar')
 
       TipBox
         id: dashboardTipBox
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        margin-bottom: 6
+        margin-bottom: 8
+        margin-left: 10
+        margin-right: 10
+        height: 44
 
     Panel
-      id: activeHuntCard
+      id: huntingCard
       anchors.top: staminaPanel.bottom
       anchors.left: parent.left
       anchors.right: parent.right
@@ -337,127 +232,192 @@ MainWindow
       margin-bottom: 8
       image-source: /images/ui/containerslot
       image-border: 3
-      padding: 12
+      padding: 10
       visible: false
 
       Panel
-        id: activeCreatureFrame
-        size: 64 64
-        image-source: /images/ui/containerslot
-        image-border: 2
+        id: huntingHeader
         anchors.top: parent.top
-        anchors.left: parent.left
-        margin-top: 4
-        margin-left: 4
-
-        UICreature
-          id: activeCreature
-          size: 58 58
-          anchors.centerIn: parent
-          phantom: true
-
-      Label
-        id: activeTitle
-        !text: tr('Cacando: ...')
-        font: verdana-11px-rounded
-        color: #00ff88
-        anchors.top: parent.top
-        anchors.left: activeCreatureFrame.right
-        margin-top: 6
-        margin-left: 12
-        text-auto-resize: true
-
-      Label
-        id: activePullLabel
-        !text: tr('Intensidade: [Ousado]')
-        font: verdana-11px-rounded
-        color: #ffd700
-        anchors.top: activeTitle.bottom
-        anchors.left: activeCreatureFrame.right
-        margin-top: 6
-        margin-left: 12
-        text-auto-resize: true
-
-      Panel
-        id: activeStatsBox
-        anchors.top: activeCreatureFrame.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: activeTipBox.top
-        margin-top: 10
-        margin-bottom: 8
+        height: 60
         image-source: /images/ui/containerslot
         image-border: 2
-        padding: 8
-        layout:
-          type: verticalBox
-          spacing: 8
+        padding: 4
+
+        Panel
+          id: activeMonsterFrame
+          size: 52 52
+          image-source: /images/ui/containerslot
+          image-border: 2
+          anchors.left: parent.left
+          anchors.verticalCenter: parent.verticalCenter
+          margin-left: 2
+
+          UICreature
+            id: activeMonsterCreature
+            size: 46 46
+            anchors.centerIn: parent
+            phantom: true
 
         Label
-          id: statXp
-          !text: tr('Experiencia Ganha: +0 XP')
-          font: verdana-11px-rounded
-          color: #00ff88
-          text-auto-resize: true
-
-        Label
-          id: statGold
-          !text: tr('Ouro / Loot Coletado: 0 gp')
+          id: activeHuntName
           font: verdana-11px-rounded
           color: #ffd700
+          anchors.top: parent.top
+          anchors.left: activeMonsterFrame.right
+          margin-left: 8
+          margin-top: 2
           text-auto-resize: true
 
         Label
-          id: statSupplies
-          !text: tr('Suprimentos Gastos: 0 gp')
+          id: huntStatusBadge
+          !text: tr('[CACANDO AO VIVO]')
           font: verdana-11px-rounded
-          color: #ff9955
+          color: #00ff88
+          anchors.top: parent.top
+          anchors.left: activeHuntName.right
+          margin-left: 8
+          margin-top: 2
           text-auto-resize: true
 
         Label
-          id: statRates
-          !text: tr('Taxa Atual: 0 XP/h | 0 GP/h')
+          id: hpLabel
+          !text: tr('HP do Jogador: 100%')
           font: verdana-11px-rounded
-          color: #00ddff
+          color: #ff5555
+          anchors.bottom: parent.bottom
+          anchors.left: activeMonsterFrame.right
+          margin-left: 8
+          margin-bottom: 4
           text-auto-resize: true
 
         Label
-          id: statTime
-          !text: tr('Tempo de Cacada: 00m 00s')
+          id: durationLabel
+          !text: tr('Tempo de Hunt: 00:00')
           font: verdana-11px-rounded
-          color: #e0e0e0
+          color: #ffffff
+          anchors.bottom: parent.bottom
+          anchors.right: parent.right
+          margin-right: 8
+          margin-bottom: 4
           text-auto-resize: true
 
-        Label
-          id: statAutosell
-          !text: tr('Proxima Auto-Venda em: 10m 00s')
-          font: verdana-11px-rounded
-          color: #a0a0a0
-          text-auto-resize: true
-
-      TipBox
-        id: activeTipBox
-        anchors.bottom: stopHuntButton.top
+      Panel
+        id: metricsGrid
+        anchors.top: huntingHeader.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        margin-bottom: 8
+        margin-top: 8
+        height: 64
+        image-source: /images/ui/containerslot
+        image-border: 2
+        padding: 6
+
+        Label
+          id: xpSessionLabel
+          !text: tr('EXP Sessao: +0')
+          font: verdana-11px-rounded
+          color: #00ff88
+          anchors.top: parent.top
+          anchors.left: parent.left
+          margin-left: 8
+          margin-top: 4
+          text-auto-resize: true
+
+        Label
+          id: xpRateLabel
+          !text: tr('Taxa EXP/h: 0 XP/h')
+          font: verdana-11px-rounded
+          color: #00ddff
+          anchors.top: parent.top
+          anchors.right: parent.right
+          margin-right: 8
+          margin-top: 4
+          text-auto-resize: true
+
+        Label
+          id: suppliesSpentLabel
+          !text: tr('Suprimentos Gastos: 0 gp')
+          font: verdana-11px-rounded
+          color: #ffaa00
+          anchors.bottom: parent.bottom
+          anchors.left: parent.left
+          margin-left: 8
+          margin-bottom: 4
+          text-auto-resize: true
+
+        Label
+          id: goldEarnedLabel
+          !text: tr('Lucro Estimado: 0 gp')
+          font: verdana-11px-rounded
+          color: #ffd700
+          anchors.bottom: parent.bottom
+          anchors.right: parent.right
+          margin-right: 8
+          margin-bottom: 4
+          text-auto-resize: true
 
       Button
-        id: stopHuntButton
-        !text: tr('ENCERRAR CACADA')
+        id: emergencyStopButton
+        !text: tr('ENCERRAR CACADA E VOLTAR AO TEMPLO')
         font: verdana-11px-rounded
-        color: #ff5555
-        size: 220 30
+        color: #ff4444
+        size: 320 32
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
-        margin-bottom: 6
+        margin-bottom: 8
+
+    Panel
+      id: dashboardBottomBar
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      height: 28
+
+      Button
+        id: quickSellButton
+        !text: tr('Quick Sell')
+        font: verdana-11px-rounded
+        color: #00ff88
+        width: 110
+        height: 26
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+
+      Button
+        id: teleportTempleButton
+        !text: tr('Templo')
+        font: verdana-11px-rounded
+        width: 90
+        height: 26
+        anchors.left: quickSellButton.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-left: 6
+
+      Button
+        id: teleportHouseButton
+        !text: tr('Casa')
+        font: verdana-11px-rounded
+        width: 90
+        height: 26
+        anchors.left: teleportTempleButton.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-left: 6
+
+      Button
+        id: closeDashboardButton
+        !text: tr('Fechar')
+        font: verdana-11px-rounded
+        width: 90
+        height: 26
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        @onClick: idleHuntController:toggle()
 
   Panel
     id: catalogView
-    anchors.top: parent.top
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.bottom: parent.bottom
+    anchors.fill: parent
     visible: false
 
     Panel
@@ -471,38 +431,27 @@ MainWindow
         id: backToDashboardBtn
         !text: tr('< Voltar ao Painel')
         font: verdana-11px-rounded
-        width: 140
+        width: 150
         height: 26
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
+
+      TextEdit
+        id: huntSearchInput
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        width: 220
+        height: 24
 
       Label
         id: searchLabel
         !text: tr('Buscar:')
         font: verdana-11px-rounded
+        color: #ffffff
+        anchors.right: huntSearchInput.left
         anchors.verticalCenter: parent.verticalCenter
-        anchors.right: searchEdit.left
         margin-right: 6
         text-auto-resize: true
-
-      TextEdit
-        id: searchEdit
-        width: 220
-        height: 24
-        font: verdana-11px-rounded
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
-
-    Panel
-      id: catalogFilterPanel
-      anchors.top: catalogTopBar.bottom
-      anchors.left: parent.left
-      anchors.right: parent.right
-      margin-top: 6
-      height: 26
-      layout:
-        type: horizontalBox
-        spacing: 6
 
     TipBox
       id: catalogTipBox
@@ -510,10 +459,11 @@ MainWindow
       anchors.left: parent.left
       anchors.right: parent.right
       margin-bottom: 4
+      height: 40
 
     VerticalScrollBar
       id: huntListScrollBar
-      anchors.top: catalogFilterPanel.bottom
+      anchors.top: catalogTopBar.bottom
       anchors.bottom: catalogTipBox.top
       anchors.right: parent.right
       margin-top: 6
@@ -523,7 +473,7 @@ MainWindow
 
     UIScrollArea
       id: huntList
-      anchors.top: catalogFilterPanel.bottom
+      anchors.top: catalogTopBar.bottom
       anchors.left: parent.left
       anchors.right: huntListScrollBar.left
       anchors.bottom: catalogTipBox.top
@@ -537,10 +487,7 @@ MainWindow
 
   Panel
     id: detailsView
-    anchors.top: parent.top
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.bottom: parent.bottom
+    anchors.fill: parent
     visible: false
 
     Panel
@@ -569,20 +516,29 @@ MainWindow
         margin-left: 12
         text-auto-resize: true
 
+      Label
+        id: detailRecordLabel
+        font: verdana-11px-rounded
+        color: #00ddff
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 6
+        text-auto-resize: true
+
     Panel
       id: detailCreatureHeader
       anchors.top: detailsTopBar.bottom
       anchors.left: parent.left
       anchors.right: parent.right
-      margin-top: 6
-      height: 64
+      margin-top: 4
+      height: 52
       image-source: /images/ui/containerslot
       image-border: 3
       padding: 4
 
       Panel
         id: detailCreatureFrame
-        size: 54 54
+        size: 44 44
         image-source: /images/ui/containerslot
         image-border: 2
         anchors.left: parent.left
@@ -591,7 +547,7 @@ MainWindow
 
         UICreature
           id: detailCreature
-          size: 48 48
+          size: 40 40
           anchors.centerIn: parent
           phantom: true
 
@@ -606,156 +562,211 @@ MainWindow
         text-auto-resize: true
 
       Label
+        id: detailFocusTag
+        font: verdana-11px-rounded
+        color: #00ff88
+        anchors.top: detailHuntName.top
+        anchors.left: detailHuntName.right
+        margin-left: 8
+        text-auto-resize: true
+
+      Label
         id: detailHuntDesc
         font: verdana-11px-rounded
         color: #c0c0c0
-        anchors.top: detailHuntName.bottom
+        anchors.bottom: parent.bottom
         anchors.left: detailCreatureFrame.right
         anchors.right: parent.right
-        margin-top: 2
         margin-left: 8
+        margin-bottom: 2
         margin-right: 8
-        height: 26
+        height: 18
         text-wrap: true
 
-      Label
-        id: detailHuntInfo
-        font: verdana-11px-rounded
-        color: #e0bb66
-        anchors.bottom: parent.bottom
-        anchors.left: detailCreatureFrame.right
-        margin-left: 8
-        margin-bottom: 2
-        text-auto-resize: true
-
-      Label
-        id: detailRecordLabel
-        font: verdana-11px-rounded
-        color: #00ddff
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        margin-right: 8
-        margin-bottom: 2
-        text-auto-resize: true
-
     Panel
-      id: pullsPanel
+      id: leftConfigPanel
       anchors.top: detailCreatureHeader.bottom
       anchors.left: parent.left
-      anchors.right: parent.right
+      anchors.right: parent.horizontalCenter
+      anchors.bottom: detailsTipBox.top
       margin-top: 6
-      height: 52
+      margin-right: 4
+      margin-bottom: 6
       image-source: /images/ui/containerslot
       image-border: 2
-      padding: 4
+      padding: 6
 
       Label
-        id: pullsTitle
-        !text: tr('1. Intensidade do Pull (Criaturas por Onda):')
+        id: diffTitle
+        !text: tr('1. Dificuldade (Tamanho do Pull):')
         font: verdana-11px-rounded
         color: #ffd700
         anchors.top: parent.top
         anchors.left: parent.left
-        margin-left: 4
-        text-auto-resize: true
-
-      Button
-        id: pullCautiousBtn
-        !text: tr('Cauteloso (1 Mob)')
-        font: verdana-11px-rounded
-        width: 180
-        height: 22
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        margin-left: 4
-        margin-bottom: 2
-
-      Button
-        id: pullBoldBtn
-        !text: tr('Ousado (2-3 Mobs)')
-        font: verdana-11px-rounded
-        width: 180
-        height: 22
-        anchors.bottom: parent.bottom
-        anchors.left: pullCautiousBtn.right
-        margin-left: 8
-        margin-bottom: 2
-
-      Button
-        id: pullAggressiveBtn
-        !text: tr('Agressivo (4-6 Mobs)')
-        font: verdana-11px-rounded
-        width: 180
-        height: 22
-        anchors.bottom: parent.bottom
-        anchors.left: pullBoldBtn.right
-        margin-left: 8
-        margin-bottom: 2
-
-    Panel
-      id: elementsPanel
-      anchors.top: pullsPanel.bottom
-      anchors.left: parent.left
-      anchors.right: parent.right
-      margin-top: 6
-      height: 58
-      image-source: /images/ui/containerslot
-      image-border: 2
-      padding: 4
-
-      Label
-        id: elementsTitle
-        !text: tr('2. Fraquezas e Resistencias Elementais:')
-        font: verdana-11px-rounded
-        color: #ffd700
-        anchors.top: parent.top
-        anchors.left: parent.left
-        margin-left: 4
+        margin-left: 2
         text-auto-resize: true
 
       Panel
-        id: elementsRow
-        anchors.top: elementsTitle.bottom
+        id: diffButtonsRow
+        anchors.top: diffTitle.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         margin-top: 4
-        height: 36
-        layout:
-          type: horizontalBox
-          spacing: 6
+        height: 26
 
-    TipBox
-      id: detailsTipBox
-      anchors.bottom: reqPanel.top
-      anchors.left: parent.left
-      anchors.right: parent.right
-      margin-bottom: 6
+        Button
+          id: diffEasyBtn
+          !text: tr('Facil')
+          font: verdana-11px-rounded
+          color: #00ff88
+          width: 104
+          height: 24
+          anchors.left: parent.left
+          anchors.verticalCenter: parent.verticalCenter
+
+        Button
+          id: diffMediumBtn
+          !text: tr('Medio')
+          font: verdana-11px-rounded
+          color: #ffd700
+          width: 104
+          height: 24
+          anchors.horizontalCenter: parent.horizontalCenter
+          anchors.verticalCenter: parent.verticalCenter
+
+        Button
+          id: diffHardBtn
+          !text: tr('Dificil')
+          font: verdana-11px-rounded
+          color: #ff5555
+          width: 104
+          height: 24
+          anchors.right: parent.right
+          anchors.verticalCenter: parent.verticalCenter
+
+      Label
+        id: wavesTitle
+        !text: tr('2. Criaturas da Onda e Custos:')
+        font: verdana-11px-rounded
+        color: #ffd700
+        anchors.top: diffButtonsRow.bottom
+        anchors.left: parent.left
+        margin-top: 8
+        margin-left: 2
+        text-auto-resize: true
+
+      Panel
+        id: wavesBox
+        anchors.top: wavesTitle.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        margin-top: 4
+        height: 48
+        image-source: /images/ui/containerslot
+        image-border: 2
+        padding: 4
+
+        Label
+          id: wavesSummaryLabel
+          !text: tr('Onda: 3x Rotworm')
+          font: verdana-11px-rounded
+          color: #ffffff
+          anchors.top: parent.top
+          anchors.left: parent.left
+          margin-left: 4
+          margin-top: 2
+          text-auto-resize: true
+
+        Label
+          id: suppliesLabel
+          !text: tr('Suprimentos: ~10 gp / turno')
+          font: verdana-11px-rounded
+          color: #e0bb66
+          anchors.bottom: parent.bottom
+          anchors.left: parent.left
+          margin-left: 4
+          margin-bottom: 2
+          text-auto-resize: true
+
+      Label
+        id: elementsTitle
+        !text: tr('3. Fraquezas e Resistencias Elementais:')
+        font: verdana-11px-rounded
+        color: #ffd700
+        anchors.top: wavesBox.bottom
+        anchors.left: parent.left
+        margin-top: 8
+        margin-left: 2
+        text-auto-resize: true
+
+      Panel
+        id: elementsGrid
+        anchors.top: elementsTitle.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        margin-top: 4
+        layout:
+          type: grid
+          cell-size: 78 30
+          cell-spacing: 4
+          flow: true
 
     Panel
-      id: dropsBoxPanel
-      anchors.top: elementsPanel.bottom
-      anchors.left: parent.left
+      id: rightLootPanel
+      anchors.top: detailCreatureHeader.bottom
+      anchors.left: parent.horizontalCenter
       anchors.right: parent.right
       anchors.bottom: detailsTipBox.top
       margin-top: 6
+      margin-left: 4
       margin-bottom: 6
       image-source: /images/ui/containerslot
       image-border: 2
-      padding: 4
+      padding: 6
 
-      Label
-        id: dropsTitle
-        !text: tr('3. Drops da Hunt ([LOCKED] = BP | [UNLOCKED] = Venda no Banco):')
-        font: verdana-11px-rounded
-        color: #ffd700
+      Panel
+        id: lootHeader
         anchors.top: parent.top
         anchors.left: parent.left
-        margin-left: 4
-        text-auto-resize: true
+        anchors.right: parent.right
+        height: 22
+
+        Label
+          id: lootTitle
+          !text: tr('Loot Possivel:')
+          font: verdana-11px-rounded
+          color: #ffd700
+          anchors.left: parent.left
+          anchors.verticalCenter: parent.verticalCenter
+          margin-left: 2
+          text-auto-resize: true
+
+        Label
+          id: keepColHeader
+          !text: tr('PEGAR')
+          font: verdana-11px-rounded
+          color: #00ddff
+          anchors.right: sellColHeader.left
+          anchors.verticalCenter: parent.verticalCenter
+          margin-right: 14
+          width: 44
+          text-align: center
+
+        Label
+          id: sellColHeader
+          !text: tr('VENDER')
+          font: verdana-11px-rounded
+          color: #ffd700
+          anchors.right: parent.right
+          anchors.verticalCenter: parent.verticalCenter
+          margin-right: 10
+          width: 44
+          text-align: center
 
       VerticalScrollBar
         id: detailDropsScrollBar
-        anchors.top: dropsTitle.bottom
+        anchors.top: lootHeader.bottom
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         margin-top: 4
@@ -764,7 +775,7 @@ MainWindow
 
       UIScrollArea
         id: detailDropsList
-        anchors.top: dropsTitle.bottom
+        anchors.top: lootHeader.bottom
         anchors.left: parent.left
         anchors.right: detailDropsScrollBar.left
         anchors.bottom: parent.bottom
@@ -774,13 +785,21 @@ MainWindow
         layout:
           type: verticalBox
 
+    TipBox
+      id: detailsTipBox
+      anchors.bottom: reqPanel.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-bottom: 6
+      height: 40
+
     Panel
       id: reqPanel
       anchors.left: parent.left
       anchors.right: parent.right
       anchors.bottom: startHuntButton.top
       margin-bottom: 8
-      height: 48
+      height: 44
       image-source: /images/ui/containerslot
       image-border: 2
       padding: 4
@@ -797,7 +816,7 @@ MainWindow
 
       Label
         id: reqDetailsLabel
-        !text: tr('Level: OK | Ataque: OK | Defesa: OK | Banco: OK | Pocoes: Health/Mana')
+        !text: tr('Level: OK | Ataque: OK | Defesa: OK | Banco: OK')
         font: verdana-11px-rounded
         color: #c0c0c0
         anchors.bottom: parent.bottom
@@ -811,7 +830,7 @@ MainWindow
       !text: tr('INICIAR CACADA IDLE')
       font: verdana-11px-rounded
       color: #00ff88
-      size: 240 30
+      size: 240 32
       anchors.bottom: parent.bottom
       anchors.horizontalCenter: parent.horizontalCenter
       margin-bottom: 4

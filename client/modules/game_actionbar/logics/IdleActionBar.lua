@@ -95,6 +95,9 @@ function modules.game_actionbar.renderIdleButton(button)
     if button.item and button.item.gray then
         button.item.gray:setVisible(false)
     end
+    if button.item and button.item.text and button.item.text.gray then
+        button.item.text.gray:setVisible(false)
+    end
     if button.item then
         button.item:setDisplayCount(0)
         button.item:setOn(false)
@@ -532,3 +535,5 @@ function modules.game_actionbar.openIdleObjectWindow(button)
 
     renderObjects()
 end
+modules.game_actionbar.IdleActionBar = modules.game_actionbar.IdleActionBar or {}
+modules.game_actionbar.IdleActionBar.getIdleHotkeys = modules.game_actionbar.getIdleHotkeys

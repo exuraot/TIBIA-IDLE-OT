@@ -445,6 +445,17 @@ function updateButtonState(button)
         return
     end
 
+    -- In IDLE Mode: Never apply normal spell cooldown gray overlay to buttons!
+    if modules.game_actionbar and modules.game_actionbar.isIdleMode then
+        if button.item.text and button.item.text.gray then
+            button.item.text.gray:setVisible(false)
+        end
+        if button.item.gray then
+            button.item.gray:setVisible(false)
+        end
+        return
+    end
+
     button:recursiveGetChildById('activeSpell'):setVisible(false)
     if button.cache.isSpell then
         setupButtonTooltip(button, false)

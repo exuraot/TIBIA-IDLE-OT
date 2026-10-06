@@ -11,6 +11,8 @@ local MAX_IDLE_STAMINA = 1440
 -- STORAGE_IDLE_LOOT_BASE + itemId: 1 = sell, 0 / <= 0 = keep
 local STORAGE_IDLE_LOOT_BASE = 880000
 local STORAGE_LAST_QUICK_SELL = 889999
+local STORAGE_RECORD_EXP_BASE = 890000
+local STORAGE_RECORD_GP_BASE = 895000
 
 -- Coordenadas das Salas Instanciadas Modelo
 local ROOM_POS_EASY = Position(385, 754, 8)
@@ -49,7 +51,8 @@ local IDLE_HUNTS = {
 		desc = "Sala de treino inicial com 3 Rotworms. Ideal para iniciantes.",
 		monster = "Rotworm",
 		lookType = 26,
-		pos = Position(32797, 31560, 7),
+		elements = { physical = 0, fire = 0, earth = 0, energy = 0, ice = 0, holy = 0, death = 0 },
+		pos = ROOM_POS_EASY,
 		baseExp = 40,
 		supplyCostPerTurn = 10,
 		reqLevel = 8,
@@ -81,7 +84,8 @@ local IDLE_HUNTS = {
 		desc = "3 Amazons ágeis com drops frequentes de Protective Charm.",
 		monster = "Amazon",
 		lookType = 137,
-		pos = Position(32355, 31645, 1),
+		elements = { physical = 0, fire = 10, earth = -10, energy = 0, ice = 10, holy = 0, death = 10 },
+		pos = ROOM_POS_EASY,
 		baseExp = 80,
 		supplyCostPerTurn = 15,
 		reqLevel = 15,
@@ -112,7 +116,8 @@ local IDLE_HUNTS = {
 		desc = "3 Cyclops corpulentos com bom ganho de experiência e Cyclops Toes.",
 		monster = "Cyclops",
 		lookType = 22,
-		pos = Position(32616, 31414, 2),
+		elements = { physical = 0, fire = 0, earth = -20, energy = 0, ice = 0, holy = 10, death = 10 },
+		pos = ROOM_POS_EASY,
 		baseExp = 150,
 		supplyCostPerTurn = 30,
 		reqLevel = 25,
@@ -143,7 +148,8 @@ local IDLE_HUNTS = {
 		desc = "3 Minotaurs com alto rendimento de Minotaur Leather.",
 		monster = "Minotaur",
 		lookType = 29,
-		pos = Position(32465, 31952, 4),
+		elements = { physical = 0, fire = -20, earth = 0, energy = 0, ice = 10, holy = 0, death = 10 },
+		pos = ROOM_POS_EASY,
 		baseExp = 120,
 		supplyCostPerTurn = 25,
 		reqLevel = 20,
@@ -174,7 +180,8 @@ local IDLE_HUNTS = {
 		desc = "3 Skeletons antigos para treino rápido.",
 		monster = "Skeleton",
 		lookType = 18,
-		pos = Position(32784, 31097, 1),
+		elements = { physical = -20, fire = 10, earth = 100, energy = 0, ice = 0, holy = 20, death = -100 },
+		pos = ROOM_POS_EASY,
 		baseExp = 110,
 		supplyCostPerTurn = 25,
 		reqLevel = 22,
@@ -204,7 +211,8 @@ local IDLE_HUNTS = {
 		desc = "3 Dragons clássicos. Excelente avanço de experiência intermediária.",
 		monster = "Dragon",
 		lookType = 34,
-		pos = Position(33078, 32168, 4),
+		elements = { physical = 0, fire = -100, earth = -100, energy = -10, ice = 10, holy = 0, death = 0 },
+		pos = ROOM_POS_EASY,
 		baseExp = 700,
 		supplyCostPerTurn = 80,
 		reqLevel = 50,
@@ -236,7 +244,8 @@ local IDLE_HUNTS = {
 		desc = "3 Fire Elementals incandescentes para treinar combate elemental.",
 		monster = "Fire Elemental",
 		lookType = 49,
-		pos = Position(32797, 31558, 3),
+		elements = { physical = -10, fire = -100, earth = 0, energy = 0, ice = 25, holy = 0, death = 0 },
+		pos = ROOM_POS_EASY,
 		baseExp = 1200,
 		supplyCostPerTurn = 130,
 		reqLevel = 80,
@@ -269,7 +278,8 @@ local IDLE_HUNTS = {
 		desc = "3 Rotworms acompanhados por 2 Carrion Worms famintos.",
 		monster = "Carrion Worm",
 		lookType = 26,
-		pos = Position(32797, 31560, 7),
+		elements = { physical = 0, fire = 0, earth = 10, energy = -10, ice = 0, holy = 0, death = 0 },
+		pos = ROOM_POS_MEDIUM,
 		baseExp = 110,
 		supplyCostPerTurn = 25,
 		reqLevel = 20,
@@ -301,7 +311,8 @@ local IDLE_HUNTS = {
 		desc = "2 Amazons e 3 Valkyries atiradoras de lanças.",
 		monster = "Valkyrie",
 		lookType = 137,
-		pos = Position(32355, 31645, 1),
+		elements = { physical = 0, fire = 0, earth = 0, energy = 0, ice = 10, holy = 0, death = 10 },
+		pos = ROOM_POS_MEDIUM,
 		baseExp = 180,
 		supplyCostPerTurn = 35,
 		reqLevel = 28,
@@ -333,7 +344,8 @@ local IDLE_HUNTS = {
 		desc = "3 Cyclops e 2 Cyclops Drones agressivos.",
 		monster = "Cyclops Drone",
 		lookType = 22,
-		pos = Position(32616, 31414, 2),
+		elements = { physical = 0, fire = 0, earth = -20, energy = 0, ice = 5, holy = 10, death = 10 },
+		pos = ROOM_POS_MEDIUM,
 		baseExp = 320,
 		supplyCostPerTurn = 55,
 		reqLevel = 40,
@@ -364,7 +376,8 @@ local IDLE_HUNTS = {
 		desc = "2 Minotaurs, 2 Minotaur Guards e 1 Minotaur Archer.",
 		monster = "Minotaur Guard",
 		lookType = 29,
-		pos = Position(32465, 31952, 4),
+		elements = { physical = 0, fire = -20, earth = 0, energy = 0, ice = 10, holy = 0, death = 10 },
+		pos = ROOM_POS_MEDIUM,
 		baseExp = 260,
 		supplyCostPerTurn = 50,
 		reqLevel = 35,
@@ -396,7 +409,8 @@ local IDLE_HUNTS = {
 		desc = "2 Ghouls e 2 Crypt Shamblers rastejantes.",
 		monster = "Crypt Shambler",
 		lookType = 18,
-		pos = Position(32784, 31097, 1),
+		elements = { physical = -10, fire = 20, earth = 100, energy = 0, ice = 0, holy = 25, death = -100 },
+		pos = ROOM_POS_MEDIUM,
 		baseExp = 380,
 		supplyCostPerTurn = 65,
 		reqLevel = 45,
@@ -427,7 +441,8 @@ local IDLE_HUNTS = {
 		desc = "4 Dragons soltando rajadas de fogo contínuas.",
 		monster = "Dragon",
 		lookType = 34,
-		pos = Position(33078, 32168, 4),
+		elements = { physical = 0, fire = -100, earth = -100, energy = -10, ice = 10, holy = 0, death = 0 },
+		pos = ROOM_POS_MEDIUM,
 		baseExp = 1100,
 		supplyCostPerTurn = 130,
 		reqLevel = 75,
@@ -459,7 +474,8 @@ local IDLE_HUNTS = {
 		desc = "2 Fire Elementals e 2 Diabolic Imps traiçoeiros.",
 		monster = "Diabolic Imp",
 		lookType = 49,
-		pos = Position(32797, 31558, 3),
+		elements = { physical = 0, fire = -100, earth = -100, energy = 0, ice = 15, holy = 10, death = -10 },
+		pos = ROOM_POS_MEDIUM,
 		baseExp = 2600,
 		supplyCostPerTurn = 260,
 		reqLevel = 120,
@@ -494,7 +510,8 @@ local IDLE_HUNTS = {
 		desc = "4 Carrion Worms e 2 Rotworm Queens enfurecidas.",
 		monster = "Rotworm Queen",
 		lookType = 26,
-		pos = Position(32797, 31560, 7),
+		elements = { physical = 0, fire = 0, earth = 20, energy = -15, ice = 0, holy = 0, death = 0 },
+		pos = ROOM_POS_HARD,
 		baseExp = 310,
 		supplyCostPerTurn = 50,
 		reqLevel = 35,
@@ -525,7 +542,8 @@ local IDLE_HUNTS = {
 		desc = "4 Valkyries armadas e 2 Witches conjuradoras de fogo.",
 		monster = "Witch",
 		lookType = 137,
-		pos = Position(32355, 31645, 1),
+		elements = { physical = 0, fire = -20, earth = 0, energy = -20, ice = 10, holy = 0, death = 10 },
+		pos = ROOM_POS_HARD,
 		baseExp = 420,
 		supplyCostPerTurn = 70,
 		reqLevel = 45,
@@ -556,7 +574,8 @@ local IDLE_HUNTS = {
 		desc = "3 Cyclops Drones e 3 Cyclops Smiths forjadores.",
 		monster = "Cyclops Smith",
 		lookType = 22,
-		pos = Position(32616, 31414, 2),
+		elements = { physical = 0, fire = -50, earth = -20, energy = 0, ice = 10, holy = 10, death = 10 },
+		pos = ROOM_POS_HARD,
 		baseExp = 780,
 		supplyCostPerTurn = 100,
 		reqLevel = 60,
@@ -587,7 +606,8 @@ local IDLE_HUNTS = {
 		desc = "3 Minotaur Guards, 2 Minotaur Archers e 2 Minotaur Mages.",
 		monster = "Minotaur Mage",
 		lookType = 29,
-		pos = Position(32465, 31952, 4),
+		elements = { physical = 0, fire = -20, earth = 0, energy = -100, ice = 10, holy = 0, death = 10 },
+		pos = ROOM_POS_HARD,
 		baseExp = 690,
 		supplyCostPerTurn = 90,
 		reqLevel = 55,
@@ -619,7 +639,8 @@ local IDLE_HUNTS = {
 		desc = "3 Crypt Shamblers, 2 Bonebeasts e 1 Vampire sinistro.",
 		monster = "Vampire",
 		lookType = 18,
-		pos = Position(32784, 31097, 1),
+		elements = { physical = 0, fire = 10, earth = 100, energy = 0, ice = 0, holy = 25, death = -100 },
+		pos = ROOM_POS_HARD,
 		baseExp = 980,
 		supplyCostPerTurn = 120,
 		reqLevel = 70,
@@ -652,7 +673,8 @@ local IDLE_HUNTS = {
 		desc = "3 Dragons enfurecidos e 3 Dragon Lords devastadores.",
 		monster = "Dragon Lord",
 		lookType = 39,
-		pos = Position(33078, 32168, 4),
+		elements = { physical = 0, fire = -100, earth = -100, energy = -20, ice = 10, holy = 0, death = 0 },
+		pos = ROOM_POS_HARD,
 		baseExp = 2800,
 		supplyCostPerTurn = 280,
 		reqLevel = 100,
@@ -685,7 +707,8 @@ local IDLE_HUNTS = {
 		desc = "4 Diabolic Imps velozes e 2 Demons titânicos.",
 		monster = "Demon",
 		lookType = 35,
-		pos = Position(32797, 31558, 3),
+		elements = { physical = 0, fire = -100, earth = -100, energy = -20, ice = 10, holy = 12, death = -20 },
+		pos = ROOM_POS_HARD,
 		baseExp = 6800,
 		supplyCostPerTurn = 500,
 		reqLevel = 180,
@@ -998,16 +1021,31 @@ local function spawnHuntWave(player, hunt, session)
 		return
 	end
 
+	-- Limite de monstros pela intensidade do Pull escolhido pelo jogador
+	local pull = session.pull or "bold"
+	local maxPullMonsters = 3
+	if pull == "cautious" then
+		maxPullMonsters = 1
+	elseif pull == "bold" then
+		maxPullMonsters = (hunt.tier == "easy") and 2 or ((hunt.tier == "medium") and 3 or 4)
+	elseif pull == "aggressive" then
+		maxPullMonsters = (hunt.tier == "easy") and 3 or ((hunt.tier == "medium") and 5 or 7)
+	end
+
 	-- Invocação da nova onda
 	local offsets = {
 		{ x = -1, y = -1 }, { x = 1, y = -1 }, { x = -1, y = 1 }, { x = 1, y = 1 },
 		{ x = 0, y = -2 }, { x = 0, y = 2 }, { x = -2, y = 0 }, { x = 2, y = 0 }
 	}
 	local offsetIndex = 1
+	local totalSpawned = 0
 
 	if hunt.waves then
 		for _, w in ipairs(hunt.waves) do
 			for i = 1, w.count do
+				if totalSpawned >= maxPullMonsters then
+					break
+				end
 				local off = offsets[offsetIndex] or { x = math.random(-2, 2), y = math.random(-2, 2) }
 				offsetIndex = (offsetIndex % #offsets) + 1
 				local spawnPos = Position(pPos.x + off.x, pPos.y + off.y, pPos.z)
@@ -1017,7 +1055,11 @@ local function spawnHuntWave(player, hunt, session)
 					spawnPos:sendMagicEffect(CONST_ME_TELEPORT)
 					monster:setTarget(player)
 					table.insert(session.spawnedMonsters, monster:getId())
+					totalSpawned = totalSpawned + 1
 				end
+			end
+			if totalSpawned >= maxPullMonsters then
+				break
 			end
 		end
 	end
@@ -1029,9 +1071,12 @@ local function sendHuntStatusOpcode(player, huntId, session, curStamina, maxHp)
 	local nextAutosell = math.max(0, 600 - (now - (session.lastAutoSell or now)))
 	local lastQ = session.lastQuickSell or (player:getStorageValue(STORAGE_LAST_QUICK_SELL) > 0 and player:getStorageValue(STORAGE_LAST_QUICK_SELL) or 0)
 	local quickCooldown = math.max(0, 5 - (now - lastQ))
+	local elapsed = math.max(1, now - (session.startTime or now))
+	local rateExp = math.floor(((session.xpGained or 0) / elapsed) * 3600)
+	local rateGp = math.floor(((session.goldEarned or 0) / elapsed) * 3600)
 
 	local statusJson = string.format(
-		'{"action":"hunt_status","hunt_id":%d,"hp_percent":%d,"xp_session":%d,"supplies_spent":%d,"idle_stamina":%d,"pending_gold":%d,"next_autosell":%d,"quick_cooldown":%d}',
+		'{"action":"hunt_status","hunt_id":%d,"hp_percent":%d,"xp_session":%d,"supplies_spent":%d,"idle_stamina":%d,"pending_gold":%d,"next_autosell":%d,"quick_cooldown":%d,"elapsed":%d,"rate_exp":%d,"rate_gp":%d,"pull":%q}',
 		huntId,
 		math.floor((player:getHealth() / maxHp) * 100),
 		session.xpGained or 0,
@@ -1039,7 +1084,11 @@ local function sendHuntStatusOpcode(player, huntId, session, curStamina, maxHp)
 		curStamina,
 		session.goldEarned or 0,
 		nextAutosell,
-		quickCooldown
+		quickCooldown,
+		elapsed,
+		rateExp,
+		rateGp,
+		session.pull or "bold"
 	)
 	player:sendExtendedOpcode(OPCODE_IDLE_HUNT, statusJson)
 end
@@ -1061,6 +1110,28 @@ local function stopIdleHunt(playerId, reason, isEmergency, skipTeleport)
 	if player then
 		-- 1. Executa auto-venda de itens marcados com [$] antes de sair
 		sellPlayerLootFromInventory(player, huntId, "auto")
+
+		-- Verificação final de Recordes de XP/h e GP/h se durou pelo menos 10 minutos
+		if session and session.startTime then
+			local elapsed = os.time() - session.startTime
+			if elapsed >= 600 then
+				local curExpRate = math.floor(((session.xpGained or 0) / elapsed) * 3600)
+				local curGpRate = math.floor(((session.goldEarned or 0) / elapsed) * 3600)
+				local bestExp = math.max(0, player:getStorageValue(STORAGE_RECORD_EXP_BASE + huntId))
+				local bestGp = math.max(0, player:getStorageValue(STORAGE_RECORD_GP_BASE + huntId))
+
+				if curExpRate > bestExp then
+					player:setStorageValue(STORAGE_RECORD_EXP_BASE + huntId, curExpRate)
+					player:sendTextMessage(
+						MESSAGE_EVENT_ADVANCE,
+						string.format("[NOVO RECORDE IDLE]: Novo recorde de EXP/h em %s: %s XP/h!", (hunt and hunt.name or "Hunt"), formatNumber(curExpRate))
+					)
+				end
+				if curGpRate > bestGp then
+					player:setStorageValue(STORAGE_RECORD_GP_BASE + huntId, curGpRate)
+				end
+			end
+		end
 
 		-- 2. Limpa condições de combate
 		player:removeCondition(CONDITION_INFIGHT)
@@ -1148,11 +1219,31 @@ local function idleCombatLoop(playerId, huntId)
 	-- 3. Verificação e Respawn Contínuo de Ondas
 	spawnHuntWave(player, hunt, session)
 
-	-- 4. Auto-Venda Recorrente a cada 10 Minutos (600 segundos)
+	-- 4. Auto-Venda Recorrente e Verificação de Recordes a cada 10 Minutos
 	local now = os.time()
 	if (now - session.lastAutoSell) >= 600 then
 		session.lastAutoSell = now
 		sellPlayerLootFromInventory(player, huntId, "auto")
+	end
+
+	-- Verificação e Persistência de Recordes de XP/h e GP/h (após 10 minutos de caçada)
+	local elapsed = now - (session.startTime or now)
+	if elapsed >= 600 then
+		local curExpRate = math.floor(((session.xpGained or 0) / elapsed) * 3600)
+		local curGpRate = math.floor(((session.goldEarned or 0) / elapsed) * 3600)
+		local bestExp = math.max(0, player:getStorageValue(STORAGE_RECORD_EXP_BASE + huntId))
+		local bestGp = math.max(0, player:getStorageValue(STORAGE_RECORD_GP_BASE + huntId))
+
+		if curExpRate > bestExp then
+			player:setStorageValue(STORAGE_RECORD_EXP_BASE + huntId, curExpRate)
+			player:sendTextMessage(
+				MESSAGE_EVENT_ADVANCE,
+				string.format("[NOVO RECORDE IDLE]: Novo recorde de EXP/h em %s: %s XP/h!", hunt.name, formatNumber(curExpRate))
+			)
+		end
+		if curGpRate > bestGp then
+			player:setStorageValue(STORAGE_RECORD_GP_BASE + huntId, curGpRate)
+		end
 	end
 
 	-- 5. Consumo de Stamina IDLE (1 minuto a cada 3 minutos reais)
@@ -1171,7 +1262,7 @@ local function idleCombatLoop(playerId, huntId)
 end
 
 -- Iniciar Caçada IDLE
-local function startIdleHunt(player, huntId)
+local function startIdleHunt(player, huntId, pull)
 	local playerId = player:getId()
 
 	if _G.OnIdleHunt[playerId] then
@@ -1190,16 +1281,20 @@ local function startIdleHunt(player, huntId)
 		return false
 	end
 
+	pull = (pull == "cautious" or pull == "aggressive") and pull or "bold"
 	local meetsAll = evaluateHuntRequirements(player, hunt)
+	local now = os.time()
 
 	_G.OnIdleHunt[playerId] = {
 		huntId = huntId,
+		pull = pull,
+		startTime = now,
 		meetsRequirements = meetsAll,
 		xpGained = 0,
 		suppliesSpent = 0,
 		goldEarned = 0,
 		turnCount = 0,
-		lastAutoSell = os.time(),
+		lastAutoSell = now,
 		lastQuickSell = 0,
 		spawnedMonsters = {},
 		droppedCounts = {},
@@ -1292,11 +1387,21 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 				end
 			end
 
+			local elemParts = {}
+			if h.elements then
+				for el, val in pairs(h.elements) do
+					table.insert(elemParts, string.format('"%s":%d', el, val))
+				end
+			end
+
+			local bestExp = math.max(0, player:getStorageValue(STORAGE_RECORD_EXP_BASE + h.id))
+			local bestGp = math.max(0, player:getStorageValue(STORAGE_RECORD_GP_BASE + h.id))
+
 			table.insert(
 				huntsJsonParts,
 				string.format(
-					'{"id":%d,"name":%s,"tier":%s,"level":%d,"focus":%s,"desc":%s,"cost":%d,"req_lvl":%d,"req_atk":%d,"req_def":%d,"req_bank":%d,"potions":%s,"looktype":%d,"loot":[%s],"waves":[%s]}',
-					h.id, escapeJsonString(h.name), escapeJsonString(h.tier), h.level, escapeJsonString(h.focus), escapeJsonString(h.desc), h.supplyCostPerTurn, h.reqLevel, h.reqAttack, h.reqDefense, h.reqBank, escapeJsonString(h.reqPotions), h.lookType or 0, table.concat(lootParts, ","), table.concat(wavesParts, ",")
+					'{"id":%d,"name":%s,"tier":%s,"level":%d,"focus":%s,"desc":%s,"cost":%d,"req_lvl":%d,"req_atk":%d,"req_def":%d,"req_bank":%d,"potions":%s,"looktype":%d,"record_exp":%d,"record_gp":%d,"loot":[%s],"waves":[%s],"elements":{%s}}',
+					h.id, escapeJsonString(h.name), escapeJsonString(h.tier), h.level, escapeJsonString(h.focus), escapeJsonString(h.desc), h.supplyCostPerTurn, h.reqLevel, h.reqAttack, h.reqDefense, h.reqBank, escapeJsonString(h.reqPotions), h.lookType or 0, bestExp, bestGp, table.concat(lootParts, ","), table.concat(wavesParts, ","), table.concat(elemParts, ",")
 				)
 			)
 		end
@@ -1340,7 +1445,8 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 	-- 3. INICIAR / ENCERRAR CAÇADA
 	elseif buffer:find("start_hunt") then
 		local huntId = tonumber(buffer:match('"hunt_id"%s*:%s*(%d+)')) or 1
-		startIdleHunt(player, huntId)
+		local pull = buffer:match('"pull"%s*:%s*"(%a+)"') or "bold"
+		startIdleHunt(player, huntId, pull)
 
 	elseif buffer:find("stop_hunt") then
 		stopIdleHunt(playerId, "Caçada IDLE encerrada pelo jogador.", false, false)

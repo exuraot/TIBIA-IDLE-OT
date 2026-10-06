@@ -32,7 +32,7 @@ DropSlotItem < Panel
     text-auto-resize: true
 
 HuntCard < Panel
-  height: 64
+  height: 72
   image-source: /images/ui/containerslot
   image-border: 3
   padding: 4
@@ -40,7 +40,7 @@ HuntCard < Panel
 
   Panel
     id: monsterFrame
-    size: 48 48
+    size: 52 52
     image-source: /images/ui/containerslot
     image-border: 2
     anchors.left: parent.left
@@ -49,7 +49,7 @@ HuntCard < Panel
 
     UICreature
       id: monsterCreature
-      size: 44 44
+      size: 46 46
       anchors.centerIn: parent
       phantom: true
 
@@ -72,31 +72,13 @@ HuntCard < Panel
     margin-left: 8
     text-auto-resize: true
 
-  Button
-    id: lootBagButton
-    size: 26 26
-    image-source: /images/ui/containerslot
-    image-border: 2
-    anchors.verticalCenter: huntTitle.verticalCenter
-    anchors.left: focusTag.right
-    margin-left: 8
-    tooltip: tr('Click to view creature drops & detailed stats')
-
-    UIItem
-      id: lootBagIcon
-      item-id: 2853
-      size: 20 20
-      virtual: true
-      phantom: true
-      anchors.centerIn: parent
-
   Label
     id: huntDesc
     font: verdana-11px-rounded
     color: #c0c0c0
     anchors.top: huntTitle.bottom
     anchors.left: monsterFrame.right
-    anchors.right: reqButton.left
+    anchors.right: configButton.left
     margin-top: 3
     margin-left: 8
     margin-right: 10
@@ -109,26 +91,97 @@ HuntCard < Panel
     anchors.bottom: parent.bottom
     anchors.left: monsterFrame.right
     margin-left: 8
+    margin-bottom: 2
+    text-auto-resize: true
+
+  Label
+    id: recordLabel
+    font: verdana-11px-rounded
+    color: #00ddff
+    anchors.bottom: parent.bottom
+    anchors.left: huntCost.right
+    margin-left: 14
+    margin-bottom: 2
     text-auto-resize: true
 
   Button
-    id: reqButton
-    !text: tr('Requirements')
+    id: configButton
+    !text: tr('Configurar')
     font: verdana-11px-rounded
-    width: 95
-    height: 22
-    anchors.right: startButton.left
-    anchors.bottom: parent.bottom
+    color: #00ff88
+    width: 100
+    height: 24
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
     margin-right: 6
 
-  Button
-    id: startButton
-    !text: tr('Start')
+ElementBadge < Panel
+  size: 88 36
+  image-source: /images/ui/containerslot
+  image-border: 2
+  padding: 2
+
+  Label
+    id: elementLabel
     font: verdana-11px-rounded
-    width: 75
+    color: #e0e0e0
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 2
+    text-auto-resize: true
+
+  Label
+    id: valueLabel
+    font: verdana-11px-rounded
+    color: #00ff88
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-bottom: 2
+    text-auto-resize: true
+
+DropRowItem < Panel
+  height: 40
+  image-source: /images/ui/containerslot
+  image-border: 2
+  padding: 3
+  margin-bottom: 3
+
+  UIItem
+    id: itemWidget
+    size: 32 32
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 2
+    virtual: true
+
+  Label
+    id: itemNameLabel
+    font: verdana-11px-rounded
+    color: #ffffff
+    anchors.top: parent.top
+    anchors.left: itemWidget.right
+    margin-left: 8
+    margin-top: 2
+    text-auto-resize: true
+
+  Label
+    id: itemInfoLabel
+    font: verdana-11px-rounded
+    color: #ffd700
+    anchors.bottom: parent.bottom
+    anchors.left: itemWidget.right
+    margin-left: 8
+    margin-bottom: 2
+    text-auto-resize: true
+
+  Button
+    id: lockButton
+    font: verdana-11px-rounded
+    width: 140
     height: 22
     anchors.right: parent.right
-    anchors.bottom: parent.bottom
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 4
 
 LootCard < Panel
   height: 48

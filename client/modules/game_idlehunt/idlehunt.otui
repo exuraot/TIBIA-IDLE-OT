@@ -1,18 +1,155 @@
+ElementBadge < Panel
+  size: 92 32
+  image-source: /images/ui/containerslot
+  image-border: 2
+  padding: 2
+
+  Label
+    id: elementLabel
+    font: verdana-11px-rounded
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    text-auto-resize: true
+
+  Label
+    id: valueLabel
+    font: verdana-11px-rounded
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    text-auto-resize: true
+
+DropRowItem < Panel
+  height: 38
+  margin-top: 4
+  image-source: /images/ui/containerslot
+  image-border: 2
+  padding: 4
+
+  UIItem
+    id: itemWidget
+    size: 32 32
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    virtual: true
+
+  Label
+    id: itemNameLabel
+    font: verdana-11px-rounded
+    color: #ffd700
+    anchors.top: parent.top
+    anchors.left: itemWidget.right
+    margin-left: 8
+    text-auto-resize: true
+
+  Label
+    id: itemInfoLabel
+    font: verdana-11px-rounded
+    color: #a0a0a0
+    anchors.bottom: parent.bottom
+    anchors.left: itemWidget.right
+    margin-left: 8
+    text-auto-resize: true
+
+  Button
+    id: lockButton
+    font: verdana-11px-rounded
+    size: 150 24
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+
+HuntCard < Panel
+  height: 74
+  margin-top: 4
+  margin-bottom: 2
+  image-source: /images/ui/containerslot
+  image-border: 2
+  padding: 6
+
+  Panel
+    id: monsterFrame
+    size: 48 48
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/containerslot
+    image-border: 2
+
+    UICreature
+      id: monsterCreature
+      size: 44 44
+      anchors.centerIn: parent
+      phantom: true
+
+  Label
+    id: huntTitle
+    font: verdana-11px-rounded
+    color: #ffd700
+    anchors.top: parent.top
+    anchors.left: monsterFrame.right
+    margin-left: 8
+    text-auto-resize: true
+
+  Label
+    id: focusTag
+    font: verdana-11px-rounded
+    anchors.top: parent.top
+    anchors.left: huntTitle.right
+    margin-left: 8
+    text-auto-resize: true
+
+  Label
+    id: huntDesc
+    font: verdana-11px-rounded
+    color: #c0c0c0
+    anchors.top: huntTitle.bottom
+    anchors.left: monsterFrame.right
+    anchors.right: configButton.left
+    margin-top: 2
+    margin-left: 8
+    margin-right: 8
+    text-wrap: true
+
+  Label
+    id: huntCost
+    font: verdana-11px-rounded
+    color: #888888
+    anchors.bottom: parent.bottom
+    anchors.left: monsterFrame.right
+    margin-left: 8
+    text-auto-resize: true
+
+  Label
+    id: recordLabel
+    font: verdana-11px-rounded
+    color: #00ddff
+    anchors.bottom: parent.bottom
+    anchors.left: huntCost.right
+    margin-left: 12
+    text-auto-resize: true
+
+  Button
+    id: configButton
+    !text: tr('Configurar')
+    font: verdana-11px-rounded
+    color: #00ff88
+    width: 90
+    height: 26
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+
 MainWindow
   id: idleHuntWindow
-  !text: tr('IDLE HUNT - SISTEMA DE CAÇADAS')
+  !text: tr('IDLE HUNT - SISTEMA DE CACADAS')
   size: 720 620
   @onEscape: self:hide()
 
-  -- =========================================================================
-  -- TELA 1: DASHBOARD / MODO
-  -- =========================================================================
   Panel
     id: dashboardView
-    anchors.fill: parent
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
     visible: true
 
-    -- Barra de Stamina IDLE
     Panel
       id: staminaPanel
       anchors.top: parent.top
@@ -34,7 +171,7 @@ MainWindow
 
       Label
         id: staminaInfo
-        !text: tr('(Consumo 3x mais lento: 1h de Stamina = 3h reais)')
+        !text: tr('(Consumo 3x mais lento: 1h Stamina = 3h reais)')
         font: verdana-11px-rounded
         color: #a0a0a0
         anchors.top: staminaLabel.top
@@ -50,7 +187,56 @@ MainWindow
         height: 10
         background-color: #00cc88
 
-    -- CARD 1: QUANDO ESTIVER LIVRE (IDLE MODE CARD)
+    Panel
+      id: dashboardBottomBar
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      height: 28
+
+      Button
+        id: quickSellButton
+        !text: tr('Quick Sell')
+        font: verdana-11px-rounded
+        width: 140
+        height: 26
+        color: #00ff88
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        tooltip: tr('Vender imediatamente itens da backpack marcados como [UNLOCKED]')
+
+      Button
+        id: teleportTempleButton
+        !text: tr('Templo')
+        font: verdana-11px-rounded
+        width: 80
+        height: 26
+        anchors.left: quickSellButton.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-left: 6
+        tooltip: tr('Teleportar para o Templo')
+
+      Button
+        id: teleportHouseButton
+        !text: tr('Casa')
+        font: verdana-11px-rounded
+        width: 80
+        height: 26
+        anchors.left: teleportTempleButton.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-left: 6
+        tooltip: tr('Teleportar para a sua casa')
+
+      Button
+        id: closeButton
+        !text: tr('Fechar')
+        font: verdana-11px-rounded
+        width: 80
+        height: 26
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        @onClick: idleHuntController:toggle()
+
     Panel
       id: idleModeCard
       anchors.top: staminaPanel.bottom
@@ -66,23 +252,23 @@ MainWindow
 
       Label
         id: idleTitle
-        !text: tr('PRONTO PARA INICIAR UMA CAÇADA IDLE')
+        !text: tr('PRONTO PARA INICIAR UMA CACADA IDLE')
         font: verdana-11px-rounded
         color: #ffd700
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
-        margin-top: 15
+        margin-top: 25
         text-auto-resize: true
 
       Label
         id: idleDesc
-        !text: tr('Escolha uma das 21 hunts disponíveis divididas em Fácil, Médio e Difícil.\nConfigure sua intensidade de Pull, analise os elementos das criaturas e avance seu personagem de forma contínua e segura!')
+        !text: tr('Escolha uma das 21 hunts disponiveis divididas em Facil, Medio e Dificil.\nConfigure sua intensidade de Pull, analise os elementos das criaturas e avance continuamente!')
         font: verdana-11px-rounded
         color: #c0c0c0
         anchors.top: idleTitle.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        margin-top: 14
+        margin-top: 16
         margin-left: 20
         margin-right: 20
         text-align: center
@@ -90,26 +276,25 @@ MainWindow
 
       Button
         id: openCatalogButton
-        !text: tr('ORGANIZAR CAÇADA')
+        !text: tr('ORGANIZAR CACADA')
         font: verdana-11px-rounded
         color: #00ff88
-        size: 240 34
+        size: 240 36
         anchors.centerIn: parent
-        tooltip: tr('Abrir o catálogo de hunts para escolher onde caçar')
+        tooltip: tr('Abrir o catalogo de hunts para escolher onde cacar')
 
       Label
         id: idleTipLabel
-        !text: tr('Dica: Use o botão Quick Sell para vender instantaneamente os drops desbloqueados da sua backpack direto para a sua conta bancária.')
+        !text: tr('Dica: Use o botao Quick Sell para vender instantaneamente os drops desbloqueados direto para sua conta bancaria.')
         font: verdana-11px-rounded
         color: #888888
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        margin-bottom: 20
+        margin-bottom: 25
         text-align: center
         text-wrap: true
 
-    -- CARD 2: QUANDO ESTIVER CAÇANDO (ACTIVE HUNT CARD)
     Panel
       id: activeHuntCard
       anchors.top: staminaPanel.bottom
@@ -141,12 +326,12 @@ MainWindow
 
       Label
         id: activeTitle
-        !text: tr('Caçando: ...')
+        !text: tr('Cacando: ...')
         font: verdana-11px-rounded
         color: #00ff88
         anchors.top: parent.top
         anchors.left: activeCreatureFrame.right
-        margin-top: 4
+        margin-top: 6
         margin-left: 12
         text-auto-resize: true
 
@@ -157,7 +342,7 @@ MainWindow
         color: #ffd700
         anchors.top: activeTitle.bottom
         anchors.left: activeCreatureFrame.right
-        margin-top: 4
+        margin-top: 6
         margin-left: 12
         text-auto-resize: true
 
@@ -174,11 +359,11 @@ MainWindow
         padding: 8
         layout:
           type: verticalBox
-          spacing: 6
+          spacing: 8
 
         Label
           id: statXp
-          !text: tr('Experiência Ganha: +0 XP')
+          !text: tr('Experiencia Ganha: +0 XP')
           font: verdana-11px-rounded
           color: #00ff88
           text-auto-resize: true
@@ -206,81 +391,36 @@ MainWindow
 
         Label
           id: statTime
-          !text: tr('Tempo de Caçada: 00m 00s')
+          !text: tr('Tempo de Cacada: 00m 00s')
           font: verdana-11px-rounded
           color: #e0e0e0
           text-auto-resize: true
 
         Label
           id: statAutosell
-          !text: tr('Próxima Auto-Venda em: 10m 00s')
+          !text: tr('Proxima Auto-Venda em: 10m 00s')
           font: verdana-11px-rounded
           color: #a0a0a0
           text-auto-resize: true
 
       Button
         id: stopHuntButton
-        !text: tr('ENCERRAR CAÇADA')
+        !text: tr('ENCERRAR CACADA')
         font: verdana-11px-rounded
         color: #ff5555
-        size: 200 28
+        size: 220 30
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         margin-bottom: 8
 
-    -- Rodapé com Ações Rápidas
-    Panel
-      id: dashboardBottomBar
-      anchors.left: parent.left
-      anchors.right: parent.right
-      anchors.bottom: parent.bottom
-      height: 28
-      layout:
-        type: horizontalBox
-        spacing: 6
-
-      Button
-        id: quickSellButton
-        !text: tr('Quick Sell')
-        font: verdana-11px-rounded
-        width: 140
-        color: #00ff88
-        tooltip: tr('Vender imediatamente todos os itens da backpack marcados como [UNLOCKED]')
-
-      Button
-        id: teleportTempleButton
-        !text: tr('Templo')
-        font: verdana-11px-rounded
-        width: 80
-        tooltip: tr('Teleportar com segurança para o Templo')
-
-      Button
-        id: teleportHouseButton
-        !text: tr('Casa')
-        font: verdana-11px-rounded
-        width: 80
-        tooltip: tr('Teleportar para a sua casa')
-
-      Panel
-        id: spacer
-        width: 280
-
-      Button
-        id: closeButton
-        !text: tr('Fechar')
-        font: verdana-11px-rounded
-        width: 80
-        @onClick: idleHuntController:toggle()
-
-  -- =========================================================================
-  -- TELA 2: CATÁLOGO DE HUNTS
-  -- =========================================================================
   Panel
     id: catalogView
-    anchors.fill: parent
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
     visible: false
 
-    -- Topo do Catálogo
     Panel
       id: catalogTopBar
       anchors.top: parent.top
@@ -292,9 +432,10 @@ MainWindow
         id: backToDashboardBtn
         !text: tr('< Voltar ao Painel')
         font: verdana-11px-rounded
-        width: 130
+        width: 140
+        height: 26
         anchors.left: parent.left
-        anchors.top: parent.top
+        anchors.verticalCenter: parent.verticalCenter
 
       Label
         id: searchLabel
@@ -307,13 +448,12 @@ MainWindow
 
       TextEdit
         id: searchEdit
-        width: 200
+        width: 220
         height: 24
         font: verdana-11px-rounded
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
 
-    -- Barra de Filtro de Dificuldade
     Panel
       id: catalogFilterPanel
       anchors.top: catalogTopBar.bottom
@@ -346,15 +486,14 @@ MainWindow
       layout:
         type: verticalBox
 
-  -- =========================================================================
-  -- TELA 3: DETALHES DA HUNT, PULLS, ELEMENTOS E DROPS
-  -- =========================================================================
   Panel
     id: detailsView
-    anchors.fill: parent
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
     visible: false
 
-    -- Topo
     Panel
       id: detailsTopBar
       anchors.top: parent.top
@@ -364,15 +503,16 @@ MainWindow
 
       Button
         id: backToCatalogBtn
-        !text: tr('< Voltar ao Catálogo')
+        !text: tr('< Voltar ao Catalogo')
         font: verdana-11px-rounded
-        width: 140
+        width: 150
+        height: 26
         anchors.left: parent.left
-        anchors.top: parent.top
+        anchors.verticalCenter: parent.verticalCenter
 
       Label
         id: detailsTitle
-        !text: tr('Configurar Caçada')
+        !text: tr('Configurar Cacada')
         font: verdana-11px-rounded
         color: #ffd700
         anchors.verticalCenter: parent.verticalCenter
@@ -380,7 +520,6 @@ MainWindow
         margin-left: 12
         text-auto-resize: true
 
-    -- Cabeçalho da Criatura
     Panel
       id: detailCreatureHeader
       anchors.top: detailsTopBar.bottom
@@ -449,21 +588,20 @@ MainWindow
         margin-bottom: 2
         text-auto-resize: true
 
-    -- 1. SELEÇÃO DE PULLS
     Panel
       id: pullsPanel
       anchors.top: detailCreatureHeader.bottom
       anchors.left: parent.left
       anchors.right: parent.right
       margin-top: 6
-      height: 54
+      height: 52
       image-source: /images/ui/containerslot
       image-border: 2
       padding: 4
 
       Label
         id: pullsTitle
-        !text: tr('1. Intensidade do Pull (Quantidade de Monstros por Onda):')
+        !text: tr('1. Intensidade do Pull (Criaturas por Onda):')
         font: verdana-11px-rounded
         color: #ffd700
         anchors.top: parent.top
@@ -504,21 +642,20 @@ MainWindow
         margin-left: 8
         margin-bottom: 2
 
-    -- 2. FRAQUEZAS E RESISTÊNCIAS ELEMENTAIS
     Panel
       id: elementsPanel
       anchors.top: pullsPanel.bottom
       anchors.left: parent.left
       anchors.right: parent.right
       margin-top: 6
-      height: 60
+      height: 58
       image-source: /images/ui/containerslot
       image-border: 2
       padding: 4
 
       Label
         id: elementsTitle
-        !text: tr('2. Fraquezas & Resistências Elementais das Criaturas:')
+        !text: tr('2. Fraquezas e Resistencias Elementais:')
         font: verdana-11px-rounded
         color: #ffd700
         anchors.top: parent.top
@@ -537,7 +674,6 @@ MainWindow
           type: horizontalBox
           spacing: 6
 
-    -- 3. DROPS DA HUNT (PEGA vs VENDE)
     Panel
       id: dropsBoxPanel
       anchors.top: elementsPanel.bottom
@@ -552,7 +688,7 @@ MainWindow
 
       Label
         id: dropsTitle
-        !text: tr('3. Drops da Hunt (Itens com [LOCKED] ficam na mochila; [UNLOCKED] são vendidos no banco):')
+        !text: tr('3. Drops da Hunt ([LOCKED] = BP | [UNLOCKED] = Venda no Banco):')
         font: verdana-11px-rounded
         color: #ffd700
         anchors.top: parent.top
@@ -581,7 +717,6 @@ MainWindow
         layout:
           type: verticalBox
 
-    -- 4. PAINEL DE REQUISITOS DE SOBREVIVÊNCIA
     Panel
       id: reqPanel
       anchors.left: parent.left
@@ -595,7 +730,7 @@ MainWindow
 
       Label
         id: reqSummaryLabel
-        !text: tr('Requisitos de Sobrevivência: Verificando...')
+        !text: tr('Requisitos de Sobrevivencia: Verificando...')
         font: verdana-11px-rounded
         color: #00ff88
         anchors.top: parent.top
@@ -605,7 +740,7 @@ MainWindow
 
       Label
         id: reqDetailsLabel
-        !text: tr('Level: OK | Ataque: OK | Defesa: OK | Banco: OK | Poções: Health/Mana')
+        !text: tr('Level: OK | Ataque: OK | Defesa: OK | Banco: OK | Pocoes: Health/Mana')
         font: verdana-11px-rounded
         color: #c0c0c0
         anchors.bottom: parent.bottom
@@ -614,10 +749,9 @@ MainWindow
         margin-bottom: 2
         text-auto-resize: true
 
-    -- BOTÃO DE INICIAR CAÇADA
     Button
       id: startHuntButton
-      !text: tr('INICIAR CAÇADA IDLE')
+      !text: tr('INICIAR CACADA IDLE')
       font: verdana-11px-rounded
       color: #00ff88
       size: 240 30

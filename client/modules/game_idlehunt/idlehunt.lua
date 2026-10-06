@@ -110,14 +110,11 @@ function idleHuntController:terminate()
 end
 
 function idleHuntController:onInit()
-    g_ui.importStyle('idlehunt')
-    self.ui = g_ui.createWidget('MainWindow', rootWidget)
-    self.ui:setId('idleHuntWindow')
-    self.ui:setText(tr('IDLE HUNT - SISTEMA DE CAÇADAS'))
-    self.ui:setSize({ width = 720, height = 620 })
-    self.ui:hide()
-
-    self.ui.onEscape = function() self.ui:hide() end
+    self.ui = g_ui.displayUI('idlehunt')
+    if self.ui then
+        self.ui:hide()
+        self.ui.onEscape = function() self.ui:hide() end
+    end
 
     ProtocolGame.registerExtendedOpcode(OPCODE_IDLE_HUNT, function(protocol, opcode, buffer)
         self:onOpcodeReceived(protocol, opcode, buffer)

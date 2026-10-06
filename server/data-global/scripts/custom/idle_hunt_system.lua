@@ -14,10 +14,10 @@ local STORAGE_LAST_QUICK_SELL = 889999
 local STORAGE_RECORD_EXP_BASE = 890000
 local STORAGE_RECORD_GP_BASE = 895000
 
--- Coordenadas das Salas Instanciadas Modelo
-local ROOM_POS_EASY = Position(385, 754, 8)
-local ROOM_POS_MEDIUM = Position(421, 301, 11)
-local ROOM_POS_HARD = Position(440, 785, 11)
+-- Coordenadas das Áreas IDLE Oficiais em world.otbm
+local ROOM_POS_EASY = Position(32797, 31560, 7)
+local ROOM_POS_MEDIUM = Position(32616, 31414, 2)
+local ROOM_POS_HARD = Position(33078, 32168, 4)
 
 -- Helper de Formatação
 local function formatNumber(n)

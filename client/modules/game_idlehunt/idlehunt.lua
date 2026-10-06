@@ -6,33 +6,702 @@ local idleButton = nil
 
 -- Tabela Oficial Fallback de 21 Hunts (3 Dificuldades: Fácil, Médio, Difícil)
 local DEFAULT_HUNTS_CATALOG = {
-    -- 🟢 FÁCIL
-    { id = 1, name = "Rotworms (Fácil)", tier = "easy", level = 8, focus = "Balanced", desc = "Sala de treino inicial com 3 Rotworms. Ideal para iniciantes.", cost = 10, req_lvl = 8, looktype = 26, waves = {{ name = "Rotworm", count = 3 }} },
-    { id = 2, name = "Amazons (Fácil)", tier = "easy", level = 15, focus = "More Loot", desc = "3 Amazons ágeis com drops frequentes de Protective Charm.", cost = 15, req_lvl = 15, looktype = 137, waves = {{ name = "Amazon", count = 3 }} },
-    { id = 3, name = "Cyclops (Fácil)", tier = "easy", level = 25, focus = "More EXP", desc = "3 Cyclops corpulentos com bom ganho de experiência e Cyclops Toes.", cost = 30, req_lvl = 25, looktype = 22, waves = {{ name = "Cyclops", count = 3 }} },
-    { id = 4, name = "Minotaurs (Fácil)", tier = "easy", level = 20, focus = "More Loot", desc = "3 Minotaurs com alto rendimento de Minotaur Leather.", cost = 25, req_lvl = 20, looktype = 29, waves = {{ name = "Minotaur", count = 3 }} },
-    { id = 5, name = "Undeads (Fácil)", tier = "easy", level = 22, focus = "Balanced", desc = "3 Skeletons antigos para treino rápido.", cost = 25, req_lvl = 22, looktype = 18, waves = {{ name = "Skeleton", count = 3 }} },
-    { id = 6, name = "Dragons (Fácil)", tier = "easy", level = 50, focus = "More EXP", desc = "3 Dragons clássicos. Excelente avanço de experiência intermediária.", cost = 80, req_lvl = 50, looktype = 34, waves = {{ name = "Dragon", count = 3 }} },
-    { id = 7, name = "Demons (Fácil)", tier = "easy", level = 80, focus = "More EXP", desc = "3 Fire Elementals incandescentes para treinar combate elemental.", cost = 130, req_lvl = 80, looktype = 49, waves = {{ name = "Fire Elemental", count = 3 }} },
+	-- =========================================================================
+	-- 🟢 FÁCIL (EASY) - Sala: Position(385, 754, 8) - 3 Monstros por Onda
+	-- =========================================================================
+	{
+		id = 1,
+		name = "Rotworms (Facil)",
+		tier = "easy",
+		level = 8,
+		focus = "Balanced",
+		desc = "Sala de treino inicial com 3 Rotworms. Ideal para iniciantes.",
+		monster = "Rotworm",
+		looktype = 26,
+		elements = { physical = 0, fire = 0, earth = 0, energy = 0, ice = 0, holy = 0, death = 0 },
+		
+		baseExp = 40,
+		cost = 10,
+		req_lvl = 8,
+		reqAttack = 15,
+		reqDefense = 12,
+		reqBank = 1000,
+		reqPotions = "Health / Mana Potion",
+		damageMin = 5,
+		damageMax = 18,
+		healAmount = 25,
+		waves = {
+			{ name = "Rotworm", count = 3 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 85, countMin = 10, countMax = 45, isMoney = true },
+			{ id = 3492, name = "Worm", price = 1, chance = 45, countMin = 1, countMax = 5 },
+			{ id = 3577, name = "Meat", price = 2, chance = 35, countMin = 1, countMax = 2 },
+			{ id = 3286, name = "Mace", price = 30, chance = 18, countMin = 1, countMax = 1 },
+			{ id = 3264, name = "Sword", price = 25, chance = 14, countMin = 1, countMax = 1 },
+			{ id = 3374, name = "Legion Helmet", price = 22, chance = 8, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 2,
+		name = "Amazons (Facil)",
+		tier = "easy",
+		level = 15,
+		focus = "More Loot",
+		desc = "3 Amazons ágeis com drops frequentes de Protective Charm.",
+		monster = "Amazon",
+		looktype = 137,
+		elements = { physical = 0, fire = 10, earth = -10, energy = 0, ice = 10, holy = 0, death = 10 },
+		
+		baseExp = 80,
+		cost = 15,
+		req_lvl = 15,
+		reqAttack = 20,
+		reqDefense = 16,
+		reqBank = 2000,
+		reqPotions = "Health / Mana Potion",
+		damageMin = 10,
+		damageMax = 28,
+		healAmount = 35,
+		waves = {
+			{ name = "Amazon", count = 3 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 85, countMin = 15, countMax = 50, isMoney = true },
+			{ id = 11444, name = "Protective Charm", price = 200, chance = 25, countMin = 1, countMax = 2 },
+			{ id = 3273, name = "Sabre", price = 12, chance = 30, countMin = 1, countMax = 1 },
+			{ id = 3267, name = "Dagger", price = 2, chance = 25, countMin = 1, countMax = 1 },
+			{ id = 3377, name = "Scale Armor", price = 75, chance = 10, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 3,
+		name = "Cyclops (Facil)",
+		tier = "easy",
+		level = 25,
+		focus = "More EXP",
+		desc = "3 Cyclops corpulentos com bom ganho de experiência e Cyclops Toes.",
+		monster = "Cyclops",
+		looktype = 22,
+		elements = { physical = 0, fire = 0, earth = -20, energy = 0, ice = 0, holy = 10, death = 10 },
+		
+		baseExp = 150,
+		cost = 30,
+		req_lvl = 25,
+		reqAttack = 28,
+		reqDefense = 22,
+		reqBank = 4000,
+		reqPotions = "Strong Health / Mana Potion",
+		damageMin = 20,
+		damageMax = 55,
+		healAmount = 60,
+		waves = {
+			{ name = "Cyclops", count = 3 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 25, countMax = 80, isMoney = true },
+			{ id = 9657, name = "Cyclops Toe", price = 55, chance = 35, countMin = 1, countMax = 2 },
+			{ id = 3413, name = "Battle Shield", price = 95, chance = 18, countMin = 1, countMax = 1 },
+			{ id = 3269, name = "Halberd", price = 400, chance = 12, countMin = 1, countMax = 1 },
+			{ id = 3384, name = "Dark Helmet", price = 250, chance = 8, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 4,
+		name = "Minotaurs (Facil)",
+		tier = "easy",
+		level = 20,
+		focus = "More Loot",
+		desc = "3 Minotaurs com alto rendimento de Minotaur Leather.",
+		monster = "Minotaur",
+		looktype = 29,
+		elements = { physical = 0, fire = -20, earth = 0, energy = 0, ice = 10, holy = 0, death = 10 },
+		
+		baseExp = 120,
+		cost = 25,
+		req_lvl = 20,
+		reqAttack = 24,
+		reqDefense = 20,
+		reqBank = 3000,
+		reqPotions = "Strong Health / Mana Potion",
+		damageMin = 18,
+		damageMax = 48,
+		healAmount = 50,
+		waves = {
+			{ name = "Minotaur", count = 3 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 20, countMax = 70, isMoney = true },
+			{ id = 5878, name = "Minotaur Leather", price = 80, chance = 35, countMin = 1, countMax = 2 },
+			{ id = 11472, name = "Minotaur Horn", price = 75, chance = 30, countMin = 1, countMax = 2 },
+			{ id = 3266, name = "Battle Axe", price = 80, chance = 20, countMin = 1, countMax = 1 },
+			{ id = 3275, name = "Double Axe", price = 260, chance = 10, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 5,
+		name = "Undeads (Facil)",
+		tier = "easy",
+		level = 22,
+		focus = "Balanced",
+		desc = "3 Skeletons antigos para treino rápido.",
+		monster = "Skeleton",
+		looktype = 18,
+		elements = { physical = -20, fire = 10, earth = 100, energy = 0, ice = 0, holy = 20, death = -100 },
+		
+		baseExp = 110,
+		cost = 25,
+		req_lvl = 22,
+		reqAttack = 25,
+		reqDefense = 20,
+		reqBank = 3500,
+		reqPotions = "Strong Health / Mana Potion",
+		damageMin = 15,
+		damageMax = 45,
+		healAmount = 45,
+		waves = {
+			{ name = "Skeleton", count = 3 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 15, countMax = 60, isMoney = true },
+			{ id = 3115, name = "Bone", price = 5, chance = 40, countMin = 1, countMax = 3 },
+			{ id = 3351, name = "Steel Helmet", price = 293, chance = 10, countMin = 1, countMax = 1 },
+			{ id = 3410, name = "Plate Shield", price = 45, chance = 20, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 6,
+		name = "Dragons (Facil)",
+		tier = "easy",
+		level = 50,
+		focus = "More EXP",
+		desc = "3 Dragons clássicos. Excelente avanço de experiência intermediária.",
+		monster = "Dragon",
+		looktype = 34,
+		elements = { physical = 0, fire = -100, earth = -100, energy = -10, ice = 10, holy = 0, death = 0 },
+		
+		baseExp = 700,
+		cost = 80,
+		req_lvl = 50,
+		reqAttack = 40,
+		reqDefense = 35,
+		reqBank = 12000,
+		reqPotions = "Great Health / Mana Potion",
+		damageMin = 50,
+		damageMax = 140,
+		healAmount = 150,
+		waves = {
+			{ name = "Dragon", count = 3 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 50, countMax = 160, isMoney = true },
+			{ id = 3583, name = "Dragon Ham", price = 25, chance = 60, countMin = 1, countMax = 3 },
+			{ id = 11457, name = "Dragon's Tail", price = 100, chance = 30, countMin = 1, countMax = 2 },
+			{ id = 5877, name = "Green Dragon Leather", price = 100, chance = 25, countMin = 1, countMax = 1 },
+			{ id = 3297, name = "Serpent Sword", price = 900, chance = 12, countMin = 1, countMax = 1 },
+			{ id = 3416, name = "Dragon Shield", price = 4000, chance = 6, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 7,
+		name = "Demons (Facil)",
+		tier = "easy",
+		level = 80,
+		focus = "More EXP",
+		desc = "3 Fire Elementals incandescentes para treinar combate elemental.",
+		monster = "Fire Elemental",
+		looktype = 49,
+		elements = { physical = -10, fire = -100, earth = 0, energy = 0, ice = 25, holy = 0, death = 0 },
+		
+		baseExp = 1200,
+		cost = 130,
+		req_lvl = 80,
+		reqAttack = 52,
+		reqDefense = 42,
+		reqBank = 25000,
+		reqPotions = "Great Health / Mana Potion",
+		damageMin = 90,
+		damageMax = 230,
+		healAmount = 240,
+		waves = {
+			{ name = "Fire Elemental", count = 3 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 60, countMax = 200, isMoney = true },
+			{ id = 3046, name = "Magic Sulphur", price = 1000, chance = 20, countMin = 1, countMax = 1 },
+			{ id = 3280, name = "Fire Sword", price = 4000, chance = 8, countMin = 1, countMax = 1 },
+		},
+	},
 
-    -- 🟡 MÉDIO
-    { id = 8, name = "Rotworms (Médio)", tier = "medium", level = 20, focus = "Balanced", desc = "3 Rotworms acompanhados por 2 Carrion Worms famintos.", cost = 25, req_lvl = 20, looktype = 26, waves = {{ name = "Rotworm", count = 3 }, { name = "Carrion Worm", count = 2 }} },
-    { id = 9, name = "Amazons (Médio)", tier = "medium", level = 28, focus = "More Loot", desc = "2 Amazons e 3 Valkyries atiradoras de lanças.", cost = 35, req_lvl = 28, looktype = 137, waves = {{ name = "Amazon", count = 2 }, { name = "Valkyrie", count = 3 }} },
-    { id = 10, name = "Cyclops (Médio)", tier = "medium", level = 40, focus = "More EXP", desc = "3 Cyclops e 2 Cyclops Drones agressivos.", cost = 55, req_lvl = 40, looktype = 22, waves = {{ name = "Cyclops", count = 3 }, { name = "Cyclops Drone", count = 2 }} },
-    { id = 11, name = "Minotaurs (Médio)", tier = "medium", level = 35, focus = "More Loot", desc = "2 Minotaurs, 2 Minotaur Guards e 1 Minotaur Archer.", cost = 50, req_lvl = 35, looktype = 29, waves = {{ name = "Minotaur", count = 2 }, { name = "Minotaur Guard", count = 2 }, { name = "Minotaur Archer", count = 1 }} },
-    { id = 12, name = "Undeads (Médio)", tier = "medium", level = 45, focus = "Balanced", desc = "2 Ghouls e 2 Crypt Shamblers rastejantes.", cost = 65, req_lvl = 45, looktype = 18, waves = {{ name = "Ghoul", count = 2 }, { name = "Crypt Shambler", count = 2 }} },
-    { id = 13, name = "Dragons (Médio)", tier = "medium", level = 75, focus = "More EXP", desc = "4 Dragons soltando rajadas de fogo contínuas.", cost = 130, req_lvl = 75, looktype = 34, waves = {{ name = "Dragon", count = 4 }} },
-    { id = 14, name = "Demons (Médio)", tier = "medium", level = 120, focus = "More EXP", desc = "2 Fire Elementals e 2 Diabolic Imps traiçoeiros.", cost = 260, req_lvl = 120, looktype = 49, waves = {{ name = "Fire Elemental", count = 2 }, { name = "Diabolic Imp", count = 2 }} },
+	-- =========================================================================
+	-- 🟡 MÉDIO (MEDIUM) - Sala: Position(421, 301, 11) - 4 a 5 Monstros por Onda
+	-- =========================================================================
+	{
+		id = 8,
+		name = "Rotworms (Medio)",
+		tier = "medium",
+		level = 20,
+		focus = "Balanced",
+		desc = "3 Rotworms acompanhados por 2 Carrion Worms famintos.",
+		monster = "Carrion Worm",
+		looktype = 26,
+		elements = { physical = 0, fire = 0, earth = 10, energy = -10, ice = 0, holy = 0, death = 0 },
+		
+		baseExp = 110,
+		cost = 25,
+		req_lvl = 20,
+		reqAttack = 26,
+		reqDefense = 22,
+		reqBank = 3000,
+		reqPotions = "Strong Health / Mana Potion",
+		damageMin = 15,
+		damageMax = 45,
+		healAmount = 50,
+		waves = {
+			{ name = "Rotworm", count = 3 },
+			{ name = "Carrion Worm", count = 2 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 20, countMax = 80, isMoney = true },
+			{ id = 3492, name = "Worm", price = 1, chance = 50, countMin = 2, countMax = 8 },
+			{ id = 3577, name = "Meat", price = 2, chance = 40, countMin = 1, countMax = 4 },
+			{ id = 3286, name = "Mace", price = 30, chance = 20, countMin = 1, countMax = 1 },
+			{ id = 3264, name = "Sword", price = 25, chance = 18, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 9,
+		name = "Amazons (Medio)",
+		tier = "medium",
+		level = 28,
+		focus = "More Loot",
+		desc = "2 Amazons e 3 Valkyries atiradoras de lanças.",
+		monster = "Valkyrie",
+		looktype = 137,
+		elements = { physical = 0, fire = 0, earth = 0, energy = 0, ice = 10, holy = 0, death = 10 },
+		
+		baseExp = 180,
+		cost = 35,
+		req_lvl = 28,
+		reqAttack = 32,
+		reqDefense = 26,
+		reqBank = 5000,
+		reqPotions = "Strong Health / Mana Potion",
+		damageMin = 25,
+		damageMax = 65,
+		healAmount = 70,
+		waves = {
+			{ name = "Amazon", count = 2 },
+			{ name = "Valkyrie", count = 3 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 30, countMax = 100, isMoney = true },
+			{ id = 11444, name = "Protective Charm", price = 200, chance = 35, countMin = 1, countMax = 2 },
+			{ id = 3277, name = "Spear", price = 3, chance = 50, countMin = 1, countMax = 3 },
+			{ id = 3377, name = "Scale Armor", price = 75, chance = 15, countMin = 1, countMax = 1 },
+			{ id = 3410, name = "Plate Shield", price = 45, chance = 20, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 10,
+		name = "Cyclops (Medio)",
+		tier = "medium",
+		level = 40,
+		focus = "More EXP",
+		desc = "3 Cyclops e 2 Cyclops Drones agressivos.",
+		monster = "Cyclops Drone",
+		looktype = 22,
+		elements = { physical = 0, fire = 0, earth = -20, energy = 0, ice = 5, holy = 10, death = 10 },
+		
+		baseExp = 320,
+		cost = 55,
+		req_lvl = 40,
+		reqAttack = 38,
+		reqDefense = 30,
+		reqBank = 8000,
+		reqPotions = "Strong Health / Mana Potion",
+		damageMin = 40,
+		damageMax = 95,
+		healAmount = 100,
+		waves = {
+			{ name = "Cyclops", count = 3 },
+			{ name = "Cyclops Drone", count = 2 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 40, countMax = 140, isMoney = true },
+			{ id = 9657, name = "Cyclops Toe", price = 55, chance = 40, countMin = 1, countMax = 3 },
+			{ id = 3269, name = "Halberd", price = 400, chance = 15, countMin = 1, countMax = 1 },
+			{ id = 3384, name = "Dark Helmet", price = 250, chance = 12, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 11,
+		name = "Minotaurs (Medio)",
+		tier = "medium",
+		level = 35,
+		focus = "More Loot",
+		desc = "2 Minotaurs, 2 Minotaur Guards e 1 Minotaur Archer.",
+		monster = "Minotaur Guard",
+		looktype = 29,
+		elements = { physical = 0, fire = -20, earth = 0, energy = 0, ice = 10, holy = 0, death = 10 },
+		
+		baseExp = 260,
+		cost = 50,
+		req_lvl = 35,
+		reqAttack = 36,
+		reqDefense = 28,
+		reqBank = 7000,
+		reqPotions = "Strong Health / Mana Potion",
+		damageMin = 35,
+		damageMax = 85,
+		healAmount = 90,
+		waves = {
+			{ name = "Minotaur", count = 2 },
+			{ name = "Minotaur Guard", count = 2 },
+			{ name = "Minotaur Archer", count = 1 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 35, countMax = 120, isMoney = true },
+			{ id = 5878, name = "Minotaur Leather", price = 80, chance = 40, countMin = 1, countMax = 3 },
+			{ id = 11472, name = "Minotaur Horn", price = 75, chance = 35, countMin = 1, countMax = 2 },
+			{ id = 3275, name = "Double Axe", price = 260, chance = 15, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 12,
+		name = "Undeads (Medio)",
+		tier = "medium",
+		level = 45,
+		focus = "Balanced",
+		desc = "2 Ghouls e 2 Crypt Shamblers rastejantes.",
+		monster = "Crypt Shambler",
+		looktype = 18,
+		elements = { physical = -10, fire = 20, earth = 100, energy = 0, ice = 0, holy = 25, death = -100 },
+		
+		baseExp = 380,
+		cost = 65,
+		req_lvl = 45,
+		reqAttack = 40,
+		reqDefense = 32,
+		reqBank = 10000,
+		reqPotions = "Strong Health / Mana Potion",
+		damageMin = 45,
+		damageMax = 110,
+		healAmount = 115,
+		waves = {
+			{ name = "Ghoul", count = 2 },
+			{ name = "Crypt Shambler", count = 2 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 90, countMin = 40, countMax = 130, isMoney = true },
+			{ id = 9647, name = "Rotten Piece of Cloth", price = 30, chance = 35, countMin = 1, countMax = 2 },
+			{ id = 3115, name = "Bone", price = 5, chance = 45, countMin = 1, countMax = 3 },
+			{ id = 3369, name = "Warrior Helmet", price = 5000, chance = 5, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 13,
+		name = "Dragons (Medio)",
+		tier = "medium",
+		level = 75,
+		focus = "More EXP",
+		desc = "4 Dragons soltando rajadas de fogo contínuas.",
+		monster = "Dragon",
+		looktype = 34,
+		elements = { physical = 0, fire = -100, earth = -100, energy = -10, ice = 10, holy = 0, death = 0 },
+		
+		baseExp = 1100,
+		cost = 130,
+		req_lvl = 75,
+		reqAttack = 48,
+		reqDefense = 40,
+		reqBank = 22000,
+		reqPotions = "Great Health / Mana Potion",
+		damageMin = 85,
+		damageMax = 220,
+		healAmount = 230,
+		waves = {
+			{ name = "Dragon", count = 4 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 95, countMin = 70, countMax = 220, isMoney = true },
+			{ id = 3583, name = "Dragon Ham", price = 25, chance = 70, countMin = 1, countMax = 4 },
+			{ id = 11457, name = "Dragon's Tail", price = 100, chance = 35, countMin = 1, countMax = 2 },
+			{ id = 5877, name = "Green Dragon Leather", price = 100, chance = 30, countMin = 1, countMax = 2 },
+			{ id = 3416, name = "Dragon Shield", price = 4000, chance = 8, countMin = 1, countMax = 1 },
+			{ id = 3280, name = "Fire Sword", price = 4000, chance = 7, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 14,
+		name = "Demons (Medio)",
+		tier = "medium",
+		level = 120,
+		focus = "More EXP",
+		desc = "2 Fire Elementals e 2 Diabolic Imps traiçoeiros.",
+		monster = "Diabolic Imp",
+		looktype = 49,
+		elements = { physical = 0, fire = -100, earth = -100, energy = 0, ice = 15, holy = 10, death = -10 },
+		
+		baseExp = 2600,
+		cost = 260,
+		req_lvl = 120,
+		reqAttack = 62,
+		reqDefense = 52,
+		reqBank = 45000,
+		reqPotions = "Ultimate Health / Great Mana Potion",
+		damageMin = 180,
+		damageMax = 440,
+		healAmount = 450,
+		waves = {
+			{ name = "Fire Elemental", count = 2 },
+			{ name = "Diabolic Imp", count = 2 }
+		},
+		loot = {
+			{ id = 3035, name = "Platinum Coin", price = 100, chance = 85, countMin = 1, countMax = 5, isMoney = true },
+			{ id = 3046, name = "Magic Sulphur", price = 1000, chance = 25, countMin = 1, countMax = 1 },
+			{ id = 3051, name = "Energy Ring", price = 500, chance = 20, countMin = 1, countMax = 1 },
+			{ id = 3420, name = "Demon Shield", price = 30000, chance = 3, countMin = 1, countMax = 1 },
+		},
+	},
 
-    -- 🔴 DIFÍCIL
-    { id = 15, name = "Rotworms (Difícil)", tier = "hard", level = 35, focus = "Balanced", desc = "4 Carrion Worms e 2 Rotworm Queens enfurecidas.", cost = 50, req_lvl = 35, looktype = 26, waves = {{ name = "Carrion Worm", count = 4 }, { name = "Rotworm Queen", count = 2 }} },
-    { id = 16, name = "Amazons (Difícil)", tier = "hard", level = 45, focus = "More Loot", desc = "4 Valkyries armadas e 2 Witches conjuradoras de fogo.", cost = 70, req_lvl = 45, looktype = 137, waves = {{ name = "Valkyrie", count = 4 }, { name = "Witch", count = 2 }} },
-    { id = 17, name = "Cyclops (Difícil)", tier = "hard", level = 60, focus = "More EXP", desc = "3 Cyclops Drones e 3 Cyclops Smiths forjadores.", cost = 100, req_lvl = 60, looktype = 22, waves = {{ name = "Cyclops Drone", count = 3 }, { name = "Cyclops Smith", count = 3 }} },
-    { id = 18, name = "Minotaurs (Difícil)", tier = "hard", level = 55, focus = "More Loot", desc = "3 Minotaur Guards, 2 Minotaur Archers e 2 Minotaur Mages.", cost = 90, req_lvl = 55, looktype = 29, waves = {{ name = "Minotaur Guard", count = 3 }, { name = "Minotaur Archer", count = 2 }, { name = "Minotaur Mage", count = 2 }} },
-    { id = 19, name = "Undeads (Difícil)", tier = "hard", level = 70, focus = "Balanced", desc = "3 Crypt Shamblers, 2 Bonebeasts e 1 Vampire sinistro.", cost = 120, req_lvl = 70, looktype = 18, waves = {{ name = "Crypt Shambler", count = 3 }, { name = "Bonebeast", count = 2 }, { name = "Vampire", count = 1 }} },
-    { id = 20, name = "Dragons (Difícil)", tier = "hard", level = 100, focus = "More EXP", desc = "3 Dragons enfurecidos e 3 Dragon Lords devastadores.", cost = 280, req_lvl = 100, looktype = 39, waves = {{ name = "Dragon", count = 3 }, { name = "Dragon Lord", count = 3 }} },
-    { id = 21, name = "Demons (Difícil)", tier = "hard", level = 180, focus = "More EXP", desc = "4 Diabolic Imps velozes e 2 Demons titânicos.", cost = 500, req_lvl = 180, looktype = 35, waves = {{ name = "Diabolic Imp", count = 4 }, { name = "Demon", count = 2 }} }
+	-- =========================================================================
+	-- 🔴 DIFÍCIL (HARD) - Sala: Position(440, 785, 11) - 6 a 7 Monstros por Onda
+	-- =========================================================================
+	{
+		id = 15,
+		name = "Rotworms (Dificil)",
+		tier = "hard",
+		level = 35,
+		focus = "Balanced",
+		desc = "4 Carrion Worms e 2 Rotworm Queens enfurecidas.",
+		monster = "Rotworm Queen",
+		looktype = 26,
+		elements = { physical = 0, fire = 0, earth = 20, energy = -15, ice = 0, holy = 0, death = 0 },
+		
+		baseExp = 310,
+		cost = 50,
+		req_lvl = 35,
+		reqAttack = 36,
+		reqDefense = 30,
+		reqBank = 6000,
+		reqPotions = "Strong Health / Mana Potion",
+		damageMin = 35,
+		damageMax = 90,
+		healAmount = 95,
+		waves = {
+			{ name = "Carrion Worm", count = 4 },
+			{ name = "Rotworm Queen", count = 2 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 95, countMin = 40, countMax = 130, isMoney = true },
+			{ id = 3492, name = "Worm", price = 1, chance = 60, countMin = 3, countMax = 10 },
+			{ id = 3577, name = "Meat", price = 2, chance = 50, countMin = 2, countMax = 6 },
+			{ id = 3286, name = "Mace", price = 30, chance = 25, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 16,
+		name = "Amazons (Dificil)",
+		tier = "hard",
+		level = 45,
+		focus = "More Loot",
+		desc = "4 Valkyries armadas e 2 Witches conjuradoras de fogo.",
+		monster = "Witch",
+		looktype = 137,
+		elements = { physical = 0, fire = -20, earth = 0, energy = -20, ice = 10, holy = 0, death = 10 },
+		
+		baseExp = 420,
+		cost = 70,
+		req_lvl = 45,
+		reqAttack = 42,
+		reqDefense = 34,
+		reqBank = 9000,
+		reqPotions = "Strong Health / Mana Potion",
+		damageMin = 45,
+		damageMax = 120,
+		healAmount = 125,
+		waves = {
+			{ name = "Valkyrie", count = 4 },
+			{ name = "Witch", count = 2 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 95, countMin = 50, countMax = 160, isMoney = true },
+			{ id = 11444, name = "Protective Charm", price = 200, chance = 45, countMin = 1, countMax = 3 },
+			{ id = 3277, name = "Spear", price = 3, chance = 60, countMin = 2, countMax = 5 },
+			{ id = 3377, name = "Scale Armor", price = 75, chance = 20, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 17,
+		name = "Cyclops (Dificil)",
+		tier = "hard",
+		level = 60,
+		focus = "More EXP",
+		desc = "3 Cyclops Drones e 3 Cyclops Smiths forjadores.",
+		monster = "Cyclops Smith",
+		looktype = 22,
+		elements = { physical = 0, fire = -50, earth = -20, energy = 0, ice = 10, holy = 10, death = 10 },
+		
+		baseExp = 780,
+		cost = 100,
+		req_lvl = 60,
+		reqAttack = 46,
+		reqDefense = 38,
+		reqBank = 15000,
+		reqPotions = "Great Health / Mana Potion",
+		damageMin = 65,
+		damageMax = 170,
+		healAmount = 180,
+		waves = {
+			{ name = "Cyclops Drone", count = 3 },
+			{ name = "Cyclops Smith", count = 3 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 95, countMin = 60, countMax = 200, isMoney = true },
+			{ id = 9657, name = "Cyclops Toe", price = 55, chance = 50, countMin = 1, countMax = 4 },
+			{ id = 3269, name = "Halberd", price = 400, chance = 20, countMin = 1, countMax = 1 },
+			{ id = 3384, name = "Dark Helmet", price = 250, chance = 18, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 18,
+		name = "Minotaurs (Dificil)",
+		tier = "hard",
+		level = 55,
+		focus = "More Loot",
+		desc = "3 Minotaur Guards, 2 Minotaur Archers e 2 Minotaur Mages.",
+		monster = "Minotaur Mage",
+		looktype = 29,
+		elements = { physical = 0, fire = -20, earth = 0, energy = -100, ice = 10, holy = 0, death = 10 },
+		
+		baseExp = 690,
+		cost = 90,
+		req_lvl = 55,
+		reqAttack = 44,
+		reqDefense = 36,
+		reqBank = 14000,
+		reqPotions = "Great Health / Mana Potion",
+		damageMin = 60,
+		damageMax = 155,
+		healAmount = 165,
+		waves = {
+			{ name = "Minotaur Guard", count = 3 },
+			{ name = "Minotaur Archer", count = 2 },
+			{ name = "Minotaur Mage", count = 2 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 95, countMin = 50, countMax = 180, isMoney = true },
+			{ id = 5878, name = "Minotaur Leather", price = 80, chance = 50, countMin = 1, countMax = 4 },
+			{ id = 11472, name = "Minotaur Horn", price = 75, chance = 40, countMin = 1, countMax = 3 },
+			{ id = 3275, name = "Double Axe", price = 260, chance = 20, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 19,
+		name = "Undeads (Dificil)",
+		tier = "hard",
+		level = 70,
+		focus = "Balanced",
+		desc = "3 Crypt Shamblers, 2 Bonebeasts e 1 Vampire sinistro.",
+		monster = "Vampire",
+		looktype = 18,
+		elements = { physical = 0, fire = 10, earth = 100, energy = 0, ice = 0, holy = 25, death = -100 },
+		
+		baseExp = 980,
+		cost = 120,
+		req_lvl = 70,
+		reqAttack = 50,
+		reqDefense = 40,
+		reqBank = 20000,
+		reqPotions = "Great Health / Mana Potion",
+		damageMin = 80,
+		damageMax = 210,
+		healAmount = 220,
+		waves = {
+			{ name = "Crypt Shambler", count = 3 },
+			{ name = "Bonebeast", count = 2 },
+			{ name = "Vampire", count = 1 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 95, countMin = 60, countMax = 220, isMoney = true },
+			{ id = 9647, name = "Rotten Piece of Cloth", price = 30, chance = 45, countMin = 1, countMax = 3 },
+			{ id = 3115, name = "Bone", price = 5, chance = 50, countMin = 2, countMax = 5 },
+			{ id = 3369, name = "Warrior Helmet", price = 5000, chance = 8, countMin = 1, countMax = 1 },
+			{ id = 3434, name = "Vampire Shield", price = 15000, chance = 4, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 20,
+		name = "Dragons (Dificil)",
+		tier = "hard",
+		level = 100,
+		focus = "More EXP",
+		desc = "3 Dragons enfurecidos e 3 Dragon Lords devastadores.",
+		monster = "Dragon Lord",
+		looktype = 39,
+		elements = { physical = 0, fire = -100, earth = -100, energy = -20, ice = 10, holy = 0, death = 0 },
+		
+		baseExp = 2800,
+		cost = 280,
+		req_lvl = 100,
+		reqAttack = 58,
+		reqDefense = 48,
+		reqBank = 50000,
+		reqPotions = "Ultimate Health / Great Mana Potion",
+		damageMin = 190,
+		damageMax = 460,
+		healAmount = 480,
+		waves = {
+			{ name = "Dragon", count = 3 },
+			{ name = "Dragon Lord", count = 3 }
+		},
+		loot = {
+			{ id = 3031, name = "Gold Coin", price = 1, chance = 95, countMin = 100, countMax = 320, isMoney = true },
+			{ id = 5882, name = "Red Dragon Scale", price = 200, chance = 35, countMin = 1, countMax = 2 },
+			{ id = 5877, name = "Green Dragon Leather", price = 100, chance = 35, countMin = 1, countMax = 2 },
+			{ id = 3280, name = "Fire Sword", price = 4000, chance = 12, countMin = 1, countMax = 1 },
+			{ id = 3428, name = "Tower Shield", price = 8000, chance = 8, countMin = 1, countMax = 1 },
+			{ id = 3392, name = "Royal Helmet", price = 30000, chance = 5, countMin = 1, countMax = 1 },
+		},
+	},
+	{
+		id = 21,
+		name = "Demons (Dificil)",
+		tier = "hard",
+		level = 180,
+		focus = "More EXP",
+		desc = "4 Diabolic Imps velozes e 2 Demons titânicos.",
+		monster = "Demon",
+		looktype = 35,
+		elements = { physical = 0, fire = -100, earth = -100, energy = -20, ice = 10, holy = 12, death = -20 },
+		
+		baseExp = 6800,
+		cost = 500,
+		req_lvl = 180,
+		reqAttack = 75,
+		reqDefense = 65,
+		reqBank = 100000,
+		reqPotions = "Supreme Health / Ultimate Mana Potion",
+		damageMin = 350,
+		damageMax = 850,
+		healAmount = 900,
+		waves = {
+			{ name = "Diabolic Imp", count = 4 },
+			{ name = "Demon", count = 2 }
+		},
+		loot = {
+			{ id = 3035, name = "Platinum Coin", price = 100, chance = 95, countMin = 3, countMax = 12, isMoney = true },
+			{ id = 3046, name = "Magic Sulphur", price = 1000, chance = 35, countMin = 1, countMax = 2 },
+			{ id = 3051, name = "Energy Ring", price = 500, chance = 25, countMin = 1, countMax = 1 },
+			{ id = 3420, name = "Demon Shield", price = 30000, chance = 6, countMin = 1, countMax = 1 },
+			{ id = 3388, name = "Mastermind Shield", price = 50000, chance = 3, countMin = 1, countMax = 1 },
+		},
+	},
 }
+
+-- FIM DO CATALOGO PADRAO
+
 
 local huntsCache = DEFAULT_HUNTS_CATALOG
 local activeFilter = "all"
@@ -271,6 +940,10 @@ function idleHuntController:updateDashboardState()
         if idleCard then idleCard:setVisible(true) end
         if activeCard then activeCard:setVisible(false) end
     end
+    -- Dica Tela 1
+    if dView.idleModeCard and dView.idleModeCard.dashboardTipBox and dView.idleModeCard.dashboardTipBox.tipText then
+        dView.idleModeCard.dashboardTipBox.tipText:setText(tr("Use o botao Quick Sell para converter seus drops em saldo bancario. Ao encerrar a cacada, voce e teleportado em seguranca para o Templo!"))
+    end
 end
 
 -- =========================================================================
@@ -297,9 +970,9 @@ function idleHuntController:setupCatalogUI()
     if filterPanel and filterPanel:getChildCount() == 0 then
         local TIERS = {
             { id = "all", name = "Todas as Hunts", color = "#ffffff", w = 120 },
-            { id = "easy", name = "[FÁCIL] Nível 8+", color = "#00ff88", w = 140 },
-            { id = "medium", name = "[MÉDIO] Nível 20+", color = "#ffd700", w = 150 },
-            { id = "hard", name = "[DIFÍCIL] Nível 35+", color = "#ff5555", w = 150 }
+            { id = "easy", name = "[FACIL] Nivel 8+", color = "#00ff88", w = 135 },
+            { id = "medium", name = "[MEDIO] Nivel 20+", color = "#ffd700", w = 145 },
+            { id = "hard", name = "[DIFICIL] Nivel 35+", color = "#ff5555", w = 145 }
         }
         for _, t in ipairs(TIERS) do
             local btn = g_ui.createWidget("Button", filterPanel)
@@ -317,6 +990,16 @@ function idleHuntController:setupCatalogUI()
             end
         end
     end
+
+    -- Dica Tela 2
+    if cView.catalogTipBox and cView.catalogTipBox.tipText then
+        cView.catalogTipBox.tipText:setText(tr("Monstros com [Mais EXP] aceleram seu level; monstros com [Mais Loot] dao maior lucro em GP. Clique em Configurar para ver detalhes!"))
+    end
+end
+
+local function trimString(s)
+    if not s then return "" end
+    return s:match("^%s*(.-)%s*$") or ""
 end
 
 function idleHuntController:filterHunts()
@@ -327,12 +1010,19 @@ function idleHuntController:filterHunts()
 
     local searchText = ""
     if cView.catalogTopBar and cView.catalogTopBar.searchEdit then
-        searchText = string.lower(string.trimSpace(cView.catalogTopBar.searchEdit:getText() or ""))
+        local rawSearch = cView.catalogTopBar.searchEdit:getText() or ""
+    searchText = string.lower(trimString(rawSearch))
     end
 
     local activeClean = string.lower(string.gsub(activeFilter or "all", "%s+", ""))
 
-    for _, h in ipairs(huntsCache) do
+        local list = huntsCache
+    if not list or #list == 0 then
+        list = DEFAULT_HUNTS_CATALOG
+        huntsCache = list
+    end
+
+    for _, h in ipairs(list) do
         local tierClean = string.lower(string.gsub(h.tier or "", "%s+", ""))
         local matchTier = (activeClean == "all" or activeClean == "todas" or tierClean == activeClean)
 
@@ -348,13 +1038,13 @@ function idleHuntController:filterHunts()
             if card then
                 local tierPrefix = ""
                 if h.tier == "easy" then
-                    tierPrefix = "[FÁCIL]"
+                    tierPrefix = "[FACIL]"
                     card.huntTitle:setColor("#00ff88")
                 elseif h.tier == "medium" then
-                    tierPrefix = "[MÉDIO]"
+                    tierPrefix = "[MEDIO]"
                     card.huntTitle:setColor("#ffd700")
                 elseif h.tier == "hard" then
-                    tierPrefix = "[DIFÍCIL]"
+                    tierPrefix = "[DIFICIL]"
                     card.huntTitle:setColor("#ff5555")
                 end
 
@@ -443,6 +1133,10 @@ function idleHuntController:setupDetailsUI()
         pPanel.pullAggressiveBtn.onClick = function() selectPull("aggressive") end
 
         selectPull(selectedPull or "bold")
+    end
+    -- Dica Tela 3
+    if dtView.detailsTipBox and dtView.detailsTipBox.tipText then
+        dtView.detailsTipBox.tipText:setText(tr("Pulls Ousado e Agressivo dao muito mais XP/h. Ajuste os frascos e runas na Action Bar IDLE para ter cura sem interrupcao!"))
     end
 end
 
@@ -587,7 +1281,13 @@ end
 
 function idleHuntController:getHuntById(id)
     id = tonumber(id) or 1
-    for _, h in ipairs(huntsCache) do
+        local list = huntsCache
+    if not list or #list == 0 then
+        list = DEFAULT_HUNTS_CATALOG
+        huntsCache = list
+    end
+
+    for _, h in ipairs(list) do
         if h.id == id then return h end
     end
     return huntsCache[1]

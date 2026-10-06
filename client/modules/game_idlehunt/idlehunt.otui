@@ -79,6 +79,16 @@ HuntCard < Panel
       anchors.centerIn: parent
       phantom: true
 
+  Button
+    id: configButton
+    !text: tr('Configurar')
+    font: verdana-11px-rounded
+    color: #00ff88
+    width: 90
+    height: 26
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+
   Label
     id: huntTitle
     font: verdana-11px-rounded
@@ -103,9 +113,10 @@ HuntCard < Panel
     anchors.top: huntTitle.bottom
     anchors.left: monsterFrame.right
     anchors.right: configButton.left
-    margin-top: 2
+    margin-top: 3
     margin-left: 8
     margin-right: 8
+    height: 26
     text-wrap: true
 
   Label
@@ -126,15 +137,40 @@ HuntCard < Panel
     margin-left: 12
     text-auto-resize: true
 
-  Button
-    id: configButton
-    !text: tr('Configurar')
+TipBox < Panel
+  height: 36
+  image-source: /images/ui/containerslot
+  image-border: 2
+  padding: 4
+
+  UIWidget
+    id: tipIcon
+    size: 16 16
+    image-source: /images/topbuttons/questlog
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 4
+
+  Label
+    id: tipTitle
+    !text: tr('[DICA]')
     font: verdana-11px-rounded
-    color: #00ff88
-    width: 90
-    height: 26
+    color: #ffd700
+    anchors.left: tipIcon.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 6
+    text-auto-resize: true
+
+  Label
+    id: tipText
+    font: verdana-11px-rounded
+    color: #99ddff
+    anchors.left: tipTitle.right
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
+    margin-left: 6
+    margin-right: 6
+    text-wrap: true
 
 MainWindow
   id: idleHuntWindow
@@ -247,7 +283,7 @@ MainWindow
       margin-bottom: 8
       image-source: /images/ui/containerslot
       image-border: 3
-      padding: 16
+      padding: 12
       visible: true
 
       Label
@@ -257,7 +293,7 @@ MainWindow
         color: #ffd700
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
-        margin-top: 25
+        margin-top: 35
         text-auto-resize: true
 
       Label
@@ -268,9 +304,10 @@ MainWindow
         anchors.top: idleTitle.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        margin-top: 16
+        margin-top: 14
         margin-left: 20
         margin-right: 20
+        height: 34
         text-align: center
         text-wrap: true
 
@@ -279,21 +316,16 @@ MainWindow
         !text: tr('ORGANIZAR CACADA')
         font: verdana-11px-rounded
         color: #00ff88
-        size: 240 36
+        size: 240 38
         anchors.centerIn: parent
         tooltip: tr('Abrir o catalogo de hunts para escolher onde cacar')
 
-      Label
-        id: idleTipLabel
-        !text: tr('Dica: Use o botao Quick Sell para vender instantaneamente os drops desbloqueados direto para sua conta bancaria.')
-        font: verdana-11px-rounded
-        color: #888888
+      TipBox
+        id: dashboardTipBox
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        margin-bottom: 25
-        text-align: center
-        text-wrap: true
+        margin-bottom: 6
 
     Panel
       id: activeHuntCard
@@ -351,9 +383,9 @@ MainWindow
         anchors.top: activeCreatureFrame.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: stopHuntButton.top
+        anchors.bottom: activeTipBox.top
         margin-top: 10
-        margin-bottom: 10
+        margin-bottom: 8
         image-source: /images/ui/containerslot
         image-border: 2
         padding: 8
@@ -403,6 +435,13 @@ MainWindow
           color: #a0a0a0
           text-auto-resize: true
 
+      TipBox
+        id: activeTipBox
+        anchors.bottom: stopHuntButton.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        margin-bottom: 8
+
       Button
         id: stopHuntButton
         !text: tr('ENCERRAR CACADA')
@@ -411,7 +450,7 @@ MainWindow
         size: 220 30
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
-        margin-bottom: 8
+        margin-bottom: 6
 
   Panel
     id: catalogView
@@ -465,12 +504,20 @@ MainWindow
         type: horizontalBox
         spacing: 6
 
+    TipBox
+      id: catalogTipBox
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-bottom: 4
+
     VerticalScrollBar
       id: huntListScrollBar
       anchors.top: catalogFilterPanel.bottom
-      anchors.bottom: parent.bottom
+      anchors.bottom: catalogTipBox.top
       anchors.right: parent.right
       margin-top: 6
+      margin-bottom: 6
       step: 40
       pixels-scroll: true
 
@@ -479,12 +526,14 @@ MainWindow
       anchors.top: catalogFilterPanel.bottom
       anchors.left: parent.left
       anchors.right: huntListScrollBar.left
-      anchors.bottom: parent.bottom
+      anchors.bottom: catalogTipBox.top
       margin-top: 6
       margin-right: 4
+      margin-bottom: 6
       vertical-scrollbar: huntListScrollBar
       layout:
         type: verticalBox
+        spacing: 4
 
   Panel
     id: detailsView
@@ -566,6 +615,7 @@ MainWindow
         margin-top: 2
         margin-left: 8
         margin-right: 8
+        height: 26
         text-wrap: true
 
       Label
@@ -674,12 +724,19 @@ MainWindow
           type: horizontalBox
           spacing: 6
 
+    TipBox
+      id: detailsTipBox
+      anchors.bottom: reqPanel.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-bottom: 6
+
     Panel
       id: dropsBoxPanel
       anchors.top: elementsPanel.bottom
       anchors.left: parent.left
       anchors.right: parent.right
-      anchors.bottom: reqPanel.top
+      anchors.bottom: detailsTipBox.top
       margin-top: 6
       margin-bottom: 6
       image-source: /images/ui/containerslot

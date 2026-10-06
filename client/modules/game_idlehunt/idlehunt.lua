@@ -836,12 +836,43 @@ local autoCombatEvent = nil
 local targetLockCreature = nil
 
 local itemRulesCache = {}
+local currentLootList = {}
+local autoSellTimer = 600
+local autoSellEvent = nil
+
+local function isItemLocked(itemId)
+	itemId = tonumber(itemId)
+	if not itemId then return true end
+	return (itemRulesCache[itemId] ~= "sell")
+end
 
 local function setItemLootRule(itemId, rule)
+	itemId = tonumber(itemId)
+	if not itemId then return end
 	itemRulesCache[itemId] = rule
 	local protocol = g_game.getProtocolGame()
 	if protocol then
 		protocol:sendExtendedOpcode(OPCODE_IDLE_HUNT, string.format('{"action":"set_loot_rule","item_id":%d,"rule":%q}', itemId, rule))
+	end
+
+	if rule == "sell" then
+		modules.game_textmessage.displayStatusMessage("[IDLE Auto-Sell]: Item DESBLOQUEADO para venda automatica.")
+	else
+		modules.game_textmessage.displayStatusMessage("[IDLE Auto-Sell]: Item BLOQUEADO e protegido na mochila.")
+	end
+
+	if idleHuntController and idleHuntController.refreshLootRuleWidgets then
+		idleHuntController:refreshLootRuleWidgets(itemId, rule)
+	end
+end
+
+local function toggleItemLootRule(itemId)
+	itemId = tonumber(itemId)
+	if not itemId then return end
+	if isItemLocked(itemId) then
+		setItemLootRule(itemId, "sell")
+	else
+		setItemLootRule(itemId, "keep")
 	end
 end
 
@@ -1305,9 +1336,19 @@ function idleHuntController:renderDetails(themeOrHuntId, tier)
 						row:setTooltip(tip)
 						row.itemWidget:setTooltip(tip)
 
+						row.itemId = item.id
 						local currentRule = itemRulesCache[item.id] or "keep"
 						row.keepCheckBox:setChecked(currentRule == "keep")
 						row.sellCheckBox:setChecked(currentRule == "sell")
+
+						if row.padlockButton then
+							local isLocked = (currentRule ~= "sell")
+							row.padlockButton:setIcon(isLocked and "/images/game/actionbar/locked" or "/images/game/actionbar/unlocked")
+							row.padlockButton:setTooltip(isLocked and "Item Seguro (Nao sera vendido). Clique para desbloquear e vender." or "Item para Venda (Sera vendido no Auto-Sell/Quick Sell). Clique para bloquear.")
+							row.padlockButton.onClick = function()
+								toggleItemLootRule(item.id)
+							end
+						end
 
 						local updating = false
 						row.keepCheckBox.onCheckChange = function(w, checked)
@@ -1317,6 +1358,9 @@ function idleHuntController:renderDetails(themeOrHuntId, tier)
 							local newRule = checked and "keep" or "sell"
 							itemRulesCache[item.id] = newRule
 							self:setLootRule(item.id, newRule)
+							if row.padlockButton then
+								row.padlockButton:setIcon(checked and "/images/game/actionbar/locked" or "/images/game/actionbar/unlocked")
+							end
 							updating = false
 						end
 
@@ -1327,6 +1371,9 @@ function idleHuntController:renderDetails(themeOrHuntId, tier)
 							local newRule = checked and "sell" or "keep"
 							itemRulesCache[item.id] = newRule
 							self:setLootRule(item.id, newRule)
+							if row.padlockButton then
+								row.padlockButton:setIcon(checked and "/images/game/actionbar/unlocked" or "/images/game/actionbar/locked")
+							end
 							updating = false
 						end
 					end
@@ -1419,6 +1466,144 @@ function idleHuntController:setLootRule(itemId, rule)
 	setItemLootRule(itemId, rule)
 end
 
+function idleHuntController:refreshLootRuleWidgets(itemId, rule)
+	itemId = tonumber(itemId)
+	if not itemId then return end
+
+	local isLocked = (rule ~= "sell")
+
+	-- 1. Atualizar cards na lista de drops da caçada ativa (huntingCard)
+	local dView = self.ui and self.ui.dashboardView
+	local hCard = dView and dView.huntingCard
+	local lootList = hCard and hCard.droppedLootCard and hCard.droppedLootCard.huntingLootList
+	if lootList then
+		for _, child in ipairs(lootList:getChildren()) do
+			if child.itemId == itemId and child.padlockButton then
+				if isLocked then
+					child.padlockButton:setIcon("/images/game/actionbar/locked")
+					child.padlockButton:setTooltip("Bloqueado: Item Seguro (nao sera vendido no Auto-Sell / Quick Sell).\nClique para desbloquear e vender.")
+				else
+					child.padlockButton:setIcon("/images/game/actionbar/unlocked")
+					child.padlockButton:setTooltip("Desbloqueado: Item sera vendido no Auto-Sell (10m) e Quick Sell.\nClique para bloquear e proteger.")
+				end
+			end
+		end
+	end
+
+	-- 2. Atualizar checkboxes e cadeado na tela de Detalhes da Hunt (se aberta)
+	local dtView = self.ui and self.ui.detailsView
+	local dropsList = dtView and dtView.dropsPanel and dtView.dropsPanel.dropsList
+	if dropsList then
+		for _, row in ipairs(dropsList:getChildren()) do
+			if row.itemId == itemId then
+				if row.keepCheckBox then row.keepCheckBox:setChecked(rule == "keep") end
+				if row.sellCheckBox then row.sellCheckBox:setChecked(rule == "sell") end
+				if row.padlockButton then
+					if isLocked then
+						row.padlockButton:setIcon("/images/game/actionbar/locked")
+						row.padlockButton:setTooltip("Item Seguro (Nao sera vendido). Clique para desbloquear e vender.")
+					else
+						row.padlockButton:setIcon("/images/game/actionbar/unlocked")
+						row.padlockButton:setTooltip("Item para Venda (Sera vendido no Auto-Sell/Quick Sell). Clique para bloquear.")
+					end
+				end
+			end
+		end
+	end
+end
+
+function idleHuntController:updateHuntingLootList(lootList)
+	currentLootList = lootList or currentLootList or {}
+
+	for _, it in ipairs(currentLootList) do
+		if it.id and it.rule then
+			itemRulesCache[it.id] = it.rule
+		end
+	end
+
+	local dView = self.ui and self.ui.dashboardView
+	local hCard = dView and dView.huntingCard
+	local lootSection = hCard and hCard.droppedLootCard
+	local list = lootSection and lootSection.huntingLootList
+	if not list then return end
+
+	list:destroyChildren()
+
+	if #currentLootList == 0 then
+		local emptyLabel = g_ui.createWidget("Label", list)
+		emptyLabel:setText("Aguardando monstros droparem itens nesta sessao...")
+		emptyLabel:setFont("verdana-11px-rounded")
+		emptyLabel:setColor("#888888")
+		emptyLabel:setMarginLeft(8)
+		emptyLabel:setMarginTop(8)
+		return
+	end
+
+	for _, item in ipairs(currentLootList) do
+		local row = g_ui.createWidget("HuntingDropRow", list)
+		if row then
+			row.itemId = item.id
+			row.itemWidget:setItemId(item.id)
+
+			local droppedCount = item.dropped or 0
+			local inBagCount = item.in_bag or 0
+			local dropText = string.format("%s (x%d dropados | %d na mochila)", item.name or "Item", droppedCount, inBagCount)
+			row.itemNameLabel:setText(dropText)
+
+			local priceText = string.format("Valor: %s gp cada | Chance: %d%%", formatNumber(item.price or 0), item.chance or 0)
+			row.itemInfoLabel:setText(priceText)
+
+			local isLocked = (item.rule ~= "sell")
+			if isLocked then
+				row.padlockButton:setIcon("/images/game/actionbar/locked")
+				row.padlockButton:setTooltip("Bloqueado: Item Seguro (nao sera vendido no Auto-Sell / Quick Sell).\nClique para desbloquear e vender.")
+			else
+				row.padlockButton:setIcon("/images/game/actionbar/unlocked")
+				row.padlockButton:setTooltip("Desbloqueado: Item sera vendido no Auto-Sell (10m) e Quick Sell.\nClique para bloquear e proteger.")
+			end
+
+			local itId = item.id
+			row.padlockButton.onClick = function()
+				toggleItemLootRule(itId)
+			end
+		end
+	end
+end
+
+function idleHuntController:startAutoSellTimer(seconds)
+	autoSellTimer = seconds or 600
+	if autoSellEvent then
+		removeEvent(autoSellEvent)
+		autoSellEvent = nil
+	end
+
+	local function tick()
+		if autoSellTimer > 0 then
+			autoSellTimer = autoSellTimer - 1
+		end
+
+		local dView = self.ui and self.ui.dashboardView
+		local hCard = dView and dView.huntingCard
+		local asPanel = hCard and hCard.autoSellPanel
+		if asPanel and asPanel.autoSellTimerLabel then
+			local mins = math.floor(autoSellTimer / 60)
+			local secs = autoSellTimer % 60
+			asPanel.autoSellTimerLabel:setText(string.format("%02d:%02d", mins, secs))
+			if autoSellTimer <= 30 then
+				asPanel.autoSellTimerLabel:setColor("#ffaa00")
+			else
+				asPanel.autoSellTimerLabel:setColor("#00ff88")
+			end
+		end
+
+		if inHunt then
+			autoSellEvent = scheduleEvent(tick, 1000)
+		end
+	end
+
+	tick()
+end
+
 -- =========================================================================
 -- MANIPULADOR DE PACOTES (OPCODE 106)
 -- =========================================================================
@@ -1461,15 +1646,38 @@ function idleHuntController:onOpcodeReceived(protocol, opcode, buffer)
 
 		self:switchView("dashboard")
 		self:startAutoCombat()
+		self:startAutoSellTimer(600)
+		self:updateHuntingLootList({})
 
 	elseif action == "hunt_ended" then
 		inHunt = false
 		currentHuntId = 0
 		targetLockCreature = nil
 		self:stopAutoCombat()
+		if autoSellEvent then
+			removeEvent(autoSellEvent)
+			autoSellEvent = nil
+		end
 		modules.game_textmessage.displayStatusMessage(data.reason or "Cacada IDLE finalizada.")
 
 		self:switchView("dashboard")
+
+	elseif action == "hunt_loot" then
+		if data.loot then
+			self:updateHuntingLootList(data.loot)
+		end
+		if data.next_autosell then
+			self:startAutoSellTimer(data.next_autosell)
+		end
+		if data.quick_cooldown and data.quick_cooldown > 0 then
+			self:startQuickSellCooldown(data.quick_cooldown)
+		end
+
+	elseif action == "loot_rule_updated" then
+		if data.item_id and data.rule then
+			itemRulesCache[data.item_id] = data.rule
+			self:refreshLootRuleWidgets(data.item_id, data.rule)
+		end
 
 	elseif action == "hunt_status" then
 		local dView = self.ui and self.ui.dashboardView
@@ -1503,6 +1711,13 @@ function idleHuntController:onOpcodeReceived(protocol, opcode, buffer)
 			sPanel.staminaBar:setValue(staminaMins, 0, 1440)
 		end
 
+		if data.next_autosell and (not autoSellEvent or math.abs((autoSellTimer or 0) - data.next_autosell) > 5) then
+			self:startAutoSellTimer(data.next_autosell)
+		end
+		if data.quick_cooldown and (not quickSellEvent or math.abs((quickSellCooldownTimer or 0) - data.quick_cooldown) > 5) then
+			self:startQuickSellCooldown(data.quick_cooldown)
+		end
+
 	elseif action == "requirements" then
 		local dtView = self.ui and self.ui.detailsView
 		local rPanel = dtView and dtView.reqPanel
@@ -1528,13 +1743,13 @@ function idleHuntController:onOpcodeReceived(protocol, opcode, buffer)
 		if (data.gold or 0) > 0 then
 			local msg = string.format("Quick Sell concluido! Vendido(s) %d item(ns) por %s gold (creditado no banco).", data.count or 0, formatNumber(data.gold or 0))
 			modules.game_textmessage.displayStatusMessage(msg)
-			self:startQuickSellCooldown(data.cooldown or 5)
+			self:startQuickSellCooldown(data.cooldown or 120)
 		else
 			self:startQuickSellCooldown(0)
 		end
 
 	elseif action == "quick_sell_cooldown" then
-		self:startQuickSellCooldown(data.remaining or 5)
+		self:startQuickSellCooldown(data.remaining or 120)
 	end
 end
 
@@ -1556,21 +1771,25 @@ function idleHuntController:startQuickSellCooldown(seconds)
 		return
 	end
 
-	btn:setEnabled(false)
-	btn:setText(string.format("Quick Sell (%ds)", quickSellCooldownTimer))
-	btn:setColor("#888888")
-
-	quickSellEvent = scheduleEvent(function()
-		quickSellCooldownTimer = quickSellCooldownTimer - 1
-		if quickSellCooldownTimer > 0 then
-			btn:setText(string.format("Quick Sell (%ds)", quickSellCooldownTimer))
-			self:startQuickSellCooldown(quickSellCooldownTimer)
-		else
+	local function tick()
+		if quickSellCooldownTimer <= 0 then
 			btn:setEnabled(true)
 			btn:setText("Quick Sell")
 			btn:setColor("#00ff88")
+			return
 		end
-	end, 1000)
+
+		btn:setEnabled(false)
+		local mins = math.floor(quickSellCooldownTimer / 60)
+		local secs = quickSellCooldownTimer % 60
+		btn:setText(string.format("Quick Sell (%02d:%02d)", mins, secs))
+		btn:setColor("#888888")
+
+		quickSellCooldownTimer = quickSellCooldownTimer - 1
+		quickSellEvent = scheduleEvent(tick, 1000)
+	end
+
+	tick()
 end
 
 -- =========================================================================
@@ -1780,3 +1999,13 @@ function idleHuntController:stopAutoCombat()
 		end
 	end)
 end
+-- Exportações Globais e Modulares para Interação Externa (ex: Botão Direito em Itens na Mochila)
+_G.idleHuntController = idleHuntController
+modules.game_idlehunt = modules.game_idlehunt or {}
+modules.game_idlehunt.setItemLootRule = setItemLootRule
+modules.game_idlehunt.isItemLocked = isItemLocked
+modules.game_idlehunt.toggleItemLootRule = toggleItemLootRule
+
+idleHuntController.setItemLootRule = setItemLootRule
+idleHuntController.isItemLocked = isItemLocked
+idleHuntController.toggleItemLootRule = toggleItemLootRule

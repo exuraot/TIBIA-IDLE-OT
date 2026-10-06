@@ -936,16 +936,14 @@ local function sendLootUpdateOpcode(player, huntId)
 				if rule == "sell" then
 					pendingSaleGold = pendingSaleGold + (inBag * l.price)
 				end
-				if inBag > 0 then
-					local look = getItemLookDescription(l.id)
-					table.insert(
-						lootParts,
-						string.format(
-							'{"id":%d,"name":%s,"price":%d,"chance":%d,"rule":%s,"dropped":%d,"in_bag":%d,"look":%s}',
-							l.id, escapeJsonString(l.name), l.price, l.chance, escapeJsonString(rule), droppedCount, inBag, escapeJsonString(look)
-						)
+				local look = getItemLookDescription(l.id)
+				table.insert(
+					lootParts,
+					string.format(
+						'{"id":%d,"name":%s,"price":%d,"chance":%d,"rule":%s,"dropped":%d,"in_bag":%d,"look":%s}',
+						l.id, escapeJsonString(l.name), l.price, l.chance, escapeJsonString(rule), droppedCount, inBag, escapeJsonString(look)
 					)
-				end
+				)
 			end
 		end
 	end
@@ -974,7 +972,7 @@ local function sendLootUpdateOpcode(player, huntId)
 	local now = os.time()
 	local nextAutosell = session and math.max(0, 600 - (now - (session.lastAutoSell or now))) or 600
 	local lastQ = session and session.lastQuickSell or (player:getStorageValue(STORAGE_LAST_QUICK_SELL) > 0 and player:getStorageValue(STORAGE_LAST_QUICK_SELL) or 0)
-	local quickCooldown = math.max(0, 5 - (now - lastQ))
+	local quickCooldown = math.max(0, 120 - (now - lastQ))
 
 	local huntName = (hunt and hunt.name) or "Global Loot"
 	local response = string.format(
@@ -1126,9 +1124,11 @@ end
 -- Telemetria de Status da Caçada Ativa
 local function sendHuntStatusOpcode(player, huntId, session, curStamina, maxHp)
 	local now = os.time()
+	local curExp = player:getExperience()
+	session.xpGained = math.max(0, curExp - (session.startExperience or curExp))
 	local nextAutosell = math.max(0, 600 - (now - (session.lastAutoSell or now)))
 	local lastQ = session.lastQuickSell or (player:getStorageValue(STORAGE_LAST_QUICK_SELL) > 0 and player:getStorageValue(STORAGE_LAST_QUICK_SELL) or 0)
-	local quickCooldown = math.max(0, 5 - (now - lastQ))
+	local quickCooldown = math.max(0, 120 - (now - lastQ))
 	local elapsed = math.max(1, now - (session.startTime or now))
 	local rateExp = math.floor(((session.xpGained or 0) / elapsed) * 3600)
 	local rateGp = math.floor(((session.goldEarned or 0) / elapsed) * 3600)
@@ -1192,6 +1192,9 @@ local function stopIdleHunt(playerId, reason, isEmergency, skipTeleport)
 		end
 
 		-- 2. Limpa condições de combate
+		player:unregisterEvent("IdleHuntMonsterKill")
+		player:unregisterEvent("IdleHuntPlayerLogout")
+
 		player:removeCondition(CONDITION_INFIGHT)
 		player:removeCondition(CONDITION_HUNTING)
 
@@ -1395,8 +1398,16 @@ local function startIdleHunt(player, huntId, pull)
 		return false
 	end
 
+	-- Registro de Eventos de Kill e Logout no Jogador
+	player:registerEvent("IdleHuntMonsterKill")
+	player:registerEvent("IdleHuntPlayerLogout")
+	session.startExperience = player:getExperience()
+
 	-- Invocação imediata da primeira onda de monstros
 	spawnHuntWave(player, hunt, session)
+
+	-- Envio do estado inicial de drops & loot
+	sendLootUpdateOpcode(player, huntId)
 
 	-- Ativar AutoLoot nativo se presente
 	pcall(function()
@@ -1549,6 +1560,13 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 
 		if itemId then
 			setPlayerLootRule(player, itemId, rule)
+			player:sendExtendedOpcode(
+				OPCODE_IDLE_HUNT,
+				string.format('{"action":"loot_rule_updated","item_id":%d,"rule":%q}', itemId, rule)
+			)
+			local session = _G.OnIdleHunt[playerId]
+			local huntId = session and session.huntId or 1
+			sendLootUpdateOpcode(player, huntId)
 		end
 
 	-- 6. BOTÃO DE VENDA RÁPIDA (QUICK SELL) - COOLDOWN 0 EM VENDA VAZIA, 5S EM SUCESSO
@@ -1560,11 +1578,13 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 		local lastQ = session and session.lastQuickSell or (player:getStorageValue(STORAGE_LAST_QUICK_SELL) > 0 and player:getStorageValue(STORAGE_LAST_QUICK_SELL) or 0)
 		local elapsed = now - lastQ
 
-		if elapsed < 5 then
-			local remaining = 5 - elapsed
+		if elapsed < 120 then
+			local remaining = 120 - elapsed
+			local remMins = math.floor(remaining / 60)
+			local remSecs = remaining % 60
 			player:sendTextMessage(
 				MESSAGE_FAILURE,
-				string.format("Aguarde %d segundo(s) para usar o Quick Sell novamente.", remaining)
+				string.format("Aguarde %02dm %02ds para usar o Quick Sell novamente.", remMins, remSecs)
 			)
 			player:sendExtendedOpcode(
 				OPCODE_IDLE_HUNT,
@@ -1584,7 +1604,7 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 			player:sendExtendedOpcode(
 				OPCODE_IDLE_HUNT,
 				string.format(
-					'{"action":"quick_sell_result","gold":%d,"count":%d,"cooldown":5}',
+					'{"action":"quick_sell_result","gold":%d,"count":%d,"cooldown":120}',
 					gold, count
 				)
 			)
@@ -1751,6 +1771,8 @@ function idleMonsterKillEvent.onKill(player, target)
 			end
 		end
 	end
+
+	sendLootUpdateOpcode(player, session.huntId)
 
 	return true
 end

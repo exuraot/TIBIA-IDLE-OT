@@ -700,22 +700,22 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
             end, shortcut)
         end
 
-        if lookThing:isItem() and (modules.game_idlehunt or idleHuntController) then
+        if lookThing:isItem() and (modules.game_idlehunt or idleHuntController or _G.idleHuntController) then
             local itemId = lookThing:getId()
-            local idlehuntMod = modules.game_idlehunt or idleHuntController
+            local idlehuntMod = modules.game_idlehunt or idleHuntController or _G.idleHuntController
             local isLocked = true
-            if idlehuntMod.isItemLocked then
+            if idlehuntMod and idlehuntMod.isItemLocked then
                 isLocked = idlehuntMod.isItemLocked(itemId)
             end
             if isLocked then
                 menu:addOption(tr("Unlock for Auto-Sell"), function()
-                    if idlehuntMod.setItemLootRule then
+                    if idlehuntMod and idlehuntMod.setItemLootRule then
                         idlehuntMod.setItemLootRule(itemId, "sell")
                     end
                 end)
             else
                 menu:addOption(tr("Lock for Auto-Sell"), function()
-                    if idlehuntMod.setItemLootRule then
+                    if idlehuntMod and idlehuntMod.setItemLootRule then
                         idlehuntMod.setItemLootRule(itemId, "keep")
                     end
                 end)

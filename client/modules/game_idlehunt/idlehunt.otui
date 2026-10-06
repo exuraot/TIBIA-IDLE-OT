@@ -22,6 +22,56 @@ ElementBadge < Panel
     margin-bottom: 1
     text-auto-resize: true
 
+HuntingDropRow < Panel
+  height: 40
+  image-source: /images/ui/containerslot
+  image-border: 2
+  padding: 2
+  margin-bottom: 3
+
+  UIItem
+    id: itemWidget
+    size: 32 32
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 4
+    virtual: true
+
+  Label
+    id: itemNameLabel
+    font: verdana-11px-rounded
+    color: #ffffff
+    anchors.top: parent.top
+    anchors.left: itemWidget.right
+    anchors.right: padlockButton.left
+    margin-left: 8
+    margin-top: 2
+    margin-right: 8
+    text-auto-resize: true
+
+  Label
+    id: itemInfoLabel
+    font: verdana-11px-rounded
+    color: #ffd700
+    anchors.bottom: parent.bottom
+    anchors.left: itemWidget.right
+    anchors.right: padlockButton.left
+    margin-left: 8
+    margin-bottom: 2
+    margin-right: 8
+    text-auto-resize: true
+
+  Button
+    id: padlockButton
+    size: 26 24
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 8
+    icon-source: /images/game/actionbar/locked
+    icon-offset: 0 0
+    $pressed:
+      icon-offset: 1 1
+
 DropRowCheckItem < Panel
   height: 40
   image-source: /images/ui/containerslot
@@ -43,7 +93,7 @@ DropRowCheckItem < Panel
     color: #ffffff
     anchors.top: parent.top
     anchors.left: itemWidget.right
-    anchors.right: keepCheckBox.left
+    anchors.right: padlockButton.left
     margin-left: 8
     margin-top: 2
     margin-right: 4
@@ -55,11 +105,22 @@ DropRowCheckItem < Panel
     color: #ffd700
     anchors.bottom: parent.bottom
     anchors.left: itemWidget.right
-    anchors.right: keepCheckBox.left
+    anchors.right: padlockButton.left
     margin-left: 8
     margin-bottom: 2
     margin-right: 4
     text-auto-resize: true
+
+  Button
+    id: padlockButton
+    size: 26 24
+    anchors.right: keepCheckBox.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 8
+    icon-source: /images/game/actionbar/locked
+    icon-offset: 0 0
+    $pressed:
+      icon-offset: 1 1
 
   CheckBox
     id: keepCheckBox
@@ -361,6 +422,93 @@ MainWindow
           margin-bottom: 4
           text-auto-resize: true
 
+      Panel
+        id: autoSellPanel
+        anchors.top: metricsGrid.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        margin-top: 6
+        height: 28
+        image-source: /images/ui/containerslot
+        image-border: 2
+        padding: 4
+        tooltip: tr('A cada 10 minutos todos os itens que nao estiverem com o cadeado fechado serao vendidos e o dinheiro depositado diretamente no seu banco.')
+
+        Label
+          id: autoSellTitleLabel
+          !text: tr('AUTO SELL:')
+          font: verdana-11px-rounded
+          color: #ffd700
+          anchors.left: parent.left
+          anchors.verticalCenter: parent.verticalCenter
+          margin-left: 6
+          text-auto-resize: true
+
+        Label
+          id: autoSellTimerLabel
+          !text: tr('10:00')
+          font: verdana-11px-rounded
+          color: #00ff88
+          anchors.left: autoSellTitleLabel.right
+          anchors.verticalCenter: parent.verticalCenter
+          margin-left: 6
+          text-auto-resize: true
+
+        Label
+          id: autoSellDescLabel
+          !text: tr('(Venda automatica a cada 10m - Trave os itens no cadeado para nao vender)')
+          font: verdana-11px-rounded
+          color: #888888
+          anchors.right: parent.right
+          anchors.verticalCenter: parent.verticalCenter
+          margin-right: 6
+          text-auto-resize: true
+
+      Panel
+        id: droppedLootCard
+        anchors.top: autoSellPanel.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: emergencyStopButton.top
+        margin-top: 6
+        margin-bottom: 6
+        image-source: /images/ui/containerslot
+        image-border: 2
+        padding: 4
+
+        Label
+          id: lootSectionTitle
+          !text: tr('Drops da Sessao & Controle de Venda (Cadeado: Fechado = Guardar | Aberto = Vender):')
+          font: verdana-11px-rounded
+          color: #ffd700
+          anchors.top: parent.top
+          anchors.left: parent.left
+          margin-left: 4
+          margin-top: 2
+          text-auto-resize: true
+
+        ScrollablePanel
+          id: huntingLootList
+          anchors.top: lootSectionTitle.bottom
+          anchors.left: parent.left
+          anchors.right: huntingLootScrollBar.left
+          anchors.bottom: parent.bottom
+          margin-top: 4
+          margin-right: 4
+          vertical-scrollbar: huntingLootScrollBar
+          layout:
+            type: verticalBox
+            fit-children: false
+
+        VerticalScrollBar
+          id: huntingLootScrollBar
+          anchors.top: lootSectionTitle.bottom
+          anchors.right: parent.right
+          anchors.bottom: parent.bottom
+          margin-top: 4
+          step: 24
+          pixels-scroll: true
+
       Button
         id: emergencyStopButton
         !text: tr('ENCERRAR CACADA E VOLTAR AO TEMPLO')
@@ -383,7 +531,7 @@ MainWindow
         !text: tr('Quick Sell')
         font: verdana-11px-rounded
         color: #00ff88
-        width: 110
+        width: 130
         height: 26
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter

@@ -985,6 +985,56 @@ local function sendLootUpdateOpcode(player, huntId)
 end
 
 -- =========================================================================
+-- =========================================================================
+-- INSTANCIAÇÃO DINÂMICA DE ARENAS IDLE EM ÁREAS ISOLADAS DO MAPA
+-- =========================================================================
+local function ensureArenaTiles(center, radius, groundId, wallId)
+	if not center then return end
+	radius = radius or 6
+	groundId = groundId or 104 -- Sand floor
+	wallId = wallId or 602     -- Rock wall barrier
+
+	-- 1. Cria o chão caminhável do interior da arena
+	for x = center.x - radius, center.x + radius do
+		for y = center.y - radius, center.y + radius do
+			local pos = Position(x, y, center.z)
+			local tile = Tile(pos)
+			if not tile then
+				tile = Game.createTile(pos)
+			end
+			if tile and not tile:getGround() then
+				tile:addItem(groundId, 1, FLAG_NOLIMIT)
+			end
+		end
+	end
+
+	-- 2. Cria paredes de pedra no perímetro para limitar a sala
+	local outer = radius + 1
+	for x = center.x - outer, center.x + outer do
+		for _, y in ipairs({ center.y - outer, center.y + outer }) do
+			local pos = Position(x, y, center.z)
+			local tile = Tile(pos)
+			if not tile then tile = Game.createTile(pos) end
+			if tile then
+				if not tile:getGround() then tile:addItem(groundId, 1, FLAG_NOLIMIT) end
+				if not tile:getItemById(wallId) then tile:addItem(wallId, 1, FLAG_NOLIMIT) end
+			end
+		end
+	end
+	for y = center.y - outer, center.y + outer do
+		for _, x in ipairs({ center.x - outer, center.x + outer }) do
+			local pos = Position(x, y, center.z)
+			local tile = Tile(pos)
+			if not tile then tile = Game.createTile(pos) end
+			if tile then
+				if not tile:getGround() then tile:addItem(groundId, 1, FLAG_NOLIMIT) end
+				if not tile:getItemById(wallId) then tile:addItem(wallId, 1, FLAG_NOLIMIT) end
+			end
+		end
+	end
+end
+
+-- =========================================================================
 -- ENGINE DE SPAWN CONTÍNUO POR ONDAS (WAVES) NA SALA INSTANCIADA
 -- =========================================================================
 local function clearHuntMonsters(session)
@@ -1002,9 +1052,17 @@ local function clearHuntMonsters(session)
 end
 
 local function spawnHuntWave(player, hunt, session)
-	if not player or not session then return end
+	if not player or not session or not hunt then return end
 	local pPos = player:getPosition()
 	session.spawnedMonsters = session.spawnedMonsters or {}
+
+	-- SEGURANÇA TOTAL: Impedir qualquer spawn caso o jogador não esteja na arena da caçada
+	if hunt.pos then
+		local dist = math.max(math.abs(pPos.x - hunt.pos.x), math.abs(pPos.y - hunt.pos.y))
+		if pPos.z ~= hunt.pos.z or dist > 8 then
+			return
+		end
+	end
 
 	-- Limpar IDs de monstros que já morreram
 	local aliveMonsters = {}
@@ -1305,14 +1363,36 @@ local function startIdleHunt(player, huntId, pull)
 
 	-- Teleportar jogador para o centro da arena instanciada da dificuldade
 	if hunt.pos then
+		-- Garante existência física dos tiles da arena antes do teleporte
+		ensureArenaTiles(hunt.pos, 6, 104, 602)
+
+		local targetTile = Tile(hunt.pos)
+		if not targetTile or not targetTile:getGround() then
+			player:sendTextMessage(MESSAGE_FAILURE, "[IDLE HUNT ERRO]: Não foi possível instanciar a arena da caçada.")
+			return false
+		end
+
 		local curPos = player:getPosition()
 		curPos:sendMagicEffect(CONST_ME_TELEPORT)
-		player:teleportTo(hunt.pos)
+		local teleportOk = player:teleportTo(hunt.pos)
+		if not teleportOk then
+			player:sendTextMessage(MESSAGE_FAILURE, "[IDLE HUNT ERRO]: Falha ao teleportar para a arena. Caçada cancelada por segurança.")
+			return false
+		end
+
 		hunt.pos:sendMagicEffect(CONST_ME_TELEPORT)
 		player:sendTextMessage(
 			MESSAGE_EVENT_ADVANCE,
 			string.format("[IDLE HUNT]: Você entrou na arena: %s!", hunt.name)
 		)
+	end
+
+	-- SEGURANÇA TOTAL: Bloqueio estrito de spawn caso o jogador não esteja na arena
+	local playerPos = player:getPosition()
+	if hunt.pos and (playerPos.x ~= hunt.pos.x or playerPos.y ~= hunt.pos.y or playerPos.z ~= hunt.pos.z) then
+		player:sendTextMessage(MESSAGE_FAILURE, "[IDLE HUNT ERRO]: O teleporte não foi concluído. Invocação de monstros bloqueada por segurança.")
+		stopIdleHunt(playerId, "Teleporte falhou.", false, false)
+		return false
 	end
 
 	-- Invocação imediata da primeira onda de monstros
@@ -1689,5 +1769,20 @@ function idleLogoutEvent.onLogout(player)
 end
 
 idleLogoutEvent:register()
+
+-- Inicialização das Arenas IDLE no Startup do Servidor
+local arenaStartupEvent = GlobalEvent("IdleHuntArenaInit")
+
+function arenaStartupEvent.onStartup()
+	addEvent(function()
+		ensureArenaTiles(ROOM_POS_EASY, 6, 104, 602)
+		ensureArenaTiles(ROOM_POS_MEDIUM, 6, 104, 602)
+		ensureArenaTiles(ROOM_POS_HARD, 6, 104, 602)
+		logger.info("[IDLE HUNT ARENAS]: 3 dynamic arenas initialized at Easy (385,754,8), Medium (421,301,11), Hard (440,785,11).")
+	end, 1000)
+	return true
+end
+
+arenaStartupEvent:register()
 
 print("[IDLE HUNT SYSTEM]: Loaded successfully with 3 difficulty tiers (Easy/Medium/Hard) and persistent Global Quick Sell.")

@@ -857,25 +857,28 @@ local function showSupplyPopup(itemId, cost, fromBank)
 	local popup = g_ui.createWidget('SupplyPopup', mapPanel)
 	if not popup then return end
 
-	local wWidth = 130
-	local wHeight = 28
-	local centerX = math.floor(mapPanel:getWidth() / 2 - (wWidth / 2))
-	local startY = math.floor(mapPanel:getHeight() / 2 - 55)
-	popup:setPosition({ x = centerX, y = startY })
-
 	if popup.itemWidget then
 		popup.itemWidget:setItemId(tonumber(itemId) or 268)
 	end
 
-	if popup.textLabel then
-		if fromBank and (tonumber(cost) or 0) > 0 then
-			popup.textLabel:setColor('#ffd700')
-			popup.textLabel:setText(string.format("Aaaah... -%d gp", tonumber(cost) or 56))
-		else
-			popup.textLabel:setColor('#00ff88')
-			popup.textLabel:setText("Aaaah... (0 gp)")
-		end
+	local txt = "Aaaah..."
+	cost = tonumber(cost) or 0
+	if fromBank and cost > 0 then
+		txt = string.format("Aaaah... -%d gp", cost)
 	end
+
+	if popup.textLabel then
+		popup.textLabel:setText(txt)
+		popup.textLabel:setColor('#ffaa00')
+	end
+
+	local textW = popup.textLabel and popup.textLabel:getTextSize().width or 75
+	local totalW = 20 + 4 + textW + 4
+	popup:setWidth(totalW)
+
+	local centerX = math.floor((mapPanel:getWidth() - totalW) / 2)
+	local startY = math.floor((mapPanel:getHeight() / 2) - 46)
+	popup:setPosition({ x = centerX, y = startY })
 
 	activeSupplyPopup = popup
 
@@ -907,7 +910,6 @@ local function showSupplyPopup(itemId, cost, fromBank)
 		end
 	end, 45)
 end
-
 local autoSellTimer = 600
 local autoSellEvent = nil
 

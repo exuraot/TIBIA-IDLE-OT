@@ -1,25 +1,23 @@
-SupplyPopup < Panel
-  size: 130 28
-  image-source: /images/ui/containerslot
-  image-border: 2
-  image-color: #111111ee
+SupplyPopup < UIWidget
+  height: 22
   focusable: false
   phantom: true
+  background-color: alpha
 
   UIItem
     id: itemWidget
     size: 20 20
     anchors.left: parent.left
     anchors.verticalCenter: parent.verticalCenter
-    margin-left: 4
     virtual: true
 
   Label
     id: textLabel
     font: verdana-11px-rounded
+    color: #ffaa00
     anchors.left: itemWidget.right
     anchors.verticalCenter: parent.verticalCenter
-    margin-left: 6
+    margin-left: 4
     text-auto-resize: true
 
 ElementBadge < Panel

@@ -1618,11 +1618,24 @@ local function isHotkeyConditionMet(hk, hpPercent, mpPercent, inCombat)
 	return false
 end
 
+-- Helper de Distancia Diagonal (Chebyshev / SQMs em Tibia)
+local function getDistanceBetween(p1, p2)
+	if not p1 or not p2 then return 999 end
+	return math.max(math.abs(p1.x - p2.x), math.abs(p1.y - p2.y))
+end
+
+local prevChaseMode = nil
+
 function idleHuntController:startAutoCombat()
 	if autoCombatEvent then
 		removeEvent(autoCombatEvent)
 		autoCombatEvent = nil
 	end
+
+	pcall(function()
+		prevChaseMode = g_game.getChaseMode()
+		g_game.setChaseMode(ChaseOpponent)
+	end)
 
 	local lastPotionTime = 0
 	local lastHealTime = 0
@@ -1633,117 +1646,120 @@ function idleHuntController:startAutoCombat()
 			return
 		end
 
-		local player = g_game.getLocalPlayer()
-		if not player then
-			autoCombatEvent = scheduleEvent(combatLoop, 400)
-			return
-		end
+		local ok, err = pcall(function()
+			local player = g_game.getLocalPlayer()
+			if not player then
+				return
+			end
 
-		local pPos = player:getPosition()
-		local maxHp = player:getMaxHealth() or 1
-		local curHp = player:getHealth() or 1
-		local hpPercent = math.floor((curHp / maxHp) * 100)
+			local pPos = player:getPosition()
+			local maxHp = player:getMaxHealth() or 1
+			local curHp = player:getHealth() or 1
+			local hpPercent = math.floor((curHp / maxHp) * 100)
 
-		local maxMp = player:getMaxMana() or 1
-		local curMp = player:getMana() or 1
-		local mpPercent = math.floor((curMp / maxMp) * 100)
+			local maxMp = player:getMaxMana() or 1
+			local curMp = player:getMana() or 1
+			local mpPercent = math.floor((curMp / maxMp) * 100)
 
-		-- Alvo / Target Lock
-		local currentTarget = g_game.getAttackingCreature()
-		local inCombat = (currentTarget ~= nil and not currentTarget:isDead())
+			-- Alvo / Target Lock
+			local currentTarget = g_game.getAttackingCreature()
+			local inCombat = (currentTarget ~= nil and not currentTarget:isDead())
 
-		if not inCombat then
-			local spectators = g_map.getSpectators(pPos, false)
-			local nearestMonster = nil
-			local minDist = 999
+			if not inCombat then
+				local spectators = g_map.getSpectators(pPos, false)
+				local nearestMonster = nil
+				local minDist = 999
 
-			for _, spec in ipairs(spectators) do
-				if spec:isMonster() and not spec:isDead() then
-					local dist = getDistanceBetween(pPos, spec:getPosition())
-					if dist < minDist then
-						minDist = dist
-						nearestMonster = spec
+				for _, spec in ipairs(spectators) do
+					if spec:isMonster() and not spec:isDead() then
+						local dist = getDistanceBetween(pPos, spec:getPosition())
+						if dist < minDist then
+							minDist = dist
+							nearestMonster = spec
+						end
 					end
+				end
+
+				if nearestMonster and not nearestMonster:isDead() then
+					g_game.attack(nearestMonster)
+					currentTarget = nearestMonster
+					inCombat = true
 				end
 			end
 
-			if nearestMonster and not nearestMonster:isDead() then
-				g_game.attack(nearestMonster)
-				currentTarget = nearestMonster
-				inCombat = true
+			-- Leitura das Hotkeys IDLE configuradas
+			local idleHotkeys = nil
+			if modules.game_actionbar and modules.game_actionbar.getIdleHotkeys then
+				idleHotkeys = modules.game_actionbar.getIdleHotkeys()
 			end
-		end
 
-		-- Leitura das Hotkeys IDLE configuradas
-		local idleHotkeys = nil
-		if modules.game_actionbar and modules.game_actionbar.getIdleHotkeys then
-			idleHotkeys = modules.game_actionbar.getIdleHotkeys()
-		end
+			local now = g_clock.millis()
 
-		local now = g_clock.millis()
-
-		if idleHotkeys and #idleHotkeys > 0 then
-			-- Trilha 1: Pocoes / Suprimentos (a cada 1000ms)
-			if (now - lastPotionTime) >= 1000 then
-				for _, hk in ipairs(idleHotkeys) do
-					if hk.type == "object" and hk.itemId and hk.itemId > 0 then
-						if isHotkeyConditionMet(hk, hpPercent, mpPercent, inCombat) then
-							lastPotionTime = now
-							local protocol = g_game.getProtocolGame()
-							if protocol then
-								protocol:sendExtendedOpcode(OPCODE_IDLE_HUNT, string.format('{"action":"use_idle_supply","item_id":%d}', hk.itemId))
+			if idleHotkeys and #idleHotkeys > 0 then
+				-- Trilha 1: Pocoes / Suprimentos (a cada 1000ms)
+				if (now - lastPotionTime) >= 1000 then
+					for _, hk in ipairs(idleHotkeys) do
+						if hk.type == "object" and hk.itemId and hk.itemId > 0 then
+							if isHotkeyConditionMet(hk, hpPercent, mpPercent, inCombat) then
+								lastPotionTime = now
+								local protocol = g_game.getProtocolGame()
+								if protocol then
+									protocol:sendExtendedOpcode(OPCODE_IDLE_HUNT, string.format('{"action":"use_idle_supply","item_id":%d}', hk.itemId))
+								end
+								break
 							end
-							break
+						end
+					end
+				end
+
+				-- Trilha 2: Magias de Cura (a cada 1000ms)
+				if (now - lastHealTime) >= 1000 then
+					for _, hk in ipairs(idleHotkeys) do
+						if hk.type == "spell" and hk.words and hk.words ~= "" then
+							local wLower = string.lower(hk.words)
+							local isHeal = string.find(wLower, "cura") or string.find(wLower, "exura") or string.find(wLower, "heal") or string.find(wLower, "vita") or not hk.offensive
+							if isHeal and isHotkeyConditionMet(hk, hpPercent, mpPercent, inCombat) then
+								lastHealTime = now
+								g_game.talk(hk.words)
+								break
+							end
+						end
+					end
+				end
+
+				-- Trilha 3: Magias Ofensivas (a cada 2000ms, em combate)
+				if (now - lastAttackSpellTime) >= 2000 and inCombat then
+					for _, hk in ipairs(idleHotkeys) do
+						if hk.type == "spell" and hk.words and hk.words ~= "" then
+							local wLower = string.lower(hk.words)
+							local isHeal = string.find(wLower, "cura") or string.find(wLower, "exura") or string.find(wLower, "heal") or string.find(wLower, "vita") or not hk.offensive
+							if not isHeal and isHotkeyConditionMet(hk, hpPercent, mpPercent, inCombat) then
+								lastAttackSpellTime = now
+								g_game.talk(hk.words)
+								break
+							end
 						end
 					end
 				end
 			end
 
-			-- Trilha 2: Magias de Cura (a cada 1000ms)
-			if (now - lastHealTime) >= 1000 then
-				for _, hk in ipairs(idleHotkeys) do
-					if hk.type == "spell" and hk.words and hk.words ~= "" then
-						local wLower = string.lower(hk.words)
-						local isHeal = string.find(wLower, "cura") or string.find(wLower, "exura") or string.find(wLower, "heal") or string.find(wLower, "vita") or not hk.offensive
-						if isHeal and isHotkeyConditionMet(hk, hpPercent, mpPercent, inCombat) then
-							lastHealTime = now
-							g_game.talk(hk.words)
-							break
-						end
-					end
+			-- Movimentacao / Aproximacao em direcao ao monstro mais proximo
+			if currentTarget and not currentTarget:isDead() then
+				local mPos = currentTarget:getPosition()
+				local dist = getDistanceBetween(pPos, mPos)
+				if dist > 1 and dist < 12 and not player:isWalking() then
+					pcall(function() player:autoWalk(mPos) end)
 				end
 			end
+		end)
 
-			-- Trilha 3: Magias Ofensivas (a cada 2000ms, em combate)
-			if (now - lastAttackSpellTime) >= 2000 and inCombat then
-				for _, hk in ipairs(idleHotkeys) do
-					if hk.type == "spell" and hk.words and hk.words ~= "" then
-						local wLower = string.lower(hk.words)
-						local isHeal = string.find(wLower, "cura") or string.find(wLower, "exura") or string.find(wLower, "heal") or string.find(wLower, "vita") or not hk.offensive
-						if not isHeal and isHotkeyConditionMet(hk, hpPercent, mpPercent, inCombat) then
-							lastAttackSpellTime = now
-							g_game.talk(hk.words)
-							break
-						end
-					end
-				end
-			end
+		if not ok then
+			pcall(function() g_logger.error("[IDLE COMBAT ERROR]: " .. tostring(err)) end)
 		end
 
-		-- Movimentacao em direcao ao monstro mais proximo se necessario
-		if currentTarget and not currentTarget:isDead() then
-			local mPos = currentTarget:getPosition()
-			local dist = getDistanceBetween(pPos, mPos)
-			if dist > 1 and dist < 8 then
-				local path = g_map.findPath(pPos, mPos, 10, 0)
-				if path and #path > 0 then
-					local dir = path[1]
-					g_game.walk(dir)
-				end
-			end
+		if inHunt then
+			autoCombatEvent = scheduleEvent(combatLoop, 400)
 		end
-
-		autoCombatEvent = scheduleEvent(combatLoop, 400)
 	end
 
 	autoCombatEvent = scheduleEvent(combatLoop, 400)
@@ -1754,7 +1770,13 @@ function idleHuntController:stopAutoCombat()
 		removeEvent(autoCombatEvent)
 		autoCombatEvent = nil
 	end
-	if g_game.isAttacking() then
-		g_game.cancelAttack()
-	end
+	pcall(function()
+		if prevChaseMode then
+			g_game.setChaseMode(prevChaseMode)
+			prevChaseMode = nil
+		end
+		if g_game.isAttacking() then
+			g_game.cancelAttack()
+		end
+	end)
 end

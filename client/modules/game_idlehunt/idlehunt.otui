@@ -286,7 +286,7 @@ MainWindow
 
         Label
           id: hpLabel
-          !text: tr('HP do Jogador: 100%')
+          !text: tr('HP do Jogador: 100%%')
           font: verdana-11px-rounded
           color: #ff5555
           anchors.bottom: parent.bottom

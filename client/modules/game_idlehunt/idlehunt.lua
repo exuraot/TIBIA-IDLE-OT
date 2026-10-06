@@ -841,7 +841,7 @@ local currentLootList = {}
 local activeSupplyPopup = nil
 local supplyAnimEvent = nil
 
-local function showSupplyPopup(itemId, cost, fromBank)
+local function showSupplyPopup(itemId, cost, fromBank, itemName, isRune)
 	local mapPanel = modules.game_interface and modules.game_interface.getMapPanel()
 	if not mapPanel then return end
 
@@ -861,10 +861,11 @@ local function showSupplyPopup(itemId, cost, fromBank)
 		popup.itemWidget:setItemId(tonumber(itemId) or 268)
 	end
 
-	local txt = "Aaaah..."
 	cost = tonumber(cost) or 0
+	local prefix = itemName or (isRune and "Rune" or "Aaaah...")
+	local txt = prefix
 	if fromBank and cost > 0 then
-		txt = string.format("Aaaah... -%d gp", cost)
+		txt = string.format("%s -%d gp", prefix, cost)
 	end
 
 	if popup.textLabel then
@@ -1905,7 +1906,7 @@ function idleHuntController:onOpcodeReceived(protocol, opcode, buffer)
 		end
 
 	elseif action == "supply_used" then
-		showSupplyPopup(data.item_id, data.cost or 0, data.from_bank)
+		showSupplyPopup(data.item_id, data.cost or 0, data.from_bank, data.item_name, data.is_rune)
 
 	elseif action == "quick_sell_result" then
 		if (data.gold or 0) > 0 then
@@ -2141,7 +2142,13 @@ function idleHuntController:startAutoCombat()
 							end
 						elseif hk.type == "object" and hk.offensive and hk.itemId and hk.itemId > 0 then
 							lastAttackSpellTime = now
-							g_game.useInventoryItemWith(hk.itemId, currentTarget)
+							local protocol = g_game.getProtocolGame()
+							if protocol then
+								protocol:sendExtendedOpcode(
+									OPCODE_IDLE_HUNT,
+									string.format('{"action":"use_idle_rune","item_id":%d,"cost":%d,"target_id":%d}', hk.itemId, hk.cost or 64, currentTarget:getId())
+								)
+							end
 							break
 						end
 					end

@@ -90,6 +90,18 @@ MainWindow
       anchors.left: parent.left
       !text: tr('Trigger Condition (IDLE Hunt):')
 
+    Label
+      id: combatNoticeLabel
+      font: verdana-11px-rounded
+      color: #00ddff
+      anchors.top: conditionTitle.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 6
+      text-auto-resize: true
+      !text: tr('Runa de Ataque: Usada automaticamente no alvo durante o combate.')
+      visible: false
+
     Panel
       id: triggerRow
       anchors.top: conditionTitle.bottom

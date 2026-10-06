@@ -145,12 +145,15 @@ function modules.game_actionbar.renderIdleButton(button)
             if button.item then
                 button.item:setItemId(conf.itemId)
             end
-            local op = conf.operator or (conf.offensive and ">=" or "<=")
-            local displayTxt = string.format("%s%s%d%%", conf.resource, op, conf.percent)
+            local displayTxt = ""
+            if not conf.offensive and conf.percent and conf.percent > 0 then
+                local op = conf.operator or "<="
+                displayTxt = string.format("%s%s%d%%", conf.resource, op, conf.percent)
+            end
             if button.parameterText then
                 button.parameterText:setText(displayTxt)
                 button.parameterText:setColor('#00ddff')
-                button.parameterText:setVisible(true)
+                button.parameterText:setVisible(displayTxt ~= "")
             end
             button:setTooltip(string.format("IDLE Object: %s\nCost: ~%d gp / use\nTrigger: %s\nRight-click to edit", conf.name, conf.cost or 0, displayTxt))
         end
@@ -487,10 +490,24 @@ function modules.game_actionbar.openIdleObjectWindow(button)
             win.previewContainer.previewItem:setItemId(selectedObj.id)
             win.previewContainer.previewLabel:setText(string.format("%s\nCost: ~%d gp / use", selectedObj.name, selectedObj.cost))
 
-            combo:setCurrentOption(selectedObj.resource or "HP")
-            win.conditionBox.triggerRow.percentInput:setText(tostring(selectedObj.percent or 60))
-            if win.conditionBox.triggerRow.opLabel then
-                win.conditionBox.triggerRow.opLabel:setText(selectedObj.offensive and ">=" or "<=")
+            if selectedObj.offensive then
+                win.conditionBox.conditionTitle:setText(tr("Runa de Combate (IDLE):"))
+                win.conditionBox.triggerRow:setVisible(false)
+                if win.conditionBox.combatNoticeLabel then
+                    win.conditionBox.combatNoticeLabel:setVisible(true)
+                    win.conditionBox.combatNoticeLabel:setText(tr("Plug & Play: Usada automaticamente no alvo durante o combate."))
+                end
+            else
+                win.conditionBox.conditionTitle:setText(tr("Gatilho de Suprimento (IDLE):"))
+                win.conditionBox.triggerRow:setVisible(true)
+                if win.conditionBox.combatNoticeLabel then
+                    win.conditionBox.combatNoticeLabel:setVisible(false)
+                end
+                combo:setCurrentOption(selectedObj.resource or "HP")
+                win.conditionBox.triggerRow.percentInput:setText(tostring(selectedObj.percent or 60))
+                if win.conditionBox.triggerRow.opLabel then
+                    win.conditionBox.triggerRow.opLabel:setText("<=")
+                end
             end
         end
     end
@@ -509,9 +526,9 @@ function modules.game_actionbar.openIdleObjectWindow(button)
             return
         end
 
-        local pct = tonumber(win.conditionBox.triggerRow.percentInput:getText()) or 60
-        local res = combo:getCurrentOption().data
-        local op = win.conditionBox.triggerRow.opLabel:getText()
+        local pct = selectedObj.offensive and 0 or (tonumber(win.conditionBox.triggerRow.percentInput:getText()) or 60)
+        local res = selectedObj.offensive and "Combat" or (combo:getCurrentOption() and combo:getCurrentOption().data or "HP")
+        local op = selectedObj.offensive and "" or win.conditionBox.triggerRow.opLabel:getText()
 
         local idleData = getSavedIdleHotkeys()
         idleData[slotId] = {

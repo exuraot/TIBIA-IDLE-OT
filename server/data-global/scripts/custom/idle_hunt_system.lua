@@ -1728,6 +1728,79 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 		templePos:sendMagicEffect(CONST_ME_TELEPORT)
 		player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "[TEMPLE]: You were safely teleported to the Temple!")
 
+	
+-- Definição dos Objetos de Combate para Runas Ofensivas IDLE
+local IDLE_COMBAT_RUNES = {}
+
+local function createRuneCombat(name, cost, combatType, magicEffect, distanceEffect, isArea, formulaFn)
+	local c = Combat()
+	c:setParameter(COMBAT_PARAM_TYPE, combatType)
+	c:setParameter(COMBAT_PARAM_EFFECT, magicEffect)
+	c:setParameter(COMBAT_PARAM_DISTANCEEFFECT, distanceEffect)
+	if isArea then
+		c:setArea(createCombatArea(AREA_CIRCLE3X3))
+	end
+	c:setCallback(CALLBACK_PARAM_LEVELMAGICVALUE, formulaFn)
+	return { name = name, cost = cost, combat = c, isArea = isArea }
+end
+
+function onIdleAvalancheValues(player, level, maglevel)
+	local min = (level / 5) + (maglevel * 1.2) + 7
+	local max = (level / 5) + (maglevel * 2.8) + 17
+	return -min, -max
+end
+
+function onIdleGfbValues(player, level, maglevel)
+	local min = (level / 5) + (maglevel * 1.2) + 7
+	local max = (level / 5) + (maglevel * 2.8) + 17
+	return -min, -max
+end
+
+function onIdleThunderstormValues(player, level, maglevel)
+	local min = (level / 5) + (maglevel * 1.2) + 7
+	local max = (level / 5) + (maglevel * 2.8) + 17
+	return -min, -max
+end
+
+function onIdleStoneShowerValues(player, level, maglevel)
+	local min = (level / 5) + (maglevel * 1.2) + 7
+	local max = (level / 5) + (maglevel * 2.8) + 17
+	return -min, -max
+end
+
+function onIdleSdValues(player, level, maglevel)
+	local min = (level / 5) + (maglevel * 4.6) + 28
+	local max = (level / 5) + (maglevel * 7.4) + 48
+	return -min, -max
+end
+
+function onIdleExplosionValues(player, level, maglevel)
+	local min = (level / 5) + (maglevel * 1.0) + 6
+	local max = (level / 5) + (maglevel * 2.4) + 14
+	return -min, -max
+end
+
+function onIdleHmmValues(player, level, maglevel)
+	local min = (level / 5) + (maglevel * 0.8) + 5
+	local max = (level / 5) + (maglevel * 1.6) + 11
+	return -min, -max
+end
+
+function onIdleLmmValues(player, level, maglevel)
+	local min = (level / 5) + (maglevel * 0.4) + 2
+	local max = (level / 5) + (maglevel * 0.8) + 6
+	return -min, -max
+end
+
+IDLE_COMBAT_RUNES[3161] = createRuneCombat("Avalanche", 64, COMBAT_ICEDAMAGE, CONST_ME_ICEAREA, CONST_ANI_ICE, true, "onIdleAvalancheValues")
+IDLE_COMBAT_RUNES[3191] = createRuneCombat("Great Fireball", 64, COMBAT_FIREDAMAGE, CONST_ME_FIREAREA, CONST_ANI_FIRE, true, "onIdleGfbValues")
+IDLE_COMBAT_RUNES[3202] = createRuneCombat("Thunderstorm", 52, COMBAT_ENERGYDAMAGE, CONST_ME_ENERGYAREA, CONST_ANI_ENERGYBALL, true, "onIdleThunderstormValues")
+IDLE_COMBAT_RUNES[3175] = createRuneCombat("Stone Shower", 41, COMBAT_EARTHDAMAGE, CONST_ME_STONES, CONST_ANI_EARTH, true, "onIdleStoneShowerValues")
+IDLE_COMBAT_RUNES[3155] = createRuneCombat("Sudden Death", 162, COMBAT_DEATHDAMAGE, CONST_ME_MORTAREA, CONST_ANI_SUDDENDEATH, false, "onIdleSdValues")
+IDLE_COMBAT_RUNES[3200] = createRuneCombat("Explosion", 31, COMBAT_PHYSICALDAMAGE, CONST_ME_EXPLOSIONAREA, CONST_ANI_EXPLOSION, true, "onIdleExplosionValues")
+IDLE_COMBAT_RUNES[3198] = createRuneCombat("Heavy Magic Missile", 65, COMBAT_ENERGYDAMAGE, CONST_ME_ENERGYHIT, CONST_ANI_ENERGY, false, "onIdleHmmValues")
+IDLE_COMBAT_RUNES[3174] = createRuneCombat("Light Magic Missile", 4, COMBAT_ENERGYDAMAGE, CONST_ME_ENERGYHIT, CONST_ANI_ENERGY, false, "onIdleLmmValues")
+
 	-- 9. SUPRIMENTO HÍBRIDO IDLE (MOCHILA OU DÉBITO DIRETO DO BANCO)
 	elseif buffer:find("use_idle_supply") then
 		local itemId = tonumber(buffer:match('"item_id"%s*:%s*(%d+)'))
@@ -1804,6 +1877,50 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 			player:sendExtendedOpcode(
 				OPCODE_IDLE_HUNT,
 				string.format('{"action":"supply_used","item_id":%d,"cost":%d,"from_bank":%s}', itemId, cost, usedFromBank and "true" or "false")
+			)
+		end
+
+	-- 10. USO DE RUNA DE ATAQUE IDLE (HÍBRIDO: MOCHILA OU DÉBITO DO BANCO)
+	elseif buffer:find("use_idle_rune") then
+		local itemId = tonumber(buffer:match('"item_id"%s*:%s*(%d+)'))
+		local cost = tonumber(buffer:match('"cost"%s*:%s*(%d+)')) or 0
+		local targetId = tonumber(buffer:match('"target_id"%s*:%s*(%d+)'))
+
+		if not itemId or not targetId then return end
+		local target = Creature(targetId)
+		if not target or target:isDead() then return end
+
+		local runeDef = IDLE_COMBAT_RUNES[itemId]
+		if not runeDef then return end
+
+		cost = (cost > 0) and cost or runeDef.cost
+		local countInBag = player:getItemCount(itemId)
+		local consumed = false
+		local fromBank = false
+
+		if countInBag > 0 then
+			player:removeItem(itemId, 1)
+			consumed = true
+		else
+			local bank = player:getBankBalance()
+			if bank >= cost then
+				Bank.debit(player, cost)
+				player:setBankBalance(bank - cost)
+				player:sendBankBalance()
+				consumed = true
+				fromBank = true
+			else
+				player:sendTextMessage(MESSAGE_FAILURE, "[SUPPLIES]: Saldo insuficiente no banco para comprar runa " .. runeDef.name .. "!")
+			end
+		end
+
+		if consumed then
+			local variant = runeDef.isArea and Variant(target:getPosition()) or Variant(target:getId())
+			runeDef.combat:execute(player, variant)
+
+			player:sendExtendedOpcode(
+				OPCODE_IDLE_HUNT,
+				string.format('{"action":"supply_used","item_id":%d,"item_name":%q,"cost":%d,"from_bank":%s,"is_rune":true}', itemId, runeDef.name, cost, fromBank and "true" or "false")
 			)
 		end
 	end

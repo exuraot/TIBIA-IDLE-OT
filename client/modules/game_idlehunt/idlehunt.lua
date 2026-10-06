@@ -2033,13 +2033,17 @@ function idleHuntController:startAutoCombat()
 					end
 				end
 
+				local function isHealSpellWord(w)
+					if not w or w == "" then return false end
+					local low = string.lower(w)
+					return string.find(low, "exura") ~= nil or string.find(low, "cura") ~= nil or string.find(low, "heal") ~= nil or string.find(low, "vita") ~= nil or string.find(low, "san") ~= nil or string.find(low, "wound") ~= nil or string.find(low, "restoration") ~= nil
+				end
+
 				-- Trilha 2: Magias de Cura & Suporte (a cada 1000ms)
 				if (now - lastHealTime) >= 1000 then
 					for _, hk in ipairs(idleHotkeys) do
 						if hk.type == "spell" and hk.words and hk.words ~= "" then
-							local wLower = string.lower(hk.words)
-							local isHeal = string.find(wLower, "cura") or string.find(wLower, "exura") or string.find(wLower, "heal") or string.find(wLower, "vita") or not hk.offensive
-							if isHeal then
+							if isHealSpellWord(hk.words) then
 								local targetVal = tonumber(hk.percent) or 80
 								if hpPercent <= targetVal then
 									lastHealTime = now
@@ -2052,22 +2056,18 @@ function idleHuntController:startAutoCombat()
 				end
 
 				-- Trilha 3: Magias e Runas Ofensivas 100% Plug & Play (a cada 2000ms, em combate)
-				if (now - lastAttackSpellTime) >= 2000 and inCombat then
+				if (now - lastAttackSpellTime) >= 2000 and inCombat and currentTarget and not currentTarget:isDead() then
 					for _, hk in ipairs(idleHotkeys) do
 						if hk.type == "spell" and hk.words and hk.words ~= "" then
-							local wLower = string.lower(hk.words)
-							local isHeal = string.find(wLower, "cura") or string.find(wLower, "exura") or string.find(wLower, "heal") or string.find(wLower, "vita") or not hk.offensive
-							if not isHeal then
+							if not isHealSpellWord(hk.words) then
 								lastAttackSpellTime = now
 								g_game.talk(hk.words)
 								break
 							end
 						elseif hk.type == "object" and hk.offensive and hk.itemId and hk.itemId > 0 then
-							if currentTarget and not currentTarget:isDead() then
-								lastAttackSpellTime = now
-								g_game.useInventoryItemWith(hk.itemId, currentTarget)
-								break
-							end
+							lastAttackSpellTime = now
+							g_game.useInventoryItemWith(hk.itemId, currentTarget)
+							break
 						end
 					end
 				end

@@ -1754,12 +1754,15 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 		if countInBag > 0 then
 			player:removeItem(itemId, 1)
 			consumed = true
+			player:sendTextMessage(MESSAGE_LOOK, "Used 1 supply potion from inventory.")
 		else
 			if cost > 0 then
 				local bank = player:getBankBalance()
 				if bank >= cost then
-					player:removeMoneyBank(cost)
+					Bank.debit(player, cost)
+					player:setBankBalance(bank - cost)
 					player:sendBankBalance()
+					player:sendTextMessage(MESSAGE_LOOK, string.format("Paid %d gold from bank account for supply. Balance: %s gold.", cost, FormatNumber(bank - cost)))
 					consumed = true
 				else
 					player:sendTextMessage(MESSAGE_FAILURE, "[SUPPLIES]: Saldo insuficiente no banco para repor suprimento!")

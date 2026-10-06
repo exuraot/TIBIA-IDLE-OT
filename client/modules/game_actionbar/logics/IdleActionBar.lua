@@ -123,18 +123,18 @@ function modules.game_actionbar.renderIdleButton(button)
                 button.item.text:setText(conf.words or conf.spellName or "")
             end
 
-            local op = conf.operator or (conf.offensive and ">=" or "<=")
             local displayTxt = ""
-            if conf.resource == "Combat" or conf.resource == "Always" or conf.resource == "In Combat" then
-                displayTxt = "COMBAT"
+            if not conf.offensive and conf.percent and conf.percent > 0 then
+                local op = conf.operator or "<="
+                displayTxt = string.format("%s%s%d%%", conf.resource or "HP", op, conf.percent)
             else
-                displayTxt = string.format("%s%s%d%%", conf.resource, op, conf.percent)
+                displayTxt = ""
             end
 
             if button.parameterText then
                 button.parameterText:setText(displayTxt)
                 button.parameterText:setColor('#00ff88')
-                button.parameterText:setVisible(true)
+                button.parameterText:setVisible(displayTxt ~= "")
             end
             button:setTooltip(string.format("IDLE Spell: %s (%s)\nTrigger: %s\nCooldown: %.1fs\nRight-click to edit", conf.spellName, conf.words, displayTxt, (conf.cooldown or 1000) / 1000))
         elseif conf.type == "object" then
@@ -320,17 +320,24 @@ function modules.game_actionbar.openIdleSpellWindow(button)
             local isHealing = (sData.words and (sData.words:lower():find("exura") or sData.words:lower():find("heal") or sData.words:lower():find("san") or sData.words:lower():find("vita") or sData.words:lower():find("cure"))) or (sData.group and sData.group[2])
 
             if isHealing then
+                win.conditionBox.conditionTitle:setText(tr("Gatilho de Cura (IDLE):"))
+                win.conditionBox.triggerRow:setVisible(true)
+                if win.conditionBox.combatNoticeLabel then
+                    win.conditionBox.combatNoticeLabel:setVisible(false)
+                end
+                win.conditionBox.combatOnlyCheck:setVisible(false)
                 combo:setCurrentOption("HP")
                 win.conditionBox.triggerRow.opLabel:setText("<=")
                 win.conditionBox.triggerRow.percentInput:setText("80")
                 win.conditionBox.triggerRow.percentInput:setEnabled(true)
-                win.conditionBox.combatOnlyCheck:setChecked(false)
             else
-                combo:setCurrentOption("MP")
-                win.conditionBox.triggerRow.opLabel:setText(">=")
-                win.conditionBox.triggerRow.percentInput:setText("20")
-                win.conditionBox.triggerRow.percentInput:setEnabled(true)
-                win.conditionBox.combatOnlyCheck:setChecked(true)
+                win.conditionBox.conditionTitle:setText(tr("Magia de Combate (IDLE):"))
+                win.conditionBox.triggerRow:setVisible(false)
+                if win.conditionBox.combatNoticeLabel then
+                    win.conditionBox.combatNoticeLabel:setVisible(true)
+                    win.conditionBox.combatNoticeLabel:setText(tr("Plug & Play: Conjurada automaticamente no alvo durante o combate."))
+                end
+                win.conditionBox.combatOnlyCheck:setVisible(false)
             end
         end
     end
@@ -369,12 +376,12 @@ function modules.game_actionbar.openIdleSpellWindow(button)
             return
         end
 
-        local pct = tonumber(win.conditionBox.triggerRow.percentInput:getText()) or 80
-        local res = combo:getCurrentOption().data
-        local op = win.conditionBox.triggerRow.opLabel:getText()
-        local combatOnly = win.conditionBox.combatOnlyCheck:isChecked()
-
         local isHealing = (selectedSpell.data.words and (selectedSpell.data.words:lower():find("exura") or selectedSpell.data.words:lower():find("heal") or selectedSpell.data.words:lower():find("san") or selectedSpell.data.words:lower():find("vita") or selectedSpell.data.words:lower():find("cure"))) or (selectedSpell.data.group and selectedSpell.data.group[2])
+
+        local pct = isHealing and (tonumber(win.conditionBox.triggerRow.percentInput:getText()) or 80) or 0
+        local res = isHealing and (combo:getCurrentOption() and combo:getCurrentOption().data or "HP") or "Combat"
+        local op = isHealing and win.conditionBox.triggerRow.opLabel:getText() or ""
+        local combatOnly = not isHealing
 
         local idleData = getSavedIdleHotkeys()
         idleData[slotId] = {

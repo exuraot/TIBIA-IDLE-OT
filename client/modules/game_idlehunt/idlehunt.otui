@@ -63,7 +63,7 @@ HuntingDropRow < Panel
 
   Button
     id: autoLootButton
-    size: 56 24
+    size: 74 22
     anchors.right: padlockButton.left
     anchors.verticalCenter: parent.verticalCenter
     margin-right: 6
@@ -74,10 +74,10 @@ HuntingDropRow < Panel
 
   Button
     id: padlockButton
-    size: 26 24
+    size: 26 22
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
-    margin-right: 8
+    margin-right: 6
     icon-source: /images/game/actionbar/locked
     icon-offset: 0 0
     $pressed:

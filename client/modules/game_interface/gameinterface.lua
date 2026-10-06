@@ -703,18 +703,39 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         if lookThing:isItem() and (modules.game_idlehunt or idleHuntController or _G.idleHuntController) then
             local itemId = lookThing:getId()
             local idlehuntMod = modules.game_idlehunt or idleHuntController or _G.idleHuntController
+
+            -- 1. Controle de Auto Loot (Coletar vs Ignorar)
+            local isAutoLoot = true
+            if idlehuntMod and idlehuntMod.isAutoLootEnabled then
+                isAutoLoot = idlehuntMod.isAutoLootEnabled(itemId)
+            end
+            if isAutoLoot then
+                menu:addOption(tr("Auto Loot: [X] Coletar"), function()
+                    if idlehuntMod and idlehuntMod.setAutoLootRule then
+                        idlehuntMod.setAutoLootRule(itemId, false)
+                    end
+                end)
+            else
+                menu:addOption(tr("Auto Loot: [  ] Ignorar"), function()
+                    if idlehuntMod and idlehuntMod.setAutoLootRule then
+                        idlehuntMod.setAutoLootRule(itemId, true)
+                    end
+                end)
+            end
+
+            -- 2. Controle de Travar Venda / Auto-Sell (Guardar vs Vender)
             local isLocked = true
             if idlehuntMod and idlehuntMod.isItemLocked then
                 isLocked = idlehuntMod.isItemLocked(itemId)
             end
             if isLocked then
-                menu:addOption(tr("Unlock for Auto-Sell"), function()
+                menu:addOption(tr("Travar Venda: [X] Guardar"), function()
                     if idlehuntMod and idlehuntMod.setItemLootRule then
                         idlehuntMod.setItemLootRule(itemId, "sell")
                     end
                 end)
             else
-                menu:addOption(tr("Lock for Auto-Sell"), function()
+                menu:addOption(tr("Travar Venda: [  ] Vender"), function()
                     if idlehuntMod and idlehuntMod.setItemLootRule then
                         idlehuntMod.setItemLootRule(itemId, "keep")
                     end

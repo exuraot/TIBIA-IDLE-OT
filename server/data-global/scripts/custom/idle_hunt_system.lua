@@ -9,6 +9,7 @@ local MAX_IDLE_STAMINA = 1440
 
 -- Base storage para persistência de regras de loot no banco de dados (player_storage)
 -- STORAGE_IDLE_LOOT_BASE + itemId: 1 = sell, 0 / <= 0 = keep
+local STORAGE_IDLE_AUTOLOOT_BASE = 870000 -- 1 = coletar (default), 0 = ignorar
 local STORAGE_IDLE_LOOT_BASE = 880000
 local STORAGE_LAST_QUICK_SELL = 889999
 local STORAGE_RECORD_EXP_BASE = 890000
@@ -782,6 +783,18 @@ local function setPlayerLootRule(player, itemId, rule)
 	end
 end
 
+local function getPlayerAutoLootRule(player, itemId)
+	local val = player:getStorageValue(STORAGE_IDLE_AUTOLOOT_BASE + itemId)
+	if val == 0 then
+		return false -- Ignorado
+	end
+	return true -- Coletar (padrão)
+end
+
+local function setPlayerAutoLootRule(player, itemId, enabled)
+	player:setStorageValue(STORAGE_IDLE_AUTOLOOT_BASE + itemId, enabled and 1 or 0)
+end
+
 -- Stamina IDLE (Armazenada no Storage 95000)
 local function getPlayerIdleStamina(player)
 	local val = player:getStorageValue(STORAGE_IDLE_STAMINA)
@@ -940,8 +953,8 @@ local function sendLootUpdateOpcode(player, huntId)
 				table.insert(
 					lootParts,
 					string.format(
-						'{"id":%d,"name":%s,"price":%d,"chance":%d,"rule":%s,"dropped":%d,"in_bag":%d,"look":%s}',
-						l.id, escapeJsonString(l.name), l.price, l.chance, escapeJsonString(rule), droppedCount, inBag, escapeJsonString(look)
+						'{"id":%d,"name":%s,"price":%d,"chance":%d,"rule":%s,"autoloot":%s,"dropped":%d,"in_bag":%d,"look":%s}',
+						l.id, escapeJsonString(l.name), l.price, l.chance, escapeJsonString(rule), getPlayerAutoLootRule(player, l.id) and "true" or "false", droppedCount, inBag, escapeJsonString(look)
 					)
 				)
 			end
@@ -1035,7 +1048,28 @@ end
 -- =========================================================================
 -- ENGINE DE SPAWN CONTÍNUO POR ONDAS (WAVES) NA SALA INSTANCIADA
 -- =========================================================================
-local function clearHuntMonsters(session)
+local function clearArenaArea(centerPos, radius)
+	if not centerPos then return end
+	radius = radius or 8
+	for x = centerPos.x - radius, centerPos.x + radius do
+		for y = centerPos.y - radius, centerPos.y + radius do
+			local tile = Tile(Position(x, y, centerPos.z))
+			if tile then
+				local creatures = tile:getCreatures()
+				if creatures then
+					for _, c in ipairs(creatures) do
+						if c:isMonster() then
+							c:getPosition():sendMagicEffect(CONST_ME_POFF)
+							c:remove()
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+local function clearHuntMonsters(session, huntPos)
 	if session and session.spawnedMonsters then
 		for _, mId in ipairs(session.spawnedMonsters) do
 			local m = Monster(mId)
@@ -1046,6 +1080,9 @@ local function clearHuntMonsters(session)
 			end
 		end
 		session.spawnedMonsters = {}
+	end
+	if huntPos then
+		clearArenaArea(huntPos, 8)
 	end
 end
 
@@ -1156,11 +1193,12 @@ local function stopIdleHunt(playerId, reason, isEmergency, skipTeleport)
 	local session = _G.OnIdleHunt[playerId]
 	local huntId = session and session.huntId or 1
 
+	local hunt = getHuntById(huntId)
 	if session then
 		if session.event then
 			stopEvent(session.event)
 		end
-		clearHuntMonsters(session)
+		clearHuntMonsters(session, hunt and hunt.pos)
 		_G.OnIdleHunt[playerId] = nil
 	end
 
@@ -1194,6 +1232,7 @@ local function stopIdleHunt(playerId, reason, isEmergency, skipTeleport)
 		-- 2. Limpa condições de combate
 		player:unregisterEvent("IdleHuntMonsterKill")
 		player:unregisterEvent("IdleHuntPlayerLogout")
+		player:unregisterEvent("IdleHuntPlayerDeath")
 
 		player:removeCondition(CONDITION_INFIGHT)
 		player:removeCondition(CONDITION_HUNTING)
@@ -1398,9 +1437,10 @@ local function startIdleHunt(player, huntId, pull)
 		return false
 	end
 
-	-- Registro de Eventos de Kill e Logout no Jogador
+	-- Registro de Eventos de Kill, Logout e Morte no Jogador
 	player:registerEvent("IdleHuntMonsterKill")
 	player:registerEvent("IdleHuntPlayerLogout")
+	player:registerEvent("IdleHuntPlayerDeath")
 	session.startExperience = player:getExperience()
 
 	-- Invocação imediata da primeira onda de monstros
@@ -1554,6 +1594,28 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 		sendLootUpdateOpcode(player, huntId)
 
 	-- 5. DEFINIR REGRA DE LOOT (MANTER vs VENDER) - PERSISTENTE NO BANCO DE DADOS
+	-- DEFINIR REGRA DE AUTO LOOT (COLETAR vs IGNORAR) - PERSISTENTE NO BANCO
+	elseif buffer:find("set_autoloot_rule") then
+		local itemId = tonumber(buffer:match('"item_id"%s*:%s*(%d+)'))
+		local enabled = buffer:find('"enabled"%s*:%s*true') ~= nil
+		if itemId then
+			setPlayerAutoLootRule(player, itemId, enabled)
+			player:sendExtendedOpcode(
+				OPCODE_IDLE_HUNT,
+				string.format('{"action":"autoloot_rule_updated","item_id":%d,"enabled":%s}', itemId, enabled and "true" or "false")
+			)
+			local itType = ItemType(itemId)
+			local itName = (itType and itType:getName() ~= "") and itType:getName() or "Item"
+			if enabled then
+				player:sendTextMessage(MESSAGE_STATUS_SMALL, string.format("[IDLE Auto-Loot]: %s sera coletado automaticamente.", itName))
+			else
+				player:sendTextMessage(MESSAGE_STATUS_SMALL, string.format("[IDLE Auto-Loot]: %s sera ignorado (nao entra na mochila).", itName))
+			end
+			local session = _G.OnIdleHunt[playerId]
+			local huntId = session and session.huntId or 1
+			sendLootUpdateOpcode(player, huntId)
+		end
+
 	elseif buffer:find("set_loot_rule") then
 		local itemId = tonumber(buffer:match('"item_id"%s*:%s*(%d+)'))
 		local rule = buffer:match('"rule"%s*:%s*"(%a+)"') or "keep"
@@ -1667,11 +1729,19 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 
 	-- 9. SUPRIMENTO HÍBRIDO IDLE (MOCHILA OU DÉBITO DIRETO DO BANCO)
 	elseif buffer:find("use_idle_supply") then
-		local supplyType = buffer:match('"supply_type"%s*:%s*"(%a+)"')
 		local itemId = tonumber(buffer:match('"item_id"%s*:%s*(%d+)'))
 		local cost = tonumber(buffer:match('"cost"%s*:%s*(%d+)')) or 0
 
-		if not itemId or not supplyType then return end
+		if not itemId then return end
+
+		local DEFAULT_ITEM_COSTS = {
+			[268] = 56, [237] = 108, [238] = 158, [23373] = 488, -- Mana Potions
+			[7876] = 20, [266] = 50, [236] = 115, [239] = 225, [7643] = 379, [23375] = 650, -- Health Potions
+			[7642] = 254, [23374] = 488 -- Spirit Potions
+		}
+		if cost <= 0 then
+			cost = DEFAULT_ITEM_COSTS[itemId] or 50
+		end
 
 		local curHp = player:getHealth()
 		local maxHp = player:getMaxHealth()
@@ -1766,8 +1836,11 @@ function idleMonsterKillEvent.onKill(player, target)
 				player:sendBankBalance()
 				session.goldEarned = (session.goldEarned or 0) + earned
 			else
-				player:addItem(l.id, count)
-				session.droppedCounts[l.id] = (session.droppedCounts[l.id] or 0) + count
+				local autoLoot = getPlayerAutoLootRule(player, l.id)
+				if autoLoot then
+					player:addItem(l.id, count)
+					session.droppedCounts[l.id] = (session.droppedCounts[l.id] or 0) + count
+				end
 			end
 		end
 	end
@@ -1778,6 +1851,20 @@ function idleMonsterKillEvent.onKill(player, target)
 end
 
 idleMonsterKillEvent:register()
+
+-- Interrupção e Limpeza Imediata da Arena ao Morrer
+local idleDeathEvent = CreatureEvent("IdleHuntPlayerDeath")
+
+function idleDeathEvent.onDeath(player, corpse, killer, mostDamageKiller, lastHitUnjustified, mostDamageUnjustified)
+	local playerId = player:getId()
+	local session = _G.OnIdleHunt[playerId]
+	if session then
+		stopIdleHunt(playerId, "Morte durante caçada IDLE. Arena resetada.", false, true)
+	end
+	return true
+end
+
+idleDeathEvent:register()
 
 -- Desconectar com Limpeza Segura
 local idleLogoutEvent = CreatureEvent("IdleHuntPlayerLogout")

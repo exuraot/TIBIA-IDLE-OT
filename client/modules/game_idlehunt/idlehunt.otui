@@ -43,10 +43,10 @@ HuntingDropRow < Panel
     color: #ffffff
     anchors.top: parent.top
     anchors.left: itemWidget.right
-    anchors.right: padlockButton.left
+    anchors.right: autoLootButton.left
     margin-left: 8
     margin-top: 2
-    margin-right: 8
+    margin-right: 6
     text-auto-resize: true
 
   Label
@@ -55,11 +55,22 @@ HuntingDropRow < Panel
     color: #ffd700
     anchors.bottom: parent.bottom
     anchors.left: itemWidget.right
-    anchors.right: padlockButton.left
+    anchors.right: autoLootButton.left
     margin-left: 8
     margin-bottom: 2
-    margin-right: 8
+    margin-right: 6
     text-auto-resize: true
+
+  Button
+    id: autoLootButton
+    size: 56 24
+    anchors.right: padlockButton.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 6
+    !text: tr('Loot: ON')
+    font: verdana-11px-rounded
+    color: #00ff88
+    tooltip: tr('Auto Loot: Ativado (Clique para ignorar este item nos monstros)')
 
   Button
     id: padlockButton

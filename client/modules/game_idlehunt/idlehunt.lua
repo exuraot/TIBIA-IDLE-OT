@@ -836,9 +836,48 @@ local autoCombatEvent = nil
 local targetLockCreature = nil
 
 local itemRulesCache = {}
+local itemAutoLootCache = {} -- true = coletar, false = ignorar
 local currentLootList = {}
 local autoSellTimer = 600
 local autoSellEvent = nil
+
+local function isAutoLootEnabled(itemId)
+	itemId = tonumber(itemId)
+	if not itemId then return true end
+	if itemAutoLootCache[itemId] == nil then
+		return true -- padrão: coletar
+	end
+	return itemAutoLootCache[itemId]
+end
+
+local function setAutoLootRule(itemId, enabled)
+	itemId = tonumber(itemId)
+	if not itemId then return end
+	itemAutoLootCache[itemId] = enabled
+
+	local protocol = g_game.getProtocolGame()
+	if protocol then
+		protocol:sendExtendedOpcode(OPCODE_IDLE_HUNT, string.format('{"action":"set_autoloot_rule","item_id":%d,"enabled":%s}', itemId, enabled and "true" or "false"))
+	end
+
+	if enabled then
+		modules.game_textmessage.displayStatusMessage("[IDLE Auto-Loot]: Item sera COLETADO dos corpos.")
+	else
+		modules.game_textmessage.displayStatusMessage("[IDLE Auto-Loot]: Item IGNORADO (nao sera recolhido).")
+	end
+
+	if idleHuntController and idleHuntController.refreshAutoLootWidgets then
+		idleHuntController:refreshAutoLootWidgets(itemId, enabled)
+	end
+end
+
+local function toggleAutoLootRule(itemId)
+	if isAutoLootEnabled(itemId) then
+		setAutoLootRule(itemId, false)
+	else
+		setAutoLootRule(itemId, true)
+	end
+end
 
 local function isItemLocked(itemId)
 	itemId = tonumber(itemId)
@@ -1466,6 +1505,30 @@ function idleHuntController:setLootRule(itemId, rule)
 	setItemLootRule(itemId, rule)
 end
 
+function idleHuntController:refreshAutoLootWidgets(itemId, enabled)
+	itemId = tonumber(itemId)
+	if not itemId then return end
+
+	local dView = self.ui and self.ui.dashboardView
+	local hCard = dView and dView.huntingCard
+	local lootList = hCard and hCard.droppedLootCard and hCard.droppedLootCard.huntingLootList
+	if lootList then
+		for _, child in ipairs(lootList:getChildren()) do
+			if child.itemId == itemId and child.autoLootButton then
+				if enabled then
+					child.autoLootButton:setText("Loot: ON")
+					child.autoLootButton:setColor("#00ff88")
+					child.autoLootButton:setTooltip("Auto Loot: Ativado (Clique para ignorar este item nos monstros)")
+				else
+					child.autoLootButton:setText("Loot: OFF")
+					child.autoLootButton:setColor("#ff5555")
+					child.autoLootButton:setTooltip("Auto Loot: Desativado (Item ignorado nos monstros - Clique para ativar)")
+				end
+			end
+		end
+	end
+end
+
 function idleHuntController:refreshLootRuleWidgets(itemId, rule)
 	itemId = tonumber(itemId)
 	if not itemId then return end
@@ -1553,6 +1616,25 @@ function idleHuntController:updateHuntingLootList(lootList)
 			local priceText = string.format("Valor: %s gp cada | Chance: %d%%", formatNumber(item.price or 0), item.chance or 0)
 			row.itemInfoLabel:setText(priceText)
 
+			-- Auto Loot Button (Coletar vs Ignorar)
+			local autoLoot = (item.autoloot ~= false and isAutoLootEnabled(item.id))
+			if row.autoLootButton then
+				if autoLoot then
+					row.autoLootButton:setText("Loot: ON")
+					row.autoLootButton:setColor("#00ff88")
+					row.autoLootButton:setTooltip("Auto Loot: Ativado (Clique para ignorar este item nos monstros)")
+				else
+					row.autoLootButton:setText("Loot: OFF")
+					row.autoLootButton:setColor("#ff5555")
+					row.autoLootButton:setTooltip("Auto Loot: Desativado (Item ignorado nos monstros - Clique para ativar)")
+				end
+				local itId = item.id
+				row.autoLootButton.onClick = function()
+					toggleAutoLootRule(itId)
+				end
+			end
+
+			-- Travar Venda / Padlock Button (Guardar vs Vender)
 			local isLocked = (item.rule ~= "sell")
 			if isLocked then
 				row.padlockButton:setIcon("/images/game/actionbar/locked")
@@ -1664,7 +1746,18 @@ function idleHuntController:onOpcodeReceived(protocol, opcode, buffer)
 
 	elseif action == "hunt_loot" then
 		if data.loot then
+			for _, it in ipairs(data.loot) do
+				if it.id and it.autoloot ~= nil then
+					itemAutoLootCache[it.id] = (it.autoloot == true)
+				end
+			end
 			self:updateHuntingLootList(data.loot)
+		end
+
+	elseif action == "autoloot_rule_updated" then
+		if data.item_id and data.enabled ~= nil then
+			itemAutoLootCache[data.item_id] = data.enabled
+			self:refreshAutoLootWidgets(data.item_id, data.enabled)
 		end
 		if data.next_autosell then
 			self:startAutoSellTimer(data.next_autosell)
@@ -1918,12 +2011,21 @@ function idleHuntController:startAutoCombat()
 				-- Trilha 1: Pocoes / Suprimentos (a cada 1000ms)
 				if (now - lastPotionTime) >= 1000 then
 					for _, hk in ipairs(idleHotkeys) do
-						if hk.type == "object" and hk.itemId and hk.itemId > 0 then
-							if isHotkeyConditionMet(hk, hpPercent, mpPercent, inCombat) then
+						if hk.type == "object" and hk.itemId and hk.itemId > 0 and not hk.offensive then
+							local res = hk.resource or "HP"
+							local targetVal = tonumber(hk.percent) or (res == "MP" and 60 or 70)
+							local isMet = false
+							if res == "MP" then
+								isMet = (mpPercent <= targetVal)
+							else
+								isMet = (hpPercent <= targetVal)
+							end
+
+							if isMet then
 								lastPotionTime = now
 								local protocol = g_game.getProtocolGame()
 								if protocol then
-									protocol:sendExtendedOpcode(OPCODE_IDLE_HUNT, string.format('{"action":"use_idle_supply","item_id":%d}', hk.itemId))
+									protocol:sendExtendedOpcode(OPCODE_IDLE_HUNT, string.format('{"action":"use_idle_supply","item_id":%d,"cost":%d}', hk.itemId, hk.cost or 56))
 								end
 								break
 							end
@@ -1931,30 +2033,39 @@ function idleHuntController:startAutoCombat()
 					end
 				end
 
-				-- Trilha 2: Magias de Cura (a cada 1000ms)
+				-- Trilha 2: Magias de Cura & Suporte (a cada 1000ms)
 				if (now - lastHealTime) >= 1000 then
 					for _, hk in ipairs(idleHotkeys) do
 						if hk.type == "spell" and hk.words and hk.words ~= "" then
 							local wLower = string.lower(hk.words)
 							local isHeal = string.find(wLower, "cura") or string.find(wLower, "exura") or string.find(wLower, "heal") or string.find(wLower, "vita") or not hk.offensive
-							if isHeal and isHotkeyConditionMet(hk, hpPercent, mpPercent, inCombat) then
-								lastHealTime = now
-								g_game.talk(hk.words)
-								break
+							if isHeal then
+								local targetVal = tonumber(hk.percent) or 80
+								if hpPercent <= targetVal then
+									lastHealTime = now
+									g_game.talk(hk.words)
+									break
+								end
 							end
 						end
 					end
 				end
 
-				-- Trilha 3: Magias Ofensivas (a cada 2000ms, em combate)
+				-- Trilha 3: Magias e Runas Ofensivas 100% Plug & Play (a cada 2000ms, em combate)
 				if (now - lastAttackSpellTime) >= 2000 and inCombat then
 					for _, hk in ipairs(idleHotkeys) do
 						if hk.type == "spell" and hk.words and hk.words ~= "" then
 							local wLower = string.lower(hk.words)
 							local isHeal = string.find(wLower, "cura") or string.find(wLower, "exura") or string.find(wLower, "heal") or string.find(wLower, "vita") or not hk.offensive
-							if not isHeal and isHotkeyConditionMet(hk, hpPercent, mpPercent, inCombat) then
+							if not isHeal then
 								lastAttackSpellTime = now
 								g_game.talk(hk.words)
+								break
+							end
+						elseif hk.type == "object" and hk.offensive and hk.itemId and hk.itemId > 0 then
+							if currentTarget and not currentTarget:isDead() then
+								lastAttackSpellTime = now
+								g_game.useInventoryItemWith(hk.itemId, currentTarget)
 								break
 							end
 						end
@@ -2005,7 +2116,13 @@ modules.game_idlehunt = modules.game_idlehunt or {}
 modules.game_idlehunt.setItemLootRule = setItemLootRule
 modules.game_idlehunt.isItemLocked = isItemLocked
 modules.game_idlehunt.toggleItemLootRule = toggleItemLootRule
+modules.game_idlehunt.isAutoLootEnabled = isAutoLootEnabled
+modules.game_idlehunt.setAutoLootRule = setAutoLootRule
+modules.game_idlehunt.toggleAutoLootRule = toggleAutoLootRule
 
 idleHuntController.setItemLootRule = setItemLootRule
 idleHuntController.isItemLocked = isItemLocked
 idleHuntController.toggleItemLootRule = toggleItemLootRule
+idleHuntController.isAutoLootEnabled = isAutoLootEnabled
+idleHuntController.setAutoLootRule = setAutoLootRule
+idleHuntController.toggleAutoLootRule = toggleAutoLootRule

@@ -1145,6 +1145,7 @@ local function spawnHuntWave(player, hunt, session)
 
 				local monster = Game.createMonster(w.name, spawnPos, true, true)
 				if monster then
+					monster:setDropLoot(false)
 					spawnPos:sendMagicEffect(CONST_ME_TELEPORT)
 					monster:setTarget(player)
 					table.insert(session.spawnedMonsters, monster:getId())
@@ -1751,10 +1752,10 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 		local consumed = false
 		local countInBag = player:getItemCount(itemId)
 
+		local usedFromBank = false
 		if countInBag > 0 then
 			player:removeItem(itemId, 1)
 			consumed = true
-			player:sendTextMessage(MESSAGE_LOOK, "Used 1 supply potion from inventory.")
 		else
 			if cost > 0 then
 				local bank = player:getBankBalance()
@@ -1762,8 +1763,8 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 					Bank.debit(player, cost)
 					player:setBankBalance(bank - cost)
 					player:sendBankBalance()
-					player:sendTextMessage(MESSAGE_LOOK, string.format("Paid %d gold from bank account for supply. Balance: %s gold.", cost, FormatNumber(bank - cost)))
 					consumed = true
+					usedFromBank = true
 				else
 					player:sendTextMessage(MESSAGE_FAILURE, "[SUPPLIES]: Saldo insuficiente no banco para repor suprimento!")
 				end
@@ -1798,10 +1799,12 @@ function idleOpcodeEvent.onExtendedOpcode(player, opcode, buffer)
 					local healMp = math.random(range.mpMin, range.mpMax)
 					player:addMana(healMp)
 				end
-				player:say("Aaaah...", TALKTYPE_MONSTER_SAY)
-			elseif supplyType == "rune" then
-				player:say("Exevo...", TALKTYPE_MONSTER_SAY)
 			end
+
+			player:sendExtendedOpcode(
+				OPCODE_IDLE_HUNT,
+				string.format('{"action":"supply_used","item_id":%d,"cost":%d,"from_bank":%s}', itemId, cost, usedFromBank and "true" or "false")
+			)
 		end
 	end
 end

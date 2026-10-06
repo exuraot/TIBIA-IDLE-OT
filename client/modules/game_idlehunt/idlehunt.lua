@@ -838,6 +838,76 @@ local targetLockCreature = nil
 local itemRulesCache = {}
 local itemAutoLootCache = {} -- true = coletar, false = ignorar
 local currentLootList = {}
+local activeSupplyPopup = nil
+local supplyAnimEvent = nil
+
+local function showSupplyPopup(itemId, cost, fromBank)
+	local mapPanel = modules.game_interface and modules.game_interface.getMapPanel()
+	if not mapPanel then return end
+
+	if activeSupplyPopup and not activeSupplyPopup:isDestroyed() then
+		activeSupplyPopup:destroy()
+		activeSupplyPopup = nil
+	end
+	if supplyAnimEvent then
+		removeEvent(supplyAnimEvent)
+		supplyAnimEvent = nil
+	end
+
+	local popup = g_ui.createWidget('SupplyPopup', mapPanel)
+	if not popup then return end
+
+	local wWidth = 130
+	local wHeight = 28
+	local centerX = math.floor(mapPanel:getWidth() / 2 - (wWidth / 2))
+	local startY = math.floor(mapPanel:getHeight() / 2 - 55)
+	popup:setPosition({ x = centerX, y = startY })
+
+	if popup.itemWidget then
+		popup.itemWidget:setItemId(tonumber(itemId) or 268)
+	end
+
+	if popup.textLabel then
+		if fromBank and (tonumber(cost) or 0) > 0 then
+			popup.textLabel:setColor('#ffd700')
+			popup.textLabel:setText(string.format("Aaaah... -%d gp", tonumber(cost) or 56))
+		else
+			popup.textLabel:setColor('#00ff88')
+			popup.textLabel:setText("Aaaah... (0 gp)")
+		end
+	end
+
+	activeSupplyPopup = popup
+
+	local ticks = 0
+	supplyAnimEvent = cycleEvent(function()
+		if not popup or popup:isDestroyed() then
+			removeEvent(supplyAnimEvent)
+			supplyAnimEvent = nil
+			return
+		end
+		ticks = ticks + 1
+		local cur = popup:getPosition()
+		popup:setPosition({ x = cur.x, y = cur.y - 1 })
+
+		if ticks > 18 then
+			local alpha = math.max(0, 1 - ((ticks - 18) / 8))
+			popup:setOpacity(alpha)
+		end
+
+		if ticks >= 26 then
+			removeEvent(supplyAnimEvent)
+			supplyAnimEvent = nil
+			if popup and not popup:isDestroyed() then
+				popup:destroy()
+			end
+			if activeSupplyPopup == popup then
+				activeSupplyPopup = nil
+			end
+		end
+	end, 45)
+end
+
 local autoSellTimer = 600
 local autoSellEvent = nil
 
@@ -1832,6 +1902,9 @@ function idleHuntController:onOpcodeReceived(protocol, opcode, buffer)
 			rPanel.reqDetailsLabel:setText(string.format("%s | %s | %s | %s", lvlStr, atkStr, defStr, bankStr))
 		end
 
+	elseif action == "supply_used" then
+		showSupplyPopup(data.item_id, data.cost or 0, data.from_bank)
+
 	elseif action == "quick_sell_result" then
 		if (data.gold or 0) > 0 then
 			local msg = string.format("Quick Sell concluido! Vendido(s) %d item(ns) por %s gold (creditado no banco).", data.count or 0, formatNumber(data.gold or 0))
@@ -2116,6 +2189,7 @@ modules.game_idlehunt = modules.game_idlehunt or {}
 modules.game_idlehunt.setItemLootRule = setItemLootRule
 modules.game_idlehunt.isItemLocked = isItemLocked
 modules.game_idlehunt.toggleItemLootRule = toggleItemLootRule
+modules.game_idlehunt.showSupplyPopup = showSupplyPopup
 modules.game_idlehunt.isAutoLootEnabled = isAutoLootEnabled
 modules.game_idlehunt.setAutoLootRule = setAutoLootRule
 modules.game_idlehunt.toggleAutoLootRule = toggleAutoLootRule
@@ -2123,6 +2197,7 @@ modules.game_idlehunt.toggleAutoLootRule = toggleAutoLootRule
 idleHuntController.setItemLootRule = setItemLootRule
 idleHuntController.isItemLocked = isItemLocked
 idleHuntController.toggleItemLootRule = toggleItemLootRule
+idleHuntController.showSupplyPopup = showSupplyPopup
 idleHuntController.isAutoLootEnabled = isAutoLootEnabled
 idleHuntController.setAutoLootRule = setAutoLootRule
 idleHuntController.toggleAutoLootRule = toggleAutoLootRule

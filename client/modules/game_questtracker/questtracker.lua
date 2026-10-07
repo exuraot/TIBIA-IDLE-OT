@@ -9,7 +9,6 @@ questTracker = {}
 local trackerMiniWindow = nil
 local guideExplorerWindow = nil
 local questDetailsWindow = nil
-local topMenuButton = nil
 local mainPanelButton = nil
 
 local guidesDatabase = {}
@@ -23,21 +22,23 @@ local gpsBeacon = nil
 local gpsEdgeArrow = nil
 local MAX_GPS_DOTS = 30
 
+local questMinimapMarker = nil
+
 local currentCategory = 'all'
 local searchQuery = ''
 
--- Compass direction calculations
+-- Compass direction calculations (Clean ASCII - No mojibake)
 local function getCompassDirection(dx, dy)
-    if dx == 0 and dy < 0 then return 'North (↑)'
-    elseif dx > 0 and dy < 0 then return 'Northeast (↗)'
-    elseif dx > 0 and dy == 0 then return 'East (→)'
-    elseif dx > 0 and dy > 0 then return 'Southeast (↘)'
-    elseif dx == 0 and dy > 0 then return 'South (↓)'
-    elseif dx < 0 and dy > 0 then return 'Southwest (↙)'
-    elseif dx < 0 and dy == 0 then return 'West (←)'
-    elseif dx < 0 and dy < 0 then return 'Northwest (↖)'
+    if dx == 0 and dy < 0 then return 'North (N)'
+    elseif dx > 0 and dy < 0 then return 'Northeast (NE)'
+    elseif dx > 0 and dy == 0 then return 'East (E)'
+    elseif dx > 0 and dy > 0 then return 'Southeast (SE)'
+    elseif dx == 0 and dy > 0 then return 'South (S)'
+    elseif dx < 0 and dy > 0 then return 'Southwest (SW)'
+    elseif dx < 0 and dy == 0 then return 'West (W)'
+    elseif dx < 0 and dy < 0 then return 'Northwest (NW)'
     end
-    return 'Here (◉)'
+    return 'Here (*)'
 end
 
 --[[=================================================
@@ -66,7 +67,8 @@ end
 =                 GPS Overlay Engine                =
 =================================================== ]]
 local function initGpsOverlay()
-    local mapPanel = modules.game_interface.getMapPanel()
+    if not g_game.isOnline() then return end
+    local mapPanel = modules.game_interface and modules.game_interface.getMapPanel()
     if not mapPanel then return end
 
     if not gpsOverlay then
@@ -121,10 +123,38 @@ end
 
 local function hideGpsVisuals()
     for _, dot in ipairs(gpsDots) do
-        dot:hide()
+        if dot then dot:hide() end
     end
     if gpsBeacon then gpsBeacon:hide() end
     if gpsEdgeArrow then gpsEdgeArrow:hide() end
+end
+
+--[[=================================================
+=                 Minimap Marker Engine             =
+=================================================== ]]
+local function updateMinimapMarker(pos, guide)
+    pcall(function()
+        if not modules.game_minimap or not modules.game_minimap.mapController then return end
+        local mm = modules.game_minimap.mapController.ui.minimapBorder.minimap
+        if not mm then return end
+
+        -- Always clear old marker first (Ensures single active marker)
+        if questMinimapMarker then
+            questMinimapMarker:destroy()
+            questMinimapMarker = nil
+        end
+
+        if not pos or not guide then return end
+
+        -- Create dedicated pulsating quest marker widget on minimap
+        questMinimapMarker = g_ui.createWidget('UIWidget', mm)
+        questMinimapMarker:setSize({width = 18, height = 18})
+        questMinimapMarker:setImageSource('/images/topbuttons/icon-questtracker-widget')
+        questMinimapMarker:setTooltip(string.format('%s\nNPC: %s (%s)', guide.name or 'Quest', guide.startNpc or 'Objective', guide.city or 'World'))
+        questMinimapMarker:setPhantom(false)
+
+        mm:centerInPosition(questMinimapMarker, pos)
+    end)
 end
 
 local function updateGpsDisplay()
@@ -158,7 +188,7 @@ local function updateGpsDisplay()
         return
     end
 
-    local mapPanel = modules.game_interface.getMapPanel()
+    local mapPanel = modules.game_interface and modules.game_interface.getMapPanel()
     if not mapPanel then return end
 
     local dx = targetPos.x - playerPos.x
@@ -167,7 +197,7 @@ local function updateGpsDisplay()
     local dist = math.floor(math.sqrt(dx * dx + dy * dy))
     local dirStr = getCompassDirection(dx, dy)
 
-    -- Update MiniWindow text
+    -- Update MiniWindow distance text
     if trackerMiniWindow and trackerMiniWindow.contentsPanel and trackerMiniWindow.contentsPanel.activeBox then
         local ab = trackerMiniWindow.contentsPanel.activeBox
         local distText = string.format('Location: %s - %dm %s', activeGuide.city or 'World', dist, dirStr)
@@ -179,16 +209,6 @@ local function updateGpsDisplay()
         ab.trackedDistance:setText(distText)
     end
 
-    -- Update Minimap Crosshair
-    pcall(function()
-        if modules.game_minimap and modules.game_minimap.mapController then
-            local mm = modules.game_minimap.mapController.ui.minimapBorder.minimap
-            if mm then
-                mm:setCrossPosition(targetPos)
-            end
-        end
-    end)
-
     -- Check if arrived
     if dist <= 1 and dz == 0 then
         hideGpsVisuals()
@@ -198,9 +218,22 @@ local function updateGpsDisplay()
         return
     end
 
-    -- If on different floor, hide ground breadcrumbs and indicate floor change
+    -- If on different floor, hide ground breadcrumbs and indicate floor change on arrow
     if playerPos.z ~= targetPos.z then
-        hideGpsVisuals()
+        for _, dot in ipairs(gpsDots) do dot:hide() end
+        if gpsBeacon then gpsBeacon:hide() end
+        if gpsEdgeArrow then
+            gpsEdgeArrow:show()
+            local mapW = mapPanel:getWidth()
+            local mapH = mapPanel:getHeight()
+            gpsEdgeArrow:setX(math.floor((mapW - 140) / 2))
+            gpsEdgeArrow:setY(math.floor(mapH - 50))
+            if dz > 0 then
+                gpsEdgeArrow:setText(string.format('Change Floor: Go Down %d', dz))
+            else
+                gpsEdgeArrow:setText(string.format('Change Floor: Go Up %d', math.abs(dz)))
+            end
+        end
         return
     end
 
@@ -226,27 +259,29 @@ local function updateGpsDisplay()
             local rect = mapPanel:getTileRect(pt)
             if rect and rect.width and rect.width > 0 and rect.height and rect.height > 0 then
                 local dot = gpsDots[dotIndex]
-                dot:show()
-                local dotSize = (dotIndex == #pathPoints and dist <= 10) and 18 or 12
-                dot:setSize({width = dotSize, height = dotSize})
-                dot:setX(rect.x + math.floor((rect.width - dotSize) / 2))
-                dot:setY(rect.y + math.floor((rect.height - dotSize) / 2))
+                if dot then
+                    dot:show()
+                    local dotSize = (dotIndex == #pathPoints and dist <= 10) and 18 or 12
+                    dot:setSize({width = dotSize, height = dotSize})
+                    dot:setX(rect.x + math.floor((rect.width - dotSize) / 2))
+                    dot:setY(rect.y + math.floor((rect.height - dotSize) / 2))
 
-                if dotIndex == #pathPoints and dist <= 10 then
-                    dot:setBackgroundColor('#ffd700ee')
-                    dot:setBorderColor('#ffffff')
-                else
-                    dot:setBackgroundColor('#00ffffbb')
-                    dot:setBorderColor('#008888')
+                    if dotIndex == #pathPoints and dist <= 10 then
+                        dot:setBackgroundColor('#ffd700ee')
+                        dot:setBorderColor('#ffffff')
+                    else
+                        dot:setBackgroundColor('#00ffffbb')
+                        dot:setBorderColor('#008888')
+                    end
+
+                    dotIndex = dotIndex + 1
                 end
-
-                dotIndex = dotIndex + 1
             end
         end
     end
 
     for i = dotIndex, MAX_GPS_DOTS do
-        gpsDots[i]:hide()
+        if gpsDots[i] then gpsDots[i]:hide() end
     end
 
     -- Render Target Beacon if target is visible on screen
@@ -289,7 +324,35 @@ end
 --[[=================================================
 =             Tracker MiniWindow Logic              =
 =================================================== ]]
+local function initTrackerMiniWindow()
+    if trackerMiniWindow then return end
+    if not g_game.isOnline() then return end
+
+    local rightPanel = modules.game_interface and (modules.game_interface.getRightPanel() or modules.game_interface.getMainRightPanel())
+    if not rightPanel then return end
+
+    trackerMiniWindow = g_ui.createWidget('QuestTrackerMiniWindow', rightPanel)
+    trackerMiniWindow:setup()
+    if trackerMiniWindow.setupOnStart then
+        trackerMiniWindow:setupOnStart()
+    end
+
+    local activeBox = trackerMiniWindow.contentsPanel and trackerMiniWindow.contentsPanel.activeBox
+    if activeBox and activeBox.miniControls then
+        activeBox.miniControls.btnToggleGps.onClick = questTracker.toggleGps
+        activeBox.miniControls.btnClearTrack.onClick = questTracker.clearTrackedGuide
+    end
+
+    local emptyBox = trackerMiniWindow.contentsPanel and trackerMiniWindow.contentsPanel.emptyBox
+    if emptyBox and emptyBox.btnOpenExplorer then
+        emptyBox.btnOpenExplorer.onClick = questTracker.showExplorer
+    end
+end
+
 local function updateTrackerMiniWindow()
+    if not trackerMiniWindow then
+        initTrackerMiniWindow()
+    end
     if not trackerMiniWindow then return end
 
     local contents = trackerMiniWindow.contentsPanel
@@ -325,16 +388,25 @@ local function updateTrackerMiniWindow()
     activeBox.trackedNpc:setText(npcStr)
     activeBox.trackedDialog:setText(dialogStr)
 
-    local btnGps = activeBox.miniControls.btnToggleGps
-    if isGpsActive then
-        btnGps:setText('GPS: ON')
-        btnGps:setColor('#00ff88')
-    else
-        btnGps:setText('GPS: OFF')
-        btnGps:setColor('#ff5555')
+    local btnGps = activeBox.miniControls and activeBox.miniControls.btnToggleGps
+    if btnGps then
+        if isGpsActive then
+            btnGps:setText('GPS: ON')
+            btnGps:setColor('#00ff88')
+        else
+            btnGps:setText('GPS: OFF')
+            btnGps:setColor('#ff5555')
+        end
     end
 
     updateGpsDisplay()
+end
+
+function questTracker.onMiniWindowOpen()
+    updateTrackerMiniWindow()
+end
+
+function questTracker.onMiniWindowClose()
 end
 
 function questTracker.setTrackedGuide(guide, enableGps)
@@ -344,6 +416,19 @@ function questTracker.setTrackedGuide(guide, enableGps)
     else
         isGpsActive = true
     end
+
+    local targetPos = nil
+    if guide then
+        if guide.steps and #guide.steps > 0 then
+            local s = guide.steps[1]
+            targetPos = s.targetCoords or s.npcCoords or guide.coords
+        else
+            targetPos = guide.coords
+        end
+    end
+
+    -- Update Minimap single marker
+    updateMinimapMarker(targetPos, guide)
 
     if guideExplorerWindow and guideExplorerWindow.sidebar and guideExplorerWindow.sidebar.trackerStatusBox then
         local box = guideExplorerWindow.sidebar.trackerStatusBox
@@ -369,6 +454,8 @@ function questTracker.clearTrackedGuide()
     activeGuide = nil
     isGpsActive = false
     hideGpsVisuals()
+    updateMinimapMarker(nil, nil)
+
     if guideExplorerWindow and guideExplorerWindow.sidebar and guideExplorerWindow.sidebar.trackerStatusBox then
         local box = guideExplorerWindow.sidebar.trackerStatusBox
         box.activeGuideName:setText('None Selected')
@@ -394,7 +481,7 @@ end
 
 function questTracker.refreshActiveCardHighlights()
     if not guideExplorerWindow then return end
-    local list = guideExplorerWindow.mainContent.guideList
+    local list = guideExplorerWindow.mainContent and guideExplorerWindow.mainContent.guideList
     if not list then return end
 
     for _, card in ipairs(list:getChildren()) do
@@ -402,7 +489,7 @@ function questTracker.refreshActiveCardHighlights()
         local btnGps = card.actionButtons and card.actionButtons.btnGps
         if btnTrack and card.guideData then
             if activeGuide and activeGuide.id == card.guideData.id then
-                btnTrack:setText('Active')
+                btnTrack:setText('[✓ Active]')
                 btnTrack:setColor('#00ff88')
                 btnTrack:setBorderColor('#00aa55')
                 if btnGps then
@@ -430,7 +517,15 @@ end
 --[[=================================================
 =             Detailed Quest Dialog Modal           =
 =================================================== ]]
+local function createDetailsWindow()
+    if questDetailsWindow then return end
+    local root = modules.game_interface and modules.game_interface.getRootPanel()
+    questDetailsWindow = g_ui.createWidget('QuestDetailsWindow', root)
+    questDetailsWindow:hide()
+end
+
 function questTracker.showDetails(guide)
+    createDetailsWindow()
     if not questDetailsWindow then return end
 
     local hb = questDetailsWindow.headerBox
@@ -438,7 +533,7 @@ function questTracker.showDetails(guide)
     hb.detailNpcInfo:setText(string.format('Starting NPC: %s (%s)', guide.startNpc or 'NPC', guide.city or 'World'))
     hb.detailLevelInfo:setText(string.format('Recommended Level: %d+', guide.level or 1))
 
-    -- Set visual avatar in details
+    -- Set visual avatar in details (Outfit, Mount, NPC or Reward Item)
     if guide.creatureLookType and guide.creatureLookType > 0 then
         hb.detailAvatarBox.detailCreature:show()
         hb.detailAvatarBox.detailCreature:setOutfit({
@@ -449,7 +544,7 @@ function questTracker.showDetails(guide)
         hb.detailAvatarBox.detailItem:hide()
     elseif guide.mountClientId and guide.mountClientId > 0 then
         hb.detailAvatarBox.detailCreature:show()
-        hb.detailAvatarBox.detailCreature:setOutfit({ type = guide.mountClientId })
+        hb.detailAvatarBox.detailCreature:setOutfit({ type = 128, mount = guide.mountClientId })
         hb.detailAvatarBox.detailItem:hide()
     elseif guide.npcLookType and guide.npcLookType > 0 then
         hb.detailAvatarBox.detailCreature:show()
@@ -492,14 +587,14 @@ function questTracker.showDetails(guide)
     content.loreText:setText(guide.lore or guide.description or 'No lore available.')
     content.dialogueText:setText(guide.dialogTranscript or 'Speak with the starting NPC to begin.')
 
-    -- Rewards text
+    -- Rewards text (Clean formatting without mojibake)
     local rStr = ''
     if guide.rewards and #guide.rewards > 0 then
         for _, r in ipairs(guide.rewards) do
-            rStr = rStr .. '• ' .. r.name .. '\n'
+            rStr = rStr .. '- ' .. r.name .. '\n'
         end
     else
-        rStr = '• Quest Experience and Completion Entry in Quest Log.'
+        rStr = '- Quest Experience and Completion Entry in Quest Log.'
     end
     content.rewardsText:setText(rStr)
 
@@ -520,14 +615,13 @@ function questTracker.showDetails(guide)
 end
 
 --[[=================================================
-=             Explorer Window & Filtering           =
+=               Guide Explorer Window               =
 =================================================== ]]
 local function createGuideCard(guide)
     local card = g_ui.createWidget('GuideCard')
-    card:setId('guide_' .. (guide.id or 'unknown'))
     card.guideData = guide
 
-    -- Visual Creature / Mount / NPC Preview
+    -- Set visual avatar preview (Outfit, Mount, NPC or Reward Item)
     if guide.creatureLookType and guide.creatureLookType > 0 then
         card.previewBox.creaturePreview:show()
         card.previewBox.creaturePreview:setOutfit({
@@ -538,9 +632,7 @@ local function createGuideCard(guide)
         card.previewBox.itemPreview:hide()
     elseif guide.mountClientId and guide.mountClientId > 0 then
         card.previewBox.creaturePreview:show()
-        card.previewBox.creaturePreview:setOutfit({
-            type = guide.mountClientId
-        })
+        card.previewBox.creaturePreview:setOutfit({ type = 128, mount = guide.mountClientId })
         card.previewBox.itemPreview:hide()
     elseif guide.npcLookType and guide.npcLookType > 0 then
         card.previewBox.creaturePreview:show()
@@ -606,7 +698,8 @@ end
 local function refreshExplorerList()
     if not guideExplorerWindow then return end
 
-    local list = guideExplorerWindow.mainContent.guideList
+    local list = guideExplorerWindow.mainContent and guideExplorerWindow.mainContent.guideList
+    if not list then return end
     list:destroyChildren()
 
     local q = string.lower(string.trim(searchQuery))
@@ -640,15 +733,46 @@ end
 
 local function setCategory(cat, btn)
     currentCategory = cat
-    local sb = guideExplorerWindow.sidebar
-    local buttons = {sb.catAll, sb.catQuest, sb.catAddon, sb.catMount, sb.catAccess}
-    for _, b in ipairs(buttons) do
-        if b then b:setChecked(b == btn) end
+    if guideExplorerWindow and guideExplorerWindow.sidebar then
+        local sb = guideExplorerWindow.sidebar
+        local buttons = {sb.catAll, sb.catQuest, sb.catAddon, sb.catMount, sb.catAccess}
+        for _, b in ipairs(buttons) do
+            if b then b:setChecked(b == btn) end
+        end
     end
     refreshExplorerList()
 end
 
+local function createExplorerWindow()
+    if guideExplorerWindow then return end
+    local root = modules.game_interface and modules.game_interface.getRootPanel()
+    guideExplorerWindow = g_ui.createWidget('GuideExplorerWindow', root)
+    guideExplorerWindow:hide()
+
+    -- Connect Explorer Search & Category Filters
+    local sb = guideExplorerWindow.sidebar
+    if sb then
+        sb.catAll.onClick = function(b) setCategory('all', b) end
+        sb.catQuest.onClick = function(b) setCategory('quest', b) end
+        sb.catAddon.onClick = function(b) setCategory('addon', b) end
+        sb.catMount.onClick = function(b) setCategory('mount', b) end
+        sb.catAccess.onClick = function(b) setCategory('access', b) end
+        if sb.trackerStatusBox then
+            sb.trackerStatusBox.btnStopAllGps.onClick = questTracker.clearTrackedGuide
+        end
+    end
+
+    local searchEdit = guideExplorerWindow.mainContent and guideExplorerWindow.mainContent.searchInput
+    if searchEdit then
+        searchEdit.onTextChange = function(w, text)
+            searchQuery = text
+            refreshExplorerList()
+        end
+    end
+end
+
 function questTracker.showExplorer()
+    createExplorerWindow()
     if not guideExplorerWindow then return end
     guideExplorerWindow:show()
     guideExplorerWindow:raise()
@@ -657,6 +781,7 @@ function questTracker.showExplorer()
 end
 
 function questTracker.toggleExplorer()
+    createExplorerWindow()
     if not guideExplorerWindow then return end
     if guideExplorerWindow:isVisible() then
         guideExplorerWindow:hide()
@@ -666,12 +791,28 @@ function questTracker.toggleExplorer()
 end
 
 function questTracker.toggleMiniWindow()
+    if not trackerMiniWindow then
+        initTrackerMiniWindow()
+    end
     if not trackerMiniWindow then return end
     if trackerMiniWindow:isVisible() then
         trackerMiniWindow:hide()
     else
         trackerMiniWindow:show()
     end
+end
+
+local function ensureMainPanelButton()
+    if mainPanelButton then return end
+    if not modules.game_mainpanel then return end
+
+    -- Register single clean button in MainPanel (index 1002 places it directly below Idle Hunt)
+    mainPanelButton = modules.game_mainpanel.addSpecialToggleButton('questTrackerMainBtn', tr('Quest & GPS Tracker'), '/images/topbuttons/icon-questtracker-widget', questTracker.toggleExplorer, false),
+        '/images/topbuttons/icon-questtracker-widget',
+        questTracker.toggleExplorer,
+        false,
+        1002
+    )
 end
 
 --[[=================================================
@@ -682,58 +823,7 @@ function init()
 
     loadDatabase()
 
-    -- 1. Create MiniWindow dockable in the Sidebar panels (Right or Left Panel)
-    local rightPanel = modules.game_interface.getRightPanel() or modules.game_interface.getMainRightPanel()
-    trackerMiniWindow = g_ui.createWidget('QuestTrackerMiniWindow', rightPanel)
-    trackerMiniWindow:setup()
-
-    local activeBox = trackerMiniWindow.contentsPanel.activeBox
-    if activeBox then
-        activeBox.miniControls.btnToggleGps.onClick = questTracker.toggleGps
-        activeBox.miniControls.btnClearTrack.onClick = questTracker.clearTrackedGuide
-    end
-
-    -- 2. Create Explorer Window
-    guideExplorerWindow = g_ui.createWidget('GuideExplorerWindow', modules.game_interface.getRootPanel())
-    guideExplorerWindow:hide()
-
-    -- Connect Explorer Search & Category Filters
-    local sb = guideExplorerWindow.sidebar
-    sb.catAll.onClick = function(b) setCategory('all', b) end
-    sb.catQuest.onClick = function(b) setCategory('quest', b) end
-    sb.catAddon.onClick = function(b) setCategory('addon', b) end
-    sb.catMount.onClick = function(b) setCategory('mount', b) end
-    sb.catAccess.onClick = function(b) setCategory('access', b) end
-    sb.trackerStatusBox.btnStopAllGps.onClick = questTracker.clearTrackedGuide
-
-    local searchEdit = guideExplorerWindow.mainContent.searchInput
-    searchEdit.onTextChange = function(w, text)
-        searchQuery = text
-        refreshExplorerList()
-    end
-
-    -- 3. Create Quest Details Window
-    questDetailsWindow = g_ui.createWidget('QuestDetailsWindow', modules.game_interface.getRootPanel())
-    questDetailsWindow:hide()
-
-    -- 4. Register Single Button directly below Idle Hunt in MainPanel
-    -- Disable legacy questlog duplicate button if present
-    if modules.game_questlog and modules.game_questlog.buttonQuestLogTrackerButton then
-        modules.game_questlog.buttonQuestLogTrackerButton:destroy()
-        modules.game_questlog.buttonQuestLogTrackerButton = nil
-    end
-
-    -- Register single clean button in MainPanel (index 1002 places it directly below Idle Hunt)
-    mainPanelButton = modules.game_mainpanel.addToggleButton(
-        'questTrackerMainBtn',
-        tr('Quest & GPS Tracker'),
-        '/images/topbuttons/icon-questtracker-widget',
-        questTracker.toggleExplorer,
-        false,
-        1002
-    )
-
-    -- 5. Register LocalPlayer position event for real-time GPS update
+    -- Register LocalPlayer position event for real-time GPS update
     connect(LocalPlayer, {
         onPositionChange = function()
             if isGpsActive then
@@ -742,7 +832,7 @@ function init()
         end
     })
 
-    -- 6. Periodic GPS update timer
+    -- Periodic GPS update timer
     gpsTimer = cycleEvent(function()
         if isGpsActive then
             updateGpsDisplay()
@@ -752,15 +842,27 @@ function init()
     connect(g_game, {
         onGameStart = function()
             initGpsOverlay()
+            initTrackerMiniWindow()
+            ensureMainPanelButton()
             updateTrackerMiniWindow()
         end,
         onGameEnd = function()
             hideGpsVisuals()
+            updateMinimapMarker(nil, nil)
+            if trackerMiniWindow then
+                trackerMiniWindow:destroy()
+                trackerMiniWindow = nil
+            end
         end
     })
 
-    initGpsOverlay()
-    updateTrackerMiniWindow()
+    -- If already online (e.g. reload), initialize immediately
+    if g_game.isOnline() then
+        initGpsOverlay()
+        initTrackerMiniWindow()
+        ensureMainPanelButton()
+        updateTrackerMiniWindow()
+    end
 end
 
 function terminate()
@@ -770,6 +872,7 @@ function terminate()
     end
 
     hideGpsVisuals()
+    updateMinimapMarker(nil, nil)
 
     if gpsOverlay then
         gpsOverlay:destroy()
@@ -796,3 +899,11 @@ function terminate()
         mainPanelButton = nil
     end
 end
+
+-- Export module functions
+for k, v in pairs(questTracker) do
+    if modules.game_questtracker then
+        modules.game_questtracker[k] = v
+    end
+end
+_G.questTracker = questTracker

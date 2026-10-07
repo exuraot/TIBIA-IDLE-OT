@@ -535,7 +535,9 @@ end
 local function createDetailsWindow()
     if questDetailsWindow then return end
     questDetailsWindow = g_ui.createWidget('QuestDetailsWindow', rootWidget)
-    questDetailsWindow:center()
+    if questDetailsWindow.centerIn then
+        questDetailsWindow:centerIn('parent')
+    end
     questDetailsWindow:hide()
 end
 
@@ -804,7 +806,9 @@ end
 local function createExplorerWindow()
     if guideExplorerWindow then return end
     guideExplorerWindow = g_ui.createWidget('GuideExplorerWindow', rootWidget)
-    guideExplorerWindow:center()
+    if guideExplorerWindow.centerIn then
+        guideExplorerWindow:centerIn('parent')
+    end
     guideExplorerWindow:hide()
 
     -- Connect Explorer Search & Category Filters

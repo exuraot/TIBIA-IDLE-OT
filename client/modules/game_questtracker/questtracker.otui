@@ -155,6 +155,7 @@ GuideExplorerWindow < MainWindow
   id: guideExplorerWindow
   !text: tr('Quests, Addons, Mounts & Access Explorer')
   size: 850 590
+  anchors.centerIn: parent
   @onEscape: self:hide()
 
   Panel
@@ -289,29 +290,32 @@ GuideExplorerWindow < MainWindow
       text: Close
       @onClick: self:getParent():getParent():hide()
 
+    VerticalScrollBar
+      id: guideScrollBar
+      anchors.top: searchInput.bottom
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      margin-top: 8
+      step: 40
+      pixels-scroll: true
+
     ScrollablePanel
       id: guideList
       anchors.left: parent.left
-      anchors.right: parent.right
+      anchors.right: guideScrollBar.left
       anchors.top: searchInput.bottom
       anchors.bottom: parent.bottom
       margin-top: 8
+      margin-right: 4
       vertical-scrollbar: guideScrollBar
       layout:
         type: verticalBox
-
-    VerticalScrollBar
-      id: guideScrollBar
-      anchors.top: guideList.top
-      anchors.bottom: guideList.bottom
-      anchors.right: guideList.right
-      step: 40
-      pixels-scroll: true
 
 QuestDetailsWindow < MainWindow
   id: questDetailsWindow
   !text: tr('Quest Guide & Dialogue Walkthrough')
   size: 600 520
+  anchors.centerIn: parent
   @onEscape: self:hide()
 
   Panel
@@ -703,8 +707,6 @@ QuestTrackerMiniWindow < MiniWindow
         id: miniControls
         height: 22
         margin-top: 6
-        anchors.left: parent.left
-        anchors.right: parent.right
 
         Button
           id: btnToggleGps

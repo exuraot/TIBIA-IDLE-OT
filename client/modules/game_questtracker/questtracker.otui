@@ -672,3 +672,72 @@ QuestTrackerMiniWindow < MiniWindow
           font: verdana-11px-rounded
           text: Guides
           @onClick: modules.game_questtracker.showExplorer()
+
+
+GpsTopBanner < Panel
+  id: gpsTopBanner
+  size: 460 34
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.top: parent.top
+  margin-top: 38
+  background-color: #0b0f16f0
+  border-width: 1
+  border-color: #00ffff
+  phantom: false
+  focusable: false
+  visible: false
+
+  UIWidget
+    id: gpsIcon
+    size: 18 18
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 10
+    image-source: /images/topbuttons/minimap
+    phantom: true
+
+  Label
+    id: targetLabel
+    anchors.left: gpsIcon.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 8
+    font: verdana-11px-rounded
+    color: #00ffff
+    text: Navigating to Target...
+    text-auto-resize: true
+
+  Label
+    id: distanceLabel
+    anchors.left: targetLabel.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 10
+    font: verdana-11px-rounded
+    color: #ffd700
+    text: 0m [NE]
+    text-auto-resize: true
+
+  Label
+    id: floorLabel
+    anchors.left: distanceLabel.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 8
+    font: verdana-11px-rounded
+    color: #00ff88
+    text: [Surface]
+    text-auto-resize: true
+
+  Button
+    id: btnStopGps
+    width: 24
+    height: 22
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 6
+    font: verdana-11px-rounded
+    text: X
+    color: #ff5555
+    border-color: #aa3333
+    $hover:
+      color: #ffffff
+      border-color: #ff5555
+    @onClick: modules.game_questtracker.questTracker.stopGps()

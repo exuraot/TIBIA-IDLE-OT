@@ -92,14 +92,14 @@
                     "npcCoords": {
                         "x": 32408,
                         "y": 32220,
-                        "z": 14
+                        "z": 7
                     },
                     "city": "Thais",
                     "instruction": "Bring 100 Chicken Feathers, 50 Honeycombs and 1 Ape Fur to Hanna at the Thais jewelry shop.",
                     "targetCoords": {
                         "x": 32408,
                         "y": 32220,
-                        "z": 14
+                        "z": 7
                     }
                 }
             ]
@@ -118,7 +118,7 @@
             "coords": {
                 "x": 32342,
                 "y": 32235,
-                "z": 14
+                "z": 7
             },
             "dialogTranscript": "Player: \"hi\"\nNPC: \"Greetings, hunter.\"\nPlayer: \"addon\"\nNPC: \"I can craft the famous sniper gloves if you have the materials.\"\nPlayer: \"yes\"",
             "requiredItems": [
@@ -157,14 +157,14 @@
                     "npcCoords": {
                         "x": 32342,
                         "y": 32235,
-                        "z": 14
+                        "z": 7
                     },
                     "city": "Thais",
                     "instruction": "Visit Elane inside the Paladin Guild in Thais and deliver the Sniper Gloves.",
                     "targetCoords": {
                         "x": 32342,
                         "y": 32235,
-                        "z": 14
+                        "z": 7
                     }
                 }
             ]
@@ -183,7 +183,7 @@
             "coords": {
                 "x": 32406,
                 "y": 32201,
-                "z": 12
+                "z": 6
             },
             "dialogTranscript": "Player: \"hi\"\nNPC: \"Hail, warrior!\"\nPlayer: \"outfit\"\nNPC: \"Are you worthy of the horned knight helm and royal sword?\"\nPlayer: \"yes\"",
             "requiredItems": [
@@ -222,14 +222,14 @@
                     "npcCoords": {
                         "x": 32406,
                         "y": 32201,
-                        "z": 12
+                        "z": 6
                     },
                     "city": "Thais",
                     "instruction": "Speak with Knight Guildmaster Gregor in southern Thais.",
                     "targetCoords": {
                         "x": 32406,
                         "y": 32201,
-                        "z": 12
+                        "z": 6
                     }
                 }
             ]
@@ -248,7 +248,7 @@
             "coords": {
                 "x": 32331,
                 "y": 32199,
-                "z": 14
+                "z": 7
             },
             "dialogTranscript": "Player: \"hi\"\nNPC: \"Greetings in the light of the gods.\"\nPlayer: \"addon\"\nNPC: \"To weave the ceremonial robes, we require dust from demons and vampires.\"\nPlayer: \"yes\"",
             "requiredItems": [
@@ -282,14 +282,14 @@
                     "npcCoords": {
                         "x": 32331,
                         "y": 32199,
-                        "z": 14
+                        "z": 7
                     },
                     "city": "Thais",
                     "instruction": "Deliver the mystical cloths and dusts to Priestess Lynda in the Church of Thais.",
                     "targetCoords": {
                         "x": 32331,
                         "y": 32199,
-                        "z": 14
+                        "z": 7
                     }
                 },
                 {
@@ -325,7 +325,7 @@
             "coords": {
                 "x": 32834,
                 "y": 32289,
-                "z": 28
+                "z": 14
             },
             "dialogTranscript": "Player: \"hi\"\nNPC: \"Who disturbs the shadows?\"\nPlayer: \"outfit\"\nNPC: \"Prove your lethal devotion with rare trophies of dragons and minotaur lords.\"\nPlayer: \"yes\"",
             "requiredItems": [
@@ -356,7 +356,7 @@
                     "targetCoords": {
                         "x": 32834,
                         "y": 32289,
-                        "z": 28
+                        "z": 14
                     }
                 }
             ]
@@ -375,7 +375,7 @@
             "coords": {
                 "x": 32346,
                 "y": 31749,
-                "z": 14
+                "z": 7
             },
             "dialogTranscript": "Player: \"hi\"\nNPC: \"Greetings, traveler.\"\nPlayer: \"addon\"\nNPC: \"Seeking the warrior blade? Bring royal steel and dragon claws.\"\nPlayer: \"yes\"",
             "requiredItems": [
@@ -411,7 +411,7 @@
                     "targetCoords": {
                         "x": 32346,
                         "y": 31749,
-                        "z": 14
+                        "z": 7
                     }
                 }
             ]
@@ -649,7 +649,7 @@
             "coords": {
                 "x": 32286,
                 "y": 32891,
-                "z": 12
+                "z": 6
             },
             "dialogTranscript": "Player: \"hi\"\nNPC: \"Ahoy! Looking for passage?\"\nPlayer: \"passage\"\nNPC: \"Do you want to sail towards the southern reef? It can be treacherous.\"\nPlayer: \"goroma\"\nNPC: \"Set sail!\"\nPlayer: \"yes\"",
             "rewards": [
@@ -668,7 +668,7 @@
                     "targetCoords": {
                         "x": 32286,
                         "y": 32891,
-                        "z": 12
+                        "z": 6
                     }
                 }
             ]
@@ -686,7 +686,7 @@
             "coords": {
                 "x": 32331,
                 "y": 32763,
-                "z": 10
+                "z": 5
             },
             "dialogTranscript": "Player: \"hi\"\nNPC: \"Greetings. Are you here to assist a lady in distress?\"\nPlayer: \"mission\"\nNPC: \"My precious ring was taken. Will you investigate?\"\nPlayer: \"yes\"",
             "rewards": [
@@ -705,7 +705,7 @@
                     "targetCoords": {
                         "x": 32331,
                         "y": 32763,
-                        "z": 10
+                        "z": 5
                     }
                 }
             ]
@@ -723,7 +723,7 @@
             "coords": {
                 "x": 13962,
                 "y": 14023,
-                "z": 14
+                "z": 7
             },
             "dialogTranscript": "Player: \"hi\"\nNPC: \"Welcome to Yalahar. I am Palimuth.\"\nPlayer: \"mission\"\nNPC: \"Will you help inspect the foreign and arena quarters?\"\nPlayer: \"pass\"\nNPC: \"Take this authorization pass for the city gates.\"\nPlayer: \"yes\"",
             "rewards": [
@@ -742,7 +742,7 @@
                     "targetCoords": {
                         "x": 13962,
                         "y": 14023,
-                        "z": 14
+                        "z": 7
                     }
                 }
             ]
@@ -760,7 +760,7 @@
             "coords": {
                 "x": 33485,
                 "y": 32236,
-                "z": 14
+                "z": 7
             },
             "dialogTranscript": "Player: \"hi\"\nNPC: \"The forest whispers of danger...\"\nPlayer: \"mission\"\nNPC: \"The dream shrines have been corrupted. Will you help cleanse them?\"\nPlayer: \"yes\"",
             "rewards": [
@@ -779,7 +779,7 @@
                     "targetCoords": {
                         "x": 33485,
                         "y": 32236,
-                        "z": 14
+                        "z": 7
                     }
                 }
             ]
@@ -798,7 +798,7 @@
             "coords": {
                 "x": 32568,
                 "y": 32018,
-                "z": 12
+                "z": 6
             },
             "dialogTranscript": "Player: \"hi\"\nNPC: \"Greetings, traveler! Welcome to the Post Office.\"\nPlayer: \"mission\"\nNPC: \"Do you want to join our noble courier guild and run your first delivery?\"\nPlayer: \"yes\"\nNPC: \"First, swear your postman oath and deliver this priority parcel to Kroox!\"",
             "requiredItems": [
@@ -842,7 +842,7 @@
                     "targetCoords": {
                         "x": 32568,
                         "y": 32018,
-                        "z": 12
+                        "z": 6
                     }
                 },
                 {
@@ -854,7 +854,7 @@
                     "targetCoords": {
                         "x": 32651,
                         "y": 31887,
-                        "z": 18
+                        "z": 9
                     }
                 },
                 {
@@ -866,7 +866,7 @@
                     "targetCoords": {
                         "x": 32416,
                         "y": 32145,
-                        "z": 30
+                        "z": 15
                     }
                 }
             ]
@@ -885,7 +885,7 @@
             "coords": {
                 "x": 32316,
                 "y": 32267,
-                "z": 16
+                "z": 8
             },
             "dialogTranscript": "Player: \"hi\"\nNPC: \"Greetings, son of the light. Do you seek the Inquisition?\"\nPlayer: \"inquisition\"\nNPC: \"Are you willing to swear the solemn oath to eradicate darkness wherever it hides?\"\nPlayer: \"mission\"\nNPC: \"Take the holy water and cleanse the shadow altars.\"\nPlayer: \"yes\"",
             "requiredItems": [
@@ -924,7 +924,7 @@
                     "targetCoords": {
                         "x": 32316,
                         "y": 32267,
-                        "z": 16
+                        "z": 8
                     }
                 }
             ]
@@ -943,7 +943,7 @@
             "coords": {
                 "x": 33251,
                 "y": 31763,
-                "z": 14
+                "z": 7
             },
             "dialogTranscript": "Player: \"hi\"\nNPC: \"Greetings, mortal! I am Avar Tar, conqueror of perils.\"\nPlayer: \"pits of inferno\"\nNPC: \"Only the bravest warriors survive the descent past the dragon lords and demon thrones.\"\nPlayer: \"yes\"",
             "requiredItems": [
@@ -1000,7 +1000,7 @@
             "coords": {
                 "x": 32260,
                 "y": 31850,
-                "z": 12
+                "z": 6
             },
             "dialogTranscript": "Player: \"hi\"\nNPC: \"Who dares summon the Queen of Sorrows?\"\nPlayer: \"seal\"\nNPC: \"Break the ancient seal and claim your fate.\"\nPlayer: \"yes\"",
             "rewards": [
@@ -1022,7 +1022,7 @@
                     "targetCoords": {
                         "x": 32260,
                         "y": 31850,
-                        "z": 12
+                        "z": 6
                     }
                 }
             ]
@@ -1081,7 +1081,7 @@
             "coords": {
                 "x": 33142,
                 "y": 32817,
-                "z": 14
+                "z": 7
             },
             "dialogTranscript": "Player: \"hi\"\nNPC: \"Alms for a blind beggar?\"\nPlayer: \"djinn\"\nNPC: \"The djinn fortress requires the ancient greeting word. Give me 1 coin for the secret.\"\nPlayer: \"word\"\nNPC: \"The word is DJANNI'HAH. Remember it!\"",
             "rewards": [
@@ -1104,7 +1104,7 @@
                     "targetCoords": {
                         "x": 33142,
                         "y": 32817,
-                        "z": 14
+                        "z": 7
                     }
                 }
             ]

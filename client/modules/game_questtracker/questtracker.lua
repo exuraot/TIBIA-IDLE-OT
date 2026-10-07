@@ -17,6 +17,7 @@ local isGpsActive = false
 local gpsTimer = nil
 
 local gpsOverlay = nil
+local gpsTopBanner = nil
 local gpsDots = {}
 local gpsBeacon = nil
 local gpsEdgeArrow = nil
@@ -69,6 +70,7 @@ end
 local function initGpsOverlay()
     if not g_game.isOnline() then return end
     local mapPanel = modules.game_interface and modules.game_interface.getMapPanel()
+    local rootPanel = modules.game_interface and modules.game_interface.getRootPanel()
     if not mapPanel then return end
 
     if not gpsOverlay then
@@ -79,7 +81,7 @@ local function initGpsOverlay()
         -- Create Pool of GPS breadcrumb dots
         for i = 1, MAX_GPS_DOTS do
             local dot = g_ui.createWidget('UIWidget', gpsOverlay)
-            dot:setSize({width = 14, height = 14})
+            dot:setSize({width = 16, height = 16})
             dot:setBackgroundColor('#00ffffcc')
             dot:setBorderWidth(1)
             dot:setBorderColor('#ffffff')
@@ -107,17 +109,12 @@ local function initGpsOverlay()
         beaconLabel:addAnchor(AnchorBottom, 'parent', AnchorTop)
         beaconLabel:addAnchor(AnchorHorizontalCenter, 'parent', AnchorHorizontalCenter)
         gpsBeacon:hide()
+    end
 
-        -- Create Edge Compass Arrow for off-screen targets
-        gpsEdgeArrow = g_ui.createWidget('UIButton', gpsOverlay)
-        gpsEdgeArrow:setSize({width = 140, height = 26})
-        gpsEdgeArrow:setBackgroundColor('#101620dd')
-        gpsEdgeArrow:setBorderWidth(1)
-        gpsEdgeArrow:setBorderColor('#00ffff')
-        gpsEdgeArrow:setFont('verdana-11px-rounded')
-        gpsEdgeArrow:setColor('#00ffff')
-        gpsEdgeArrow:setPhantom(true)
-        gpsEdgeArrow:hide()
+    -- Create or attach Top Banner to root panel
+    if rootPanel and not gpsTopBanner then
+        gpsTopBanner = g_ui.createWidget('GpsTopBanner', rootPanel)
+        gpsTopBanner:hide()
     end
 end
 
@@ -126,6 +123,7 @@ local function hideGpsVisuals()
         if dot then dot:hide() end
     end
     if gpsBeacon then gpsBeacon:hide() end
+    if gpsTopBanner then gpsTopBanner:hide() end
     if gpsEdgeArrow then gpsEdgeArrow:hide() end
 end
 
@@ -466,6 +464,17 @@ function questTracker.clearTrackedGuide()
     questTracker.refreshActiveCardHighlights()
 end
 
+
+function questTracker.stopGps()
+    isGpsActive = false
+    hideGpsVisuals()
+    updateTrackerMiniWindow()
+    questTracker.refreshActiveCardHighlights()
+    if modules.game_textmessage then
+        modules.game_textmessage.displayStatusConsole('[GPS Guide] Navigation stopped.')
+    end
+end
+
 function questTracker.toggleGps()
     if not activeGuide then return end
     isGpsActive = not isGpsActive
@@ -606,6 +615,10 @@ function questTracker.showDetails(guide)
     end
     footer.btnDetailGps.onClick = function()
         questTracker.setTrackedGuide(guide, true)
+        questDetailsWindow:hide()
+        if guideExplorerWindow then
+            guideExplorerWindow:hide()
+        end
         modules.game_textmessage.displayStatusConsole(string.format('[GPS Guide] Navigating to %s in %s.', guide.startNpc or guide.name, guide.city or 'world'))
     end
 
@@ -679,8 +692,15 @@ local function createGuideCard(guide)
 
     -- Button handlers
     card.actionButtons.btnGps.onClick = function()
-        questTracker.setTrackedGuide(guide, true)
-        modules.game_textmessage.displayStatusConsole(string.format('[GPS Guide] Navigating to %s in %s.', guide.startNpc or guide.name, guide.city or 'world'))
+        if activeGuide and activeGuide.id == guide.id and isGpsActive then
+            questTracker.stopGps()
+        else
+            questTracker.setTrackedGuide(guide, true)
+            if guideExplorerWindow then
+                guideExplorerWindow:hide()
+            end
+            modules.game_textmessage.displayStatusConsole(string.format('[GPS Guide] Navigating to %s in %s.', guide.startNpc or guide.name, guide.city or 'world'))
+        end
     end
 
     card.actionButtons.btnTrack.onClick = function()

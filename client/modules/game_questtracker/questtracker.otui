@@ -20,7 +20,7 @@ GuideCategoryButton < UIButton
     border-color: #e5a720
 
 GuideCard < Panel
-  height: 82
+  height: 86
   background-color: #161c24
   border-width: 1
   border-color: #252f3d
@@ -30,18 +30,33 @@ GuideCard < Panel
     border-color: #3d4f66
     background-color: #1a222c
 
-  UIItem
-    id: iconItem
-    size: 40 40
+  Panel
+    id: previewBox
+    size: 56 60
     anchors.left: parent.left
-    anchors.top: parent.top
-    margin-top: 4
-    margin-left: 4
-    virtual: true
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 2
+    background-color: #11151b
+    border-width: 1
+    border-color: #252f3d
+
+    UICreature
+      id: creaturePreview
+      size: 48 48
+      anchors.centerIn: parent
+      phantom: true
+      visible: false
+
+    UIItem
+      id: itemPreview
+      size: 38 38
+      anchors.centerIn: parent
+      virtual: true
+      visible: false
 
   Label
     id: name
-    anchors.left: iconItem.right
+    anchors.left: previewBox.right
     anchors.top: parent.top
     margin-left: 10
     margin-top: 2
@@ -51,7 +66,7 @@ GuideCard < Panel
 
   UIWidget
     id: categoryBadge
-    size: 55 16
+    size: 58 16
     anchors.left: name.right
     anchors.top: parent.top
     margin-left: 8
@@ -65,7 +80,7 @@ GuideCard < Panel
 
   Label
     id: details
-    anchors.left: iconItem.right
+    anchors.left: previewBox.right
     anchors.top: name.bottom
     anchors.right: actionButtons.left
     margin-left: 10
@@ -77,7 +92,7 @@ GuideCard < Panel
 
   Label
     id: npcInfo
-    anchors.left: iconItem.right
+    anchors.left: previewBox.right
     anchors.bottom: parent.bottom
     margin-left: 10
     margin-bottom: 2
@@ -87,36 +102,21 @@ GuideCard < Panel
 
   Panel
     id: actionButtons
-    width: 170
+    width: 185
     anchors.right: parent.right
     anchors.top: parent.top
     anchors.bottom: parent.bottom
-
-    Button
-      id: btnGps
-      width: 78
-      height: 24
-      anchors.right: parent.right
-      anchors.top: parent.top
-      margin-top: 4
-      font: verdana-11px-rounded
-      text: Iniciar GPS
-      color: #00ffff
-      border-color: #00aaaa
-      $hover:
-        color: #ffffff
-        border-color: #00ffff
+    margin-right: 22
 
     Button
       id: btnTrack
-      width: 78
+      width: 90
       height: 24
-      anchors.right: btnGps.left
+      anchors.left: parent.left
       anchors.top: parent.top
-      margin-right: 6
       margin-top: 4
       font: verdana-11px-rounded
-      text: Fixar
+      text: Track Map
       color: #ffd700
       border-color: #ccaa00
       $hover:
@@ -124,27 +124,42 @@ GuideCard < Panel
         border-color: #ffd700
 
     Button
-      id: btnDialog
-      width: 162
+      id: btnGps
+      width: 85
+      height: 24
+      anchors.right: parent.right
+      anchors.top: parent.top
+      margin-top: 4
+      font: verdana-11px-rounded
+      text: Start GPS
+      color: #00ffff
+      border-color: #00aaaa
+      $hover:
+        color: #ffffff
+        border-color: #00ffff
+
+    Button
+      id: btnDetails
+      width: 181
       height: 22
       anchors.right: parent.right
       anchors.bottom: parent.bottom
       margin-bottom: 4
       font: verdana-11px-rounded
-      text: Ver Dialogo
+      text: Quest Details
       color: #e0e0e0
       $hover:
         color: #ffffff
 
 GuideExplorerWindow < MainWindow
   id: guideExplorerWindow
-  !text: tr('Central de Quests, Addons, Montarias & Acessos')
-  size: 840 580
+  !text: tr('Quests, Addons, Mounts & Access Explorer')
+  size: 850 590
   @onEscape: self:hide()
 
   Panel
     id: sidebar
-    width: 180
+    width: 185
     anchors.left: parent.left
     anchors.top: parent.top
     anchors.bottom: parent.bottom
@@ -152,7 +167,7 @@ GuideExplorerWindow < MainWindow
 
     Label
       id: sidebarTitle
-      text: CATEGORIAS
+      text: CATEGORIES
       font: verdana-11px-rounded
       color: #ffd700
       anchors.left: parent.left
@@ -166,7 +181,7 @@ GuideExplorerWindow < MainWindow
       anchors.right: parent.right
       anchors.top: sidebarTitle.bottom
       margin-top: 8
-      text: Todas (83)
+      text: All Guides
       checked: true
 
     GuideCategoryButton
@@ -174,7 +189,7 @@ GuideExplorerWindow < MainWindow
       anchors.left: parent.left
       anchors.right: parent.right
       anchors.top: prev.bottom
-      text: Quests Principais
+      text: Main Quests
 
     GuideCategoryButton
       id: catAddon
@@ -188,18 +203,18 @@ GuideExplorerWindow < MainWindow
       anchors.left: parent.left
       anchors.right: parent.right
       anchors.top: prev.bottom
-      text: Montarias
+      text: Mounts
 
     GuideCategoryButton
       id: catAccess
       anchors.left: parent.left
       anchors.right: parent.right
       anchors.top: prev.bottom
-      text: Acessos & Portais
+      text: Access & Gates
 
     Panel
       id: trackerStatusBox
-      height: 120
+      height: 124
       anchors.left: parent.left
       anchors.right: parent.right
       anchors.bottom: parent.bottom
@@ -209,7 +224,7 @@ GuideExplorerWindow < MainWindow
       padding: 6
 
       Label
-        text: GUIA ATIVO
+        text: ACTIVE GUIDE
         font: verdana-9px-bold
         color: #ffd700
         anchors.top: parent.top
@@ -217,7 +232,7 @@ GuideExplorerWindow < MainWindow
 
       Label
         id: activeGuideName
-        text: Nenhum selecionado
+        text: None Selected
         font: verdana-11px-rounded
         color: #ffffff
         anchors.top: prev.bottom
@@ -228,7 +243,7 @@ GuideExplorerWindow < MainWindow
 
       Label
         id: activeGpsStatus
-        text: GPS: Desligado
+        text: GPS: Disabled
         font: verdana-11px-rounded
         color: #888888
         anchors.top: prev.bottom
@@ -237,7 +252,7 @@ GuideExplorerWindow < MainWindow
 
       Button
         id: btnStopAllGps
-        text: Parar Guia GPS
+        text: Clear Active Guide
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -262,7 +277,7 @@ GuideExplorerWindow < MainWindow
       margin-right: 8
       height: 26
       font: verdana-11px-rounded
-      placeholder: Digite para buscar quest, NPC, cidade, addon ou montaria...
+      placeholder: Search quest, NPC, city, addon or mount...
       placeholder-color: #667788
 
     Button
@@ -271,7 +286,7 @@ GuideExplorerWindow < MainWindow
       height: 26
       anchors.right: parent.right
       anchors.top: parent.top
-      text: Fechar
+      text: Close
       @onClick: self:getParent():getParent():hide()
 
     ScrollablePanel
@@ -293,9 +308,202 @@ GuideExplorerWindow < MainWindow
       step: 40
       pixels-scroll: true
 
+QuestDetailsWindow < MainWindow
+  id: questDetailsWindow
+  !text: tr('Quest Guide & Dialogue Walkthrough')
+  size: 600 520
+  @onEscape: self:hide()
+
+  Panel
+    id: headerBox
+    height: 68
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    background-color: #161c24
+    border-width: 1
+    border-color: #2b3848
+    padding: 6
+
+    Panel
+      id: detailAvatarBox
+      size: 54 54
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      background-color: #10141a
+      border-width: 1
+      border-color: #222b38
+
+      UICreature
+        id: detailCreature
+        size: 48 48
+        anchors.centerIn: parent
+        phantom: true
+        visible: false
+
+      UIItem
+        id: detailItem
+        size: 38 38
+        anchors.centerIn: parent
+        virtual: true
+        visible: false
+
+    Label
+      id: detailTitle
+      font: verdana-11px-rounded
+      color: #ffd700
+      anchors.left: detailAvatarBox.right
+      anchors.top: parent.top
+      margin-left: 12
+      margin-top: 4
+      text-auto-resize: true
+
+    UIWidget
+      id: detailBadge
+      size: 60 16
+      anchors.left: detailTitle.right
+      anchors.top: parent.top
+      margin-left: 8
+      margin-top: 4
+      font: verdana-9px-bold
+      text-align: center
+      color: #ffffff
+      background-color: #2b3a4a
+      border-width: 1
+      border-color: #3b5066
+
+    Label
+      id: detailNpcInfo
+      font: verdana-11px-rounded
+      color: #00ffcc
+      anchors.left: detailAvatarBox.right
+      anchors.top: detailTitle.bottom
+      margin-left: 12
+      margin-top: 4
+      text-auto-resize: true
+
+    Label
+      id: detailLevelInfo
+      font: verdana-11px-rounded
+      color: #e0e0e0
+      anchors.left: detailAvatarBox.right
+      anchors.bottom: parent.bottom
+      margin-left: 12
+      margin-bottom: 4
+      text-auto-resize: true
+
+  ScrollablePanel
+    id: detailsContent
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: headerBox.bottom
+    anchors.bottom: footerPanel.top
+    margin-top: 8
+    margin-bottom: 8
+    vertical-scrollbar: detailScrollBar
+    layout:
+      type: verticalBox
+      fit-children: true
+
+    Label
+      id: loreTitle
+      text: STORY & OVERVIEW
+      font: verdana-11px-rounded
+      color: #ffd700
+      margin-top: 4
+
+    Label
+      id: loreText
+      font: verdana-11px-rounded
+      color: #cccccc
+      margin-top: 4
+      text-wrap: true
+
+    Label
+      id: dialogueTitle
+      text: DIALOGUE & WALKTHROUGH
+      font: verdana-11px-rounded
+      color: #ffd700
+      margin-top: 10
+
+    MultilineTextEdit
+      id: dialogueText
+      height: 120
+      margin-top: 4
+      font: verdana-11px-rounded
+      color: #00ffcc
+      background-color: #0f141c
+      border-width: 1
+      border-color: #253242
+      padding: 6
+      text-wrap: true
+      focusable: false
+
+    Label
+      id: rewardsTitle
+      text: REWARDS & UNLOCKS
+      font: verdana-11px-rounded
+      color: #ffd700
+      margin-top: 10
+
+    Label
+      id: rewardsText
+      font: verdana-11px-rounded
+      color: #88ff88
+      margin-top: 4
+      text-wrap: true
+
+  VerticalScrollBar
+    id: detailScrollBar
+    anchors.top: detailsContent.top
+    anchors.bottom: detailsContent.bottom
+    anchors.right: parent.right
+    step: 40
+    pixels-scroll: true
+
+  Panel
+    id: footerPanel
+    height: 32
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+
+    Button
+      id: btnDetailTrack
+      width: 130
+      height: 26
+      anchors.left: parent.left
+      anchors.top: parent.top
+      font: verdana-11px-rounded
+      text: Track on Map
+      color: #ffd700
+      border-color: #ccaa00
+
+    Button
+      id: btnDetailGps
+      width: 120
+      height: 26
+      anchors.left: prev.right
+      anchors.top: parent.top
+      margin-left: 8
+      font: verdana-11px-rounded
+      text: Start GPS
+      color: #00ffff
+      border-color: #00aaaa
+
+    Button
+      id: btnDetailClose
+      width: 80
+      height: 26
+      anchors.right: parent.right
+      anchors.top: parent.top
+      font: verdana-11px-rounded
+      text: Close
+      @onClick: self:getParent():getParent():hide()
+
 QuestTrackerMiniWindow < MiniWindow
   id: questTrackerMiniWindow
-  !text: tr('Quest & GPS Tracker')
+  !text: tr('Quest Tracker')
   height: 180
   icon: /images/topbuttons/icon-questtracker-widget
   @onOpen: modules.game_questtracker.onMiniWindowOpen()
@@ -321,7 +529,7 @@ QuestTrackerMiniWindow < MiniWindow
     margin-right: 50
     font: verdana-11px-monochrome
     height: 13
-    !text: tr('Quest & GPS Tracker')
+    !text: tr('Quest Tracker')
     color: #9d9d9dff
 
   MiniWindowContents
@@ -338,19 +546,19 @@ QuestTrackerMiniWindow < MiniWindow
 
     Panel
       id: emptyBox
-      height: 100
+      height: 110
       visible: true
       layout: verticalBox
 
       Label
-        text: Nenhum guia ativo.
+        text: No Active Guide.
         text-align: center
         font: verdana-11px-rounded
         color: #888888
         margin-top: 15
 
       Label
-        text: Clique abaixo para explorar Quests, Addons e Montarias com GPS visual.
+        text: Open the explorer to track Quests, Addons, and Mounts.
         text-align: center
         text-wrap: true
         font: verdana-11px-rounded
@@ -366,7 +574,7 @@ QuestTrackerMiniWindow < MiniWindow
         margin-left: 10
         margin-right: 10
         font: verdana-11px-rounded
-        text: Explorar Guias & GPS
+        text: Open Quest Explorer
         color: #ffd700
         border-color: #ccaa00
         @onClick: modules.game_questtracker.showExplorer()
@@ -434,7 +642,7 @@ QuestTrackerMiniWindow < MiniWindow
 
         Button
           id: btnToggleGps
-          width: 80
+          width: 78
           height: 22
           anchors.left: parent.left
           anchors.top: parent.top
@@ -445,22 +653,22 @@ QuestTrackerMiniWindow < MiniWindow
 
         Button
           id: btnClearTrack
-          width: 60
+          width: 58
           height: 22
           anchors.right: parent.right
           anchors.top: parent.top
           font: verdana-11px-rounded
-          text: Desafixar
+          text: Untrack
           color: #ff5555
           border-color: #aa3333
 
         Button
           id: btnMiniExplorer
-          width: 50
+          width: 52
           height: 22
           anchors.right: btnClearTrack.left
           anchors.top: parent.top
           margin-right: 4
           font: verdana-11px-rounded
-          text: Guias
+          text: Guides
           @onClick: modules.game_questtracker.showExplorer()

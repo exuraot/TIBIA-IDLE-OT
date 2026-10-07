@@ -603,6 +603,8 @@ local function isCompletedMissionText(text)
 end
 
 local function ensureQuestTrackerButton()
+    -- DISABLED_QUESTLOG_BUTTON_EXURA: Disabled in favor of game_questtracker
+    do return end
     if buttonQuestLogTrackerButton then
         return
     end

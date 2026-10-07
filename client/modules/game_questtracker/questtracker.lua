@@ -8,6 +8,7 @@ questTracker = {}
 
 local trackerMiniWindow = nil
 local guideExplorerWindow = nil
+local questDetailsWindow = nil
 local topMenuButton = nil
 local mainPanelButton = nil
 
@@ -19,23 +20,24 @@ local gpsTimer = nil
 local gpsOverlay = nil
 local gpsDots = {}
 local gpsBeacon = nil
-local MAX_GPS_DOTS = 35
+local gpsEdgeArrow = nil
+local MAX_GPS_DOTS = 30
 
 local currentCategory = 'all'
 local searchQuery = ''
 
--- Helper for direction and compass
+-- Compass direction calculations
 local function getCompassDirection(dx, dy)
-    if dx == 0 and dy < 0 then return 'Norte (↑)'
-    elseif dx > 0 and dy < 0 then return 'Nordeste (↗)'
-    elseif dx > 0 and dy == 0 then return 'Leste (→)'
-    elseif dx > 0 and dy > 0 then return 'Sudeste (↘)'
-    elseif dx == 0 and dy > 0 then return 'Sul (↓)'
-    elseif dx < 0 and dy > 0 then return 'Sudoeste (↙)'
-    elseif dx < 0 and dy == 0 then return 'Oeste (←)'
-    elseif dx < 0 and dy < 0 then return 'Noroeste (↖)'
+    if dx == 0 and dy < 0 then return 'North (↑)'
+    elseif dx > 0 and dy < 0 then return 'Northeast (↗)'
+    elseif dx > 0 and dy == 0 then return 'East (→)'
+    elseif dx > 0 and dy > 0 then return 'Southeast (↘)'
+    elseif dx == 0 and dy > 0 then return 'South (↓)'
+    elseif dx < 0 and dy > 0 then return 'Southwest (↙)'
+    elseif dx < 0 and dy == 0 then return 'West (←)'
+    elseif dx < 0 and dy < 0 then return 'Northwest (↖)'
     end
-    return 'Aqui (◉)'
+    return 'Here (◉)'
 end
 
 --[[=================================================
@@ -43,20 +45,15 @@ end
 =================================================== ]]
 local function loadDatabase()
     local path = '/modules/game_questtracker/data/quests_guide.json'
-    if not g_resources.fileExists(path) then
-        pcall(function()
-            local raw = g_resources.readFileContents(path)
-            if raw then
-                guidesDatabase = json.decode(raw)
-            end
-        end)
-    else
-        local content = g_resources.readFileContents(path)
-        if content then
-            local ok, data = pcall(function() return json.decode(content) end)
-            if ok and data then
-                guidesDatabase = data
-            end
+    local content = nil
+    if g_resources.fileExists(path) then
+        content = g_resources.readFileContents(path)
+    end
+
+    if content then
+        local ok, data = pcall(function() return json.decode(content) end)
+        if ok and data then
+            guidesDatabase = data
         end
     end
 
@@ -89,7 +86,7 @@ local function initGpsOverlay()
             gpsDots[i] = dot
         end
 
-        -- Create Target Beacon
+        -- Create Target Beacon for visible target
         gpsBeacon = g_ui.createWidget('UIWidget', gpsOverlay)
         gpsBeacon:setSize({width = 38, height = 38})
         gpsBeacon:setBackgroundColor('#ffd70044')
@@ -107,8 +104,18 @@ local function initGpsOverlay()
         beaconLabel:setParent(gpsBeacon)
         beaconLabel:addAnchor(AnchorBottom, 'parent', AnchorTop)
         beaconLabel:addAnchor(AnchorHorizontalCenter, 'parent', AnchorHorizontalCenter)
-
         gpsBeacon:hide()
+
+        -- Create Edge Compass Arrow for off-screen targets
+        gpsEdgeArrow = g_ui.createWidget('UIButton', gpsOverlay)
+        gpsEdgeArrow:setSize({width = 140, height = 26})
+        gpsEdgeArrow:setBackgroundColor('#101620dd')
+        gpsEdgeArrow:setBorderWidth(1)
+        gpsEdgeArrow:setBorderColor('#00ffff')
+        gpsEdgeArrow:setFont('verdana-11px-rounded')
+        gpsEdgeArrow:setColor('#00ffff')
+        gpsEdgeArrow:setPhantom(true)
+        gpsEdgeArrow:hide()
     end
 end
 
@@ -116,9 +123,8 @@ local function hideGpsVisuals()
     for _, dot in ipairs(gpsDots) do
         dot:hide()
     end
-    if gpsBeacon then
-        gpsBeacon:hide()
-    end
+    if gpsBeacon then gpsBeacon:hide() end
+    if gpsEdgeArrow then gpsEdgeArrow:hide() end
 end
 
 local function updateGpsDisplay()
@@ -140,10 +146,9 @@ local function updateGpsDisplay()
     end
 
     local targetPos = nil
-    local stepData = nil
     if activeGuide.steps and #activeGuide.steps > 0 then
-        stepData = activeGuide.steps[1]
-        targetPos = stepData.targetCoords or stepData.npcCoords or activeGuide.coords
+        local s = activeGuide.steps[1]
+        targetPos = s.targetCoords or s.npcCoords or activeGuide.coords
     else
         targetPos = activeGuide.coords
     end
@@ -165,11 +170,11 @@ local function updateGpsDisplay()
     -- Update MiniWindow text
     if trackerMiniWindow and trackerMiniWindow.contentsPanel and trackerMiniWindow.contentsPanel.activeBox then
         local ab = trackerMiniWindow.contentsPanel.activeBox
-        local distText = string.format('📍 %s - %d sqm %s', activeGuide.city or 'Destino', dist, dirStr)
+        local distText = string.format('Location: %s - %dm %s', activeGuide.city or 'World', dist, dirStr)
         if dz > 0 then
-            distText = distText .. string.format(' (Descer %d andares)', dz)
+            distText = distText .. string.format(' (Go down %d fl)', dz)
         elseif dz < 0 then
-            distText = distText .. string.format(' (Subir %d andares)', math.abs(dz))
+            distText = distText .. string.format(' (Go up %d fl)', math.abs(dz))
         end
         ab.trackedDistance:setText(distText)
     end
@@ -188,7 +193,7 @@ local function updateGpsDisplay()
     if dist <= 1 and dz == 0 then
         hideGpsVisuals()
         if trackerMiniWindow and trackerMiniWindow.contentsPanel.activeBox then
-            trackerMiniWindow.contentsPanel.activeBox.trackedDistance:setText('🎯 Você chegou ao local!')
+            trackerMiniWindow.contentsPanel.activeBox.trackedDistance:setText('Target Reached!')
         end
         return
     end
@@ -199,16 +204,17 @@ local function updateGpsDisplay()
         return
     end
 
-    -- Calculate breadcrumb path on same floor
+    -- Calculate local breadcrumb points starting from the player's current tile
     local pathPoints = {}
-    local stepsCount = math.min(dist, 16)
-    if stepsCount > 0 then
-        for i = 1, stepsCount do
-            local ratio = i / stepsCount
-            local px = math.floor(playerPos.x + dx * ratio + 0.5)
-            local py = math.floor(playerPos.y + dy * ratio + 0.5)
-            table.insert(pathPoints, {x = px, y = py, z = playerPos.z})
-        end
+    local norm = math.sqrt(dx * dx + dy * dy)
+    local udx = norm > 0 and (dx / norm) or 0
+    local udy = norm > 0 and (dy / norm) or 0
+
+    local stepsToDraw = math.min(dist, 10)
+    for i = 1, stepsToDraw do
+        local px = math.floor(playerPos.x + udx * i + 0.5)
+        local py = math.floor(playerPos.y + udy * i + 0.5)
+        table.insert(pathPoints, {x = px, y = py, z = playerPos.z})
     end
 
     -- Render Breadcrumb Dots on MapPanel tiles
@@ -221,13 +227,12 @@ local function updateGpsDisplay()
             if rect and rect.width and rect.width > 0 and rect.height and rect.height > 0 then
                 local dot = gpsDots[dotIndex]
                 dot:show()
-                local dotSize = (dotIndex == #pathPoints) and 18 or 12
+                local dotSize = (dotIndex == #pathPoints and dist <= 10) and 18 or 12
                 dot:setSize({width = dotSize, height = dotSize})
                 dot:setX(rect.x + math.floor((rect.width - dotSize) / 2))
                 dot:setY(rect.y + math.floor((rect.height - dotSize) / 2))
 
-                -- Color gradient from player (cyan) to destination (golden)
-                if dotIndex == #pathPoints then
+                if dotIndex == #pathPoints and dist <= 10 then
                     dot:setBackgroundColor('#ffd700ee')
                     dot:setBorderColor('#ffffff')
                 else
@@ -240,7 +245,6 @@ local function updateGpsDisplay()
         end
     end
 
-    -- Hide remaining dots
     for i = dotIndex, MAX_GPS_DOTS do
         gpsDots[i]:hide()
     end
@@ -255,13 +259,30 @@ local function updateGpsDisplay()
             gpsBeacon:setY(rect.y)
             local lbl = gpsBeacon:getChildById('beaconLabel')
             if lbl then
-                lbl:setText(activeGuide.startNpc or activeGuide.name or 'Alvo')
+                lbl:setText(activeGuide.startNpc or activeGuide.name or 'Target')
             end
         else
             gpsBeacon:hide()
         end
+        if gpsEdgeArrow then gpsEdgeArrow:hide() end
     else
         gpsBeacon:hide()
+
+        -- Render Edge Compass Arrow pointing toward offscreen target
+        if gpsEdgeArrow then
+            gpsEdgeArrow:show()
+            local mapW = mapPanel:getWidth()
+            local mapH = mapPanel:getHeight()
+            local cx = mapW / 2
+            local cy = mapH / 2
+
+            local arrowX = math.max(16, math.min(mapW - 150, cx + udx * (cx - 30) - 70))
+            local arrowY = math.max(16, math.min(mapH - 40, cy + udy * (cy - 30) - 13))
+
+            gpsEdgeArrow:setX(arrowX)
+            gpsEdgeArrow:setY(arrowY)
+            gpsEdgeArrow:setText(string.format('%s (%dm)', activeGuide.startNpc or 'Target', dist))
+        end
     end
 end
 
@@ -286,20 +307,17 @@ local function updateTrackerMiniWindow()
     emptyBox:hide()
     activeBox:show()
 
-    activeBox.trackedTitle:setText(activeGuide.name or 'Guia Ativo')
+    activeBox.trackedTitle:setText(activeGuide.name or 'Active Guide')
     
-    local stepTitle = 'Passo 1/1: Dirija-se ao local'
-    local npcStr = 'NPC: ' .. (activeGuide.startNpc or 'Local Marcado') .. ' (' .. (activeGuide.city or 'Outdoors') .. ')'
-    local dialogStr = 'Diálogo: ' .. (activeGuide.dialog or 'Converse com o NPC')
+    local stepTitle = 'Step 1/1: Travel to destination'
+    local npcStr = 'NPC: ' .. (activeGuide.startNpc or 'Target Location') .. ' (' .. (activeGuide.city or 'Outdoors') .. ')'
+    local dialogStr = 'Talk: ' .. (activeGuide.dialogTranscript or 'Speak with the NPC')
 
     if activeGuide.steps and #activeGuide.steps > 0 then
         local s = activeGuide.steps[1]
-        stepTitle = 'Passo 1/' .. #activeGuide.steps .. ': ' .. (s.title or s.instruction or '')
+        stepTitle = 'Step 1/' .. #activeGuide.steps .. ': ' .. (s.title or s.instruction or '')
         if s.npc then
             npcStr = 'NPC: ' .. s.npc .. ' (' .. (s.city or activeGuide.city or '') .. ')'
-        end
-        if s.dialog then
-            dialogStr = 'Diálogo: ' .. s.dialog
         end
     end
 
@@ -329,8 +347,8 @@ function questTracker.setTrackedGuide(guide, enableGps)
 
     if guideExplorerWindow and guideExplorerWindow.sidebar and guideExplorerWindow.sidebar.trackerStatusBox then
         local box = guideExplorerWindow.sidebar.trackerStatusBox
-        box.activeGuideName:setText(guide and guide.name or 'Nenhum selecionado')
-        box.activeGpsStatus:setText(isGpsActive and 'GPS: Ativo' or 'GPS: Desligado')
+        box.activeGuideName:setText(guide and guide.name or 'None Selected')
+        box.activeGpsStatus:setText(isGpsActive and 'GPS: Active' or 'GPS: Disabled')
         box.activeGpsStatus:setColor(isGpsActive and '#00ff88' or '#888888')
     end
 
@@ -342,6 +360,9 @@ function questTracker.setTrackedGuide(guide, enableGps)
     else
         hideGpsVisuals()
     end
+
+    -- Refresh active highlight in explorer cards
+    questTracker.refreshActiveCardHighlights()
 end
 
 function questTracker.clearTrackedGuide()
@@ -350,11 +371,12 @@ function questTracker.clearTrackedGuide()
     hideGpsVisuals()
     if guideExplorerWindow and guideExplorerWindow.sidebar and guideExplorerWindow.sidebar.trackerStatusBox then
         local box = guideExplorerWindow.sidebar.trackerStatusBox
-        box.activeGuideName:setText('Nenhum selecionado')
-        box.activeGpsStatus:setText('GPS: Desligado')
+        box.activeGuideName:setText('None Selected')
+        box.activeGpsStatus:setText('GPS: Disabled')
         box.activeGpsStatus:setColor('#888888')
     end
     updateTrackerMiniWindow()
+    questTracker.refreshActiveCardHighlights()
 end
 
 function questTracker.toggleGps()
@@ -367,6 +389,134 @@ function questTracker.toggleGps()
         hideGpsVisuals()
     end
     updateTrackerMiniWindow()
+    questTracker.refreshActiveCardHighlights()
+end
+
+function questTracker.refreshActiveCardHighlights()
+    if not guideExplorerWindow then return end
+    local list = guideExplorerWindow.mainContent.guideList
+    if not list then return end
+
+    for _, card in ipairs(list:getChildren()) do
+        local btnTrack = card.actionButtons and card.actionButtons.btnTrack
+        local btnGps = card.actionButtons and card.actionButtons.btnGps
+        if btnTrack and card.guideData then
+            if activeGuide and activeGuide.id == card.guideData.id then
+                btnTrack:setText('Active')
+                btnTrack:setColor('#00ff88')
+                btnTrack:setBorderColor('#00aa55')
+                if btnGps then
+                    if isGpsActive then
+                        btnGps:setText('Stop GPS')
+                        btnGps:setColor('#ff5555')
+                    else
+                        btnGps:setText('Start GPS')
+                        btnGps:setColor('#00ffff')
+                    end
+                end
+            else
+                btnTrack:setText('Track Map')
+                btnTrack:setColor('#ffd700')
+                btnTrack:setBorderColor('#ccaa00')
+                if btnGps then
+                    btnGps:setText('Start GPS')
+                    btnGps:setColor('#00ffff')
+                end
+            end
+        end
+    end
+end
+
+--[[=================================================
+=             Detailed Quest Dialog Modal           =
+=================================================== ]]
+function questTracker.showDetails(guide)
+    if not questDetailsWindow then return end
+
+    local hb = questDetailsWindow.headerBox
+    hb.detailTitle:setText(guide.name or 'Quest Details')
+    hb.detailNpcInfo:setText(string.format('Starting NPC: %s (%s)', guide.startNpc or 'NPC', guide.city or 'World'))
+    hb.detailLevelInfo:setText(string.format('Recommended Level: %d+', guide.level or 1))
+
+    -- Set visual avatar in details
+    if guide.creatureLookType and guide.creatureLookType > 0 then
+        hb.detailAvatarBox.detailCreature:show()
+        hb.detailAvatarBox.detailCreature:setOutfit({
+            type = guide.creatureLookType,
+            head = 0, body = 114, legs = 94, feet = 114,
+            addons = guide.addons or 0
+        })
+        hb.detailAvatarBox.detailItem:hide()
+    elseif guide.mountClientId and guide.mountClientId > 0 then
+        hb.detailAvatarBox.detailCreature:show()
+        hb.detailAvatarBox.detailCreature:setOutfit({ type = guide.mountClientId })
+        hb.detailAvatarBox.detailItem:hide()
+    elseif guide.npcLookType and guide.npcLookType > 0 then
+        hb.detailAvatarBox.detailCreature:show()
+        hb.detailAvatarBox.detailCreature:setOutfit({
+            type = guide.npcLookType,
+            head = 76, body = 43, legs = 38, feet = 76,
+            addons = 0
+        })
+        hb.detailAvatarBox.detailItem:hide()
+    elseif guide.rewardItemId and guide.rewardItemId > 0 then
+        hb.detailAvatarBox.detailItem:show()
+        hb.detailAvatarBox.detailItem:setItemId(guide.rewardItemId)
+        hb.detailAvatarBox.detailCreature:hide()
+    else
+        hb.detailAvatarBox.detailItem:show()
+        hb.detailAvatarBox.detailItem:setItemId(guide.iconItem or 1988)
+        hb.detailAvatarBox.detailCreature:hide()
+    end
+
+    local badge = hb.detailBadge
+    if guide.category == 'addon' then
+        badge:setText('ADDON')
+        badge:setBackgroundColor('#3d2b50')
+        badge:setColor('#ff88ff')
+    elseif guide.category == 'mount' then
+        badge:setText('MOUNT')
+        badge:setBackgroundColor('#2b503d')
+        badge:setColor('#88ff88')
+    elseif guide.category == 'access' then
+        badge:setText('ACCESS')
+        badge:setBackgroundColor('#50452b')
+        badge:setColor('#ffff88')
+    else
+        badge:setText('QUEST')
+        badge:setBackgroundColor('#2b3a4a')
+        badge:setColor('#88ccff')
+    end
+
+    local content = questDetailsWindow.detailsContent
+    content.loreText:setText(guide.lore or guide.description or 'No lore available.')
+    content.dialogueText:setText(guide.dialogTranscript or 'Speak with the starting NPC to begin.')
+
+    -- Rewards text
+    local rStr = ''
+    if guide.rewards and #guide.rewards > 0 then
+        for _, r in ipairs(guide.rewards) do
+            rStr = rStr .. '• ' .. r.name .. '\n'
+        end
+    else
+        rStr = '• Quest Experience and Completion Entry in Quest Log.'
+    end
+    content.rewardsText:setText(rStr)
+
+    -- Footer buttons
+    local footer = questDetailsWindow.footerPanel
+    footer.btnDetailTrack.onClick = function()
+        questTracker.setTrackedGuide(guide, false)
+        modules.game_textmessage.displayStatusConsole(string.format('[Quest Tracker] Now tracking: %s on your map.', guide.name))
+    end
+    footer.btnDetailGps.onClick = function()
+        questTracker.setTrackedGuide(guide, true)
+        modules.game_textmessage.displayStatusConsole(string.format('[GPS Guide] Navigating to %s in %s.', guide.startNpc or guide.name, guide.city or 'world'))
+    end
+
+    questDetailsWindow:show()
+    questDetailsWindow:raise()
+    questDetailsWindow:focus()
 end
 
 --[[=================================================
@@ -375,17 +525,45 @@ end
 local function createGuideCard(guide)
     local card = g_ui.createWidget('GuideCard')
     card:setId('guide_' .. (guide.id or 'unknown'))
+    card.guideData = guide
 
-    if guide.iconItem and guide.iconItem > 0 then
-        card.iconItem:setItemId(guide.iconItem)
+    -- Visual Creature / Mount / NPC Preview
+    if guide.creatureLookType and guide.creatureLookType > 0 then
+        card.previewBox.creaturePreview:show()
+        card.previewBox.creaturePreview:setOutfit({
+            type = guide.creatureLookType,
+            head = 0, body = 114, legs = 94, feet = 114,
+            addons = guide.addons or 0
+        })
+        card.previewBox.itemPreview:hide()
+    elseif guide.mountClientId and guide.mountClientId > 0 then
+        card.previewBox.creaturePreview:show()
+        card.previewBox.creaturePreview:setOutfit({
+            type = guide.mountClientId
+        })
+        card.previewBox.itemPreview:hide()
+    elseif guide.npcLookType and guide.npcLookType > 0 then
+        card.previewBox.creaturePreview:show()
+        card.previewBox.creaturePreview:setOutfit({
+            type = guide.npcLookType,
+            head = 76, body = 43, legs = 38, feet = 76,
+            addons = 0
+        })
+        card.previewBox.itemPreview:hide()
+    elseif guide.rewardItemId and guide.rewardItemId > 0 then
+        card.previewBox.itemPreview:show()
+        card.previewBox.itemPreview:setItemId(guide.rewardItemId)
+        card.previewBox.creaturePreview:hide()
     else
-        card.iconItem:setItemId(1988)
+        card.previewBox.itemPreview:show()
+        card.previewBox.itemPreview:setItemId(guide.iconItem or 1988)
+        card.previewBox.creaturePreview:hide()
     end
 
-    card.name:setText(guide.name or 'Guia')
+    card.name:setText(guide.name or 'Guide')
     card.details:setText(guide.description or '')
     
-    local npcCity = 'NPC: ' .. (guide.startNpc or 'Local') .. ' | ' .. (guide.city or 'Outdoors') .. ' | Lv ' .. (guide.level or 1) .. '+'
+    local npcCity = 'NPC: ' .. (guide.startNpc or 'Location') .. ' | ' .. (guide.city or 'Outdoors') .. ' | Lv ' .. (guide.level or 1) .. '+'
     card.npcInfo:setText(npcCity)
 
     local catBadge = card.categoryBadge
@@ -398,7 +576,7 @@ local function createGuideCard(guide)
         catBadge:setBackgroundColor('#2b503d')
         catBadge:setColor('#88ff88')
     elseif guide.category == 'access' then
-        catBadge:setText('ACESSO')
+        catBadge:setText('ACCESS')
         catBadge:setBackgroundColor('#50452b')
         catBadge:setColor('#ffff88')
     else
@@ -410,24 +588,16 @@ local function createGuideCard(guide)
     -- Button handlers
     card.actionButtons.btnGps.onClick = function()
         questTracker.setTrackedGuide(guide, true)
-        modules.game_textmessage.displayStatusConsole(string.format('[GPS Ativado] Guiando ate %s em %s.', guide.startNpc or guide.name, guide.city or 'destino'))
+        modules.game_textmessage.displayStatusConsole(string.format('[GPS Guide] Navigating to %s in %s.', guide.startNpc or guide.name, guide.city or 'world'))
     end
 
     card.actionButtons.btnTrack.onClick = function()
         questTracker.setTrackedGuide(guide, false)
-        modules.game_textmessage.displayStatusConsole(string.format('[Tracker Fixado] %s fixado no seu painel lateral.', guide.name))
+        modules.game_textmessage.displayStatusConsole(string.format('[Quest Tracker] Now tracking: %s.', guide.name))
     end
 
-    card.actionButtons.btnDialog.onClick = function()
-        local d = guide.dialog or 'Converse normalmente com o NPC.'
-        local msg = string.format('=== %s ===\nNPC: %s (%s)\nDiálogo:\n%s', guide.name, guide.startNpc or 'NPC', guide.city or '', d)
-        if guide.requiredItems and #guide.requiredItems > 0 then
-            msg = msg .. '\n\nItens Necessários:\n'
-            for _, it in ipairs(guide.requiredItems) do
-                msg = msg .. string.format('• %dx %s\n', it.count or 1, it.name or ('Item ' .. it.id))
-            end
-        end
-        displayInfoBox(guide.name, msg)
+    card.actionButtons.btnDetails.onClick = function()
+        questTracker.showDetails(guide)
     end
 
     return card
@@ -440,7 +610,6 @@ local function refreshExplorerList()
     list:destroyChildren()
 
     local q = string.lower(string.trim(searchQuery))
-    local count = 0
 
     for _, guide in ipairs(guidesDatabase.entries or {}) do
         local matchCat = (currentCategory == 'all') or (guide.category == currentCategory)
@@ -463,9 +632,10 @@ local function refreshExplorerList()
         if matchCat and matchSearch then
             local card = createGuideCard(guide)
             list:addChild(card)
-            count = count + 1
         end
     end
+
+    questTracker.refreshActiveCardHighlights()
 end
 
 local function setCategory(cat, btn)
@@ -512,12 +682,11 @@ function init()
 
     loadDatabase()
 
-    -- 1. Create MiniWindow docked into Right Panel
-    local rightPanel = modules.game_interface.getMainRightPanel() or modules.game_interface.getRightPanel()
+    -- 1. Create MiniWindow dockable in the Sidebar panels (Right or Left Panel)
+    local rightPanel = modules.game_interface.getRightPanel() or modules.game_interface.getMainRightPanel()
     trackerMiniWindow = g_ui.createWidget('QuestTrackerMiniWindow', rightPanel)
     trackerMiniWindow:setup()
 
-    -- Connect buttons inside MiniWindow
     local activeBox = trackerMiniWindow.contentsPanel.activeBox
     if activeBox then
         activeBox.miniControls.btnToggleGps.onClick = questTracker.toggleGps
@@ -528,7 +697,7 @@ function init()
     guideExplorerWindow = g_ui.createWidget('GuideExplorerWindow', modules.game_interface.getRootPanel())
     guideExplorerWindow:hide()
 
-    -- Connect Explorer Search & Filters
+    -- Connect Explorer Search & Category Filters
     local sb = guideExplorerWindow.sidebar
     sb.catAll.onClick = function(b) setCategory('all', b) end
     sb.catQuest.onClick = function(b) setCategory('quest', b) end
@@ -543,11 +712,28 @@ function init()
         refreshExplorerList()
     end
 
-    -- 3. Register TopMenu and MainPanel Toggle Buttons
-    topMenuButton = modules.client_topmenu.addRightGameToggleButton('questTrackerTopBtn', tr('Quest & GPS Tracker'), '/images/topbuttons/icon-questtracker-widget', questTracker.toggleExplorer)
-    mainPanelButton = modules.game_mainpanel.addToggleButton('questTrackerMainBtn', tr('Quest & GPS Tracker'), '/images/topbuttons/icon-questtracker-widget', questTracker.toggleMiniWindow, false, 1002)
+    -- 3. Create Quest Details Window
+    questDetailsWindow = g_ui.createWidget('QuestDetailsWindow', modules.game_interface.getRootPanel())
+    questDetailsWindow:hide()
 
-    -- 4. Register LocalPlayer position event for real-time GPS update
+    -- 4. Register Single Button directly below Idle Hunt in MainPanel
+    -- Disable legacy questlog duplicate button if present
+    if modules.game_questlog and modules.game_questlog.buttonQuestLogTrackerButton then
+        modules.game_questlog.buttonQuestLogTrackerButton:destroy()
+        modules.game_questlog.buttonQuestLogTrackerButton = nil
+    end
+
+    -- Register single clean button in MainPanel (index 1002 places it directly below Idle Hunt)
+    mainPanelButton = modules.game_mainpanel.addToggleButton(
+        'questTrackerMainBtn',
+        tr('Quest & GPS Tracker'),
+        '/images/topbuttons/icon-questtracker-widget',
+        questTracker.toggleExplorer,
+        false,
+        1002
+    )
+
+    -- 5. Register LocalPlayer position event for real-time GPS update
     connect(LocalPlayer, {
         onPositionChange = function()
             if isGpsActive then
@@ -556,12 +742,12 @@ function init()
         end
     })
 
-    -- 5. Periodic GPS update timer (for moving map camera or smooth updates)
+    -- 6. Periodic GPS update timer
     gpsTimer = cycleEvent(function()
         if isGpsActive then
             updateGpsDisplay()
         end
-    end, 500)
+    end, 400)
 
     connect(g_game, {
         onGameStart = function()
@@ -600,9 +786,9 @@ function terminate()
         guideExplorerWindow = nil
     end
 
-    if topMenuButton then
-        topMenuButton:destroy()
-        topMenuButton = nil
+    if questDetailsWindow then
+        questDetailsWindow:destroy()
+        questDetailsWindow = nil
     end
 
     if mainPanelButton then

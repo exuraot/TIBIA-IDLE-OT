@@ -392,75 +392,6 @@ QuestDetailsWindow < MainWindow
       margin-bottom: 4
       text-auto-resize: true
 
-  ScrollablePanel
-    id: detailsContent
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: headerBox.bottom
-    anchors.bottom: footerPanel.top
-    margin-top: 8
-    margin-bottom: 8
-    vertical-scrollbar: detailScrollBar
-    layout:
-      type: verticalBox
-      fit-children: true
-
-    Label
-      id: loreTitle
-      text: STORY & OVERVIEW
-      font: verdana-11px-rounded
-      color: #ffd700
-      margin-top: 4
-
-    Label
-      id: loreText
-      font: verdana-11px-rounded
-      color: #cccccc
-      margin-top: 4
-      text-wrap: true
-
-    Label
-      id: dialogueTitle
-      text: DIALOGUE & WALKTHROUGH
-      font: verdana-11px-rounded
-      color: #ffd700
-      margin-top: 10
-
-    MultilineTextEdit
-      id: dialogueText
-      height: 120
-      margin-top: 4
-      font: verdana-11px-rounded
-      color: #00ffcc
-      background-color: #0f141c
-      border-width: 1
-      border-color: #253242
-      padding: 6
-      text-wrap: true
-      focusable: false
-
-    Label
-      id: rewardsTitle
-      text: REWARDS & UNLOCKS
-      font: verdana-11px-rounded
-      color: #ffd700
-      margin-top: 10
-
-    Label
-      id: rewardsText
-      font: verdana-11px-rounded
-      color: #88ff88
-      margin-top: 4
-      text-wrap: true
-
-  VerticalScrollBar
-    id: detailScrollBar
-    anchors.top: detailsContent.top
-    anchors.bottom: detailsContent.bottom
-    anchors.right: parent.right
-    step: 40
-    pixels-scroll: true
-
   Panel
     id: footerPanel
     height: 32
@@ -501,10 +432,146 @@ QuestDetailsWindow < MainWindow
       text: Close
       @onClick: self:getParent():getParent():hide()
 
+  VerticalScrollBar
+    id: detailScrollBar
+    anchors.top: headerBox.bottom
+    anchors.bottom: footerPanel.top
+    anchors.right: parent.right
+    margin-top: 8
+    margin-bottom: 8
+    step: 40
+    pixels-scroll: true
+
+  ScrollablePanel
+    id: detailsContent
+    anchors.left: parent.left
+    anchors.right: detailScrollBar.left
+    anchors.top: headerBox.bottom
+    anchors.bottom: footerPanel.top
+    margin-top: 8
+    margin-bottom: 8
+    margin-right: 4
+    vertical-scrollbar: detailScrollBar
+    layout:
+      type: verticalBox
+      fit-children: true
+
+    Label
+      id: loreTitle
+      text: STORY & OVERVIEW
+      font: verdana-11px-rounded
+      color: #ffd700
+      margin-top: 4
+
+    Label
+      id: loreText
+      font: verdana-11px-rounded
+      color: #cccccc
+      margin-top: 4
+      text-wrap: true
+
+    Label
+      id: dialogueTitle
+      text: DIALOGUE & WALKTHROUGH
+      font: verdana-11px-rounded
+      color: #ffd700
+      margin-top: 10
+
+    Panel
+      id: dialogueBox
+      background-color: #0f141c
+      border-width: 1
+      border-color: #253242
+      padding: 8
+      margin-top: 4
+      layout:
+        type: verticalBox
+        fit-children: true
+
+      Label
+        id: dialogueText
+        font: verdana-11px-rounded
+        color: #00ffcc
+        text-wrap: true
+
+    Label
+      id: rewardsTitle
+      text: REWARDS & UNLOCKS
+      font: verdana-11px-rounded
+      color: #ffd700
+      margin-top: 10
+
+    Label
+      id: rewardsText
+      font: verdana-11px-rounded
+      color: #88ff88
+      margin-top: 4
+      text-wrap: true
+
+GpsOverlay < Panel
+  anchors.fill: parent
+  background-color: alpha
+  phantom: true
+  focusable: false
+  visible: false
+
+GpsDot < Panel
+  size: 16 16
+  background-color: alpha
+  phantom: true
+  focusable: false
+  visible: false
+
+  Panel
+    id: ring
+    anchors.fill: parent
+    background-color: #00ffff33
+    border-width: 2
+    border-color: #00ffffff
+    phantom: true
+
+  Panel
+    id: core
+    size: 6 6
+    anchors.centerIn: parent
+    background-color: #ffffff
+    phantom: true
+
+GpsBeacon < Panel
+  size: 34 34
+  background-color: alpha
+  phantom: true
+  focusable: false
+  visible: false
+
+  Panel
+    id: ring
+    anchors.fill: parent
+    background-color: #ffd70044
+    border-width: 2
+    border-color: #ffd700
+    phantom: true
+
+  Panel
+    id: core
+    size: 10 10
+    anchors.centerIn: parent
+    background-color: #ffffff
+    phantom: true
+
+  Label
+    id: label
+    anchors.bottom: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-bottom: 4
+    font: verdana-11px-rounded
+    color: #ffd700
+    text-auto-resize: true
+
 QuestTrackerMiniWindow < MiniWindow
   id: questTrackerMiniWindow
   !text: tr('Quest Tracker')
-  height: 180
+  height: 190
   icon: /images/topbuttons/icon-questtracker-widget
   @onOpen: modules.game_questtracker.onMiniWindowOpen()
   @onClose: modules.game_questtracker.onMiniWindowClose()
@@ -558,7 +625,7 @@ QuestTrackerMiniWindow < MiniWindow
         margin-top: 15
 
       Label
-        text: Open the explorer to track Quests, Addons, and Mounts.
+        text: Open explorer to track Quests, Addons, and Mounts.
         text-align: center
         text-wrap: true
         font: verdana-11px-rounded
@@ -581,98 +648,97 @@ QuestTrackerMiniWindow < MiniWindow
 
     Panel
       id: activeBox
-      height: 140
+      height: 155
       visible: false
+      layout:
+        type: verticalBox
+        fit-children: true
 
       Label
         id: trackedTitle
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.right: parent.right
         font: verdana-11px-rounded
         color: #ffd700
-        text-auto-resize: true
+        text-wrap: true
+        margin-top: 1
+        margin-left: 2
+        margin-right: 2
+
+      Label
+        id: trackedTarget
+        font: verdana-11px-rounded
+        color: #00ffcc
+        text-wrap: true
+        margin-top: 2
+        margin-left: 2
+        margin-right: 2
 
       Label
         id: trackedStep
-        anchors.left: parent.left
-        anchors.top: trackedTitle.bottom
-        anchors.right: parent.right
-        margin-top: 3
         font: verdana-11px-rounded
-        color: #ffffff
-        text-auto-resize: true
+        color: #e0e0e0
+        text-wrap: true
+        margin-top: 2
+        margin-left: 2
+        margin-right: 2
 
       Label
-        id: trackedNpc
-        anchors.left: parent.left
-        anchors.top: trackedStep.bottom
-        anchors.right: parent.right
-        margin-top: 2
-        font: verdana-11px-rounded
-        color: #00ffcc
-        text-auto-resize: true
-
-      Label
-        id: trackedDialog
-        anchors.left: parent.left
-        anchors.top: trackedNpc.bottom
-        anchors.right: parent.right
-        margin-top: 2
+        id: trackedHint
         font: verdana-11px-rounded
         color: #ffd966
-        text-auto-resize: true
+        text-wrap: true
+        margin-top: 2
+        margin-left: 2
+        margin-right: 2
 
       Label
         id: trackedDistance
-        anchors.left: parent.left
-        anchors.top: trackedDialog.bottom
-        anchors.right: parent.right
-        margin-top: 4
         font: verdana-11px-rounded
         color: #00ffff
-        text-auto-resize: true
+        text-wrap: true
+        margin-top: 3
+        margin-left: 2
+        margin-right: 2
 
       Panel
         id: miniControls
+        height: 22
+        margin-top: 6
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        height: 24
 
         Button
           id: btnToggleGps
-          width: 78
           height: 22
           anchors.left: parent.left
-          anchors.top: parent.top
+          anchors.right: btnUntrack.left
+          margin-right: 4
           font: verdana-11px-rounded
           text: GPS: ON
           color: #00ff88
           border-color: #00aa55
 
         Button
-          id: btnClearTrack
-          width: 58
+          id: btnUntrack
+          width: 22
           height: 22
-          anchors.right: parent.right
-          anchors.top: parent.top
-          font: verdana-11px-rounded
-          text: Untrack
-          color: #ff5555
-          border-color: #aa3333
-
-        Button
-          id: btnMiniExplorer
-          width: 52
-          height: 22
-          anchors.right: btnClearTrack.left
-          anchors.top: parent.top
+          anchors.right: btnMiniDetails.left
           margin-right: 4
           font: verdana-11px-rounded
-          text: Guides
-          @onClick: modules.game_questtracker.showExplorer()
+          text: X
+          color: #ff5555
+          border-color: #aa3333
+          tooltip: Untrack quest
 
+        Button
+          id: btnMiniDetails
+          width: 52
+          height: 22
+          anchors.right: parent.right
+          font: verdana-11px-rounded
+          text: Details
+          color: #ffd700
+          border-color: #ccaa00
+          @onClick: modules.game_questtracker.showDetailsForActive()
 
 GpsTopBanner < Panel
   id: gpsTopBanner

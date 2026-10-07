@@ -208,7 +208,7 @@ TipBox < Panel
 MainWindow
   id: idleHuntWindow
   !text: tr('IDLE HUNT - SISTEMA DE CACADAS')
-  size: 720 620
+  size: 830 630
   padding-top: 38
   padding-left: 14
   padding-right: 14
@@ -609,13 +609,13 @@ MainWindow
       anchors.top: parent.top
       anchors.left: parent.left
       anchors.right: parent.right
-      height: 28
+      height: 30
 
       Button
         id: backToDashboardBtn
         !text: tr('< Voltar ao Painel')
         font: verdana-11px-rounded
-        width: 150
+        width: 140
         height: 26
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
@@ -624,18 +624,129 @@ MainWindow
         id: huntSearchInput
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
-        width: 220
-        height: 24
+        width: 320
+        height: 26
 
       Label
         id: searchLabel
-        !text: tr('Buscar:')
+        !text: tr('Busca Inteligente:')
         font: verdana-11px-rounded
-        color: #ffffff
+        color: #ffd700
         anchors.right: huntSearchInput.left
         anchors.verticalCenter: parent.verticalCenter
-        margin-right: 6
+        margin-right: 8
         text-auto-resize: true
+
+    Panel
+      id: filterSidebar
+      anchors.top: catalogTopBar.bottom
+      anchors.left: parent.left
+      anchors.bottom: catalogTipBox.top
+      width: 175
+      margin-top: 6
+      margin-bottom: 6
+      image-source: /images/ui/panel_flat
+      image-border: 4
+      padding: 6
+      layout:
+        type: verticalBox
+        spacing: 3
+
+      Label
+        !text: tr('OBJETIVO PRINCIPAL')
+        font: verdana-11px-rounded
+        color: #ffcc00
+        margin-top: 2
+        margin-bottom: 2
+        text-align: center
+
+      Button
+        id: filterObjAll
+        !text: tr('Todas as Hunts')
+        font: verdana-11px-rounded
+        height: 22
+
+      Button
+        id: filterObjXp
+        !text: tr('XP Rush')
+        font: verdana-11px-rounded
+        color: #00ddff
+        height: 22
+
+      Button
+        id: filterObjProfit
+        !text: tr('Lucro / GP')
+        font: verdana-11px-rounded
+        color: #ffd700
+        height: 22
+
+      Button
+        id: filterObjItems
+        !text: tr('Coleta de Itens')
+        font: verdana-11px-rounded
+        color: #00ff88
+        height: 22
+
+      Label
+        !text: tr('CATEGORIA DE DROPS')
+        font: verdana-11px-rounded
+        color: #ffcc00
+        margin-top: 8
+        margin-bottom: 2
+        text-align: center
+
+      Button
+        id: filterCatImbuement
+        !text: tr('Imbuements')
+        font: verdana-11px-rounded
+        color: #ff77ee
+        height: 22
+
+      Button
+        id: filterCatAddon
+        !text: tr('Itens de Addon')
+        font: verdana-11px-rounded
+        color: #ffaa33
+        height: 22
+
+      Button
+        id: filterCatEquip
+        !text: tr('Equipamentos')
+        font: verdana-11px-rounded
+        color: #ffffff
+        height: 22
+
+      Label
+        !text: tr('DIFICULDADE')
+        font: verdana-11px-rounded
+        color: #ffcc00
+        margin-top: 8
+        margin-bottom: 2
+        text-align: center
+
+      Button
+        id: filterTierAll
+        !text: tr('Todos os Niveis')
+        font: verdana-11px-rounded
+        height: 22
+
+      Button
+        id: filterTierEasy
+        !text: tr('Facil (8+)')
+        font: verdana-11px-rounded
+        height: 22
+
+      Button
+        id: filterTierMed
+        !text: tr('Medio (20+)')
+        font: verdana-11px-rounded
+        height: 22
+
+      Button
+        id: filterTierHard
+        !text: tr('Dificil (35+)')
+        font: verdana-11px-rounded
+        height: 22
 
     TipBox
       id: catalogTipBox
@@ -658,10 +769,11 @@ MainWindow
     UIScrollArea
       id: huntList
       anchors.top: catalogTopBar.bottom
-      anchors.left: parent.left
+      anchors.left: filterSidebar.right
       anchors.right: huntListScrollBar.left
       anchors.bottom: catalogTipBox.top
       margin-top: 6
+      margin-left: 6
       margin-right: 4
       margin-bottom: 6
       vertical-scrollbar: huntListScrollBar

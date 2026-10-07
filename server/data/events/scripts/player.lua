@@ -502,12 +502,20 @@ function Player:onGainExperience(target, exp, rawExp)
 	local hasXpBoost = xpBoostTimeLeft > 0
 	local xpBoostPercent = hasXpBoost and self:getXpBoostPercent() or 0
 
-	-- Stamina Bonus
+	-- Stamina Bonus & IDLE Hunt Balance
 	local staminaBonusXp = 1
-	if configManager.getBoolean(configKeys.STAMINA_SYSTEM) then
-		useStamina(self, true)
-		staminaBonusXp = self:getFinalBonusStamina()
-		self:setStaminaXpBoost(staminaBonusXp * 100)
+	local isIdleHunting = (_G.OnIdleHunt and _G.OnIdleHunt[self:getId()]) ~= nil
+
+	if not isIdleHunting then
+		if configManager.getBoolean(configKeys.STAMINA_SYSTEM) then
+			useStamina(self, true)
+			staminaBonusXp = self:getFinalBonusStamina()
+			self:setStaminaXpBoost(staminaBonusXp * 100)
+		end
+	else
+		-- Modo IDLE: Stamina Preservada (0% de consumo) e 50% de EXP Nominal
+		exp = math.floor(exp * 0.5)
+		self:setStaminaXpBoost(0)
 	end
 
 	-- Concoction System

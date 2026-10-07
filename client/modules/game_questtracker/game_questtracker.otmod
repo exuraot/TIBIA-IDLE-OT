@@ -1,0 +1,9 @@
+Module
+  name: game_questtracker
+  description: Universal Quest, Addon, Mount Tracker with In-Game Visual GPS
+  author: Exura OT Team
+  website: https://exura-ot.com
+  sandboxed: true
+  scripts: [ questtracker ]
+  @onLoad: init()
+  @onUnload: terminate()

@@ -20,6 +20,7 @@ Module
     - game_imbuementtracker
     - game_hotkeys
     - game_questlog
+    - game_questtracker
     - game_textmessage
     - game_console
     - game_actionbar

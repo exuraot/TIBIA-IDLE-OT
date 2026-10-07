@@ -1,0 +1,2967 @@
+{
+    "categories": [
+        {
+            "id": "all",
+            "name": "Todas"
+        },
+        {
+            "id": "quest",
+            "name": "Quests"
+        },
+        {
+            "id": "addon",
+            "name": "Addons & Outfits"
+        },
+        {
+            "id": "mount",
+            "name": "Montarias"
+        },
+        {
+            "id": "access",
+            "name": "Acessos & Portais"
+        }
+    ],
+    "entries": [
+        {
+            "id": "addon_citizen",
+            "name": "Citizen Outfit & Addons",
+            "category": "addon",
+            "level": 1,
+            "iconItem": 5878,
+            "description": "Mochila (Addon 1) e Chapéu/Pena (Addon 2) do Citizen Outfit.",
+            "startNpc": "Luboo",
+            "dialog": "hi > addon > backpack > yes",
+            "requiredItems": [
+                {
+                    "id": 5878,
+                    "name": "Minotaur Leather",
+                    "count": 100
+                },
+                {
+                    "id": 5890,
+                    "name": "Chicken Feather",
+                    "count": 100
+                },
+                {
+                    "id": 5902,
+                    "name": "Honeycomb",
+                    "count": 50
+                },
+                {
+                    "id": 5883,
+                    "name": "Ape Fur",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Citizen Addon 1 (Backpack)",
+                    "npc": "Luboo",
+                    "npcCoords": {
+                        "x": 32398,
+                        "y": 32185,
+                        "z": 7
+                    },
+                    "city": "Thais",
+                    "dialog": "hi > addon > backpack > yes",
+                    "instruction": "Leve 100 Minotaur Leathers para o NPC Luboo no templo sul de Thais.",
+                    "targetCoords": {
+                        "x": 32398,
+                        "y": 32185,
+                        "z": 7
+                    }
+                },
+                {
+                    "step": 2,
+                    "title": "Citizen Addon 2 (Hat / Feather)",
+                    "npc": "Hanna",
+                    "npcCoords": {
+                        "x": 32408,
+                        "y": 32220,
+                        "z": 14
+                    },
+                    "city": "Thais",
+                    "dialog": "hi > addon > hat > yes",
+                    "instruction": "Entregue 100 Chicken Feathers, 50 Honeycombs e 1 Ape Fur para Hanna na joalheria de Thais.",
+                    "targetCoords": {
+                        "x": 32408,
+                        "y": 32220,
+                        "z": 14
+                    }
+                }
+            ]
+        },
+        {
+            "id": "addon_hunter",
+            "name": "Hunter Outfit & Addons",
+            "category": "addon",
+            "level": 30,
+            "iconItem": 5879,
+            "description": "Luvas/Capuz (Addon 1) e Arco de Caça (Addon 2) do Hunter Outfit.",
+            "startNpc": "Elane",
+            "dialog": "hi > addon > sniper gloves > yes",
+            "requiredItems": [
+                {
+                    "id": 5875,
+                    "name": "Sniper Gloves",
+                    "count": 1
+                },
+                {
+                    "id": 5879,
+                    "name": "Spider Silk",
+                    "count": 100
+                },
+                {
+                    "id": 5881,
+                    "name": "Lizard Scale",
+                    "count": 100
+                },
+                {
+                    "id": 5882,
+                    "name": "Red Dragon Scale",
+                    "count": 100
+                },
+                {
+                    "id": 5948,
+                    "name": "Red Piece of Cloth",
+                    "count": 1
+                },
+                {
+                    "id": 5804,
+                    "name": "Nose Ring",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Hunter Addon 1 (Sniper Gloves)",
+                    "npc": "Elane",
+                    "npcCoords": {
+                        "x": 32342,
+                        "y": 32235,
+                        "z": 14
+                    },
+                    "city": "Thais",
+                    "dialog": "hi > addon > sniper gloves > yes",
+                    "instruction": "Fale com Elane na guilda dos Paladins em Thais e entregue o Sniper Gloves.",
+                    "targetCoords": {
+                        "x": 32342,
+                        "y": 32235,
+                        "z": 14
+                    }
+                },
+                {
+                    "step": 2,
+                    "title": "Hunter Addon 2 (Bow / Hood)",
+                    "npc": "Elane",
+                    "npcCoords": {
+                        "x": 32342,
+                        "y": 32235,
+                        "z": 14
+                    },
+                    "city": "Thais",
+                    "dialog": "hi > addon > bow > yes",
+                    "instruction": "Entregue 100 Spider Silks, 100 Lizard Scales, 100 Red Dragon Scales e 1 Red Piece of Cloth.",
+                    "targetCoords": {
+                        "x": 32342,
+                        "y": 32235,
+                        "z": 14
+                    }
+                }
+            ]
+        },
+        {
+            "id": "addon_knight",
+            "name": "Knight Outfit & Addons",
+            "category": "addon",
+            "level": 40,
+            "iconItem": 5880,
+            "description": "Espada de Ferro (Addon 1) e Elmo com Chifres (Addon 2) do Knight Outfit.",
+            "startNpc": "Gregor",
+            "dialog": "hi > outfit > knight > yes",
+            "requiredItems": [
+                {
+                    "id": 5880,
+                    "name": "Iron Ore",
+                    "count": 100
+                },
+                {
+                    "id": 5887,
+                    "name": "Piece of Royal Steel",
+                    "count": 1
+                },
+                {
+                    "id": 5888,
+                    "name": "Piece of Hell Steel",
+                    "count": 1
+                },
+                {
+                    "id": 5889,
+                    "name": "Piece of Draconian Steel",
+                    "count": 1
+                },
+                {
+                    "id": 5925,
+                    "name": "Hardened Bone",
+                    "count": 100
+                },
+                {
+                    "id": 5899,
+                    "name": "Turtle Shell",
+                    "count": 100
+                },
+                {
+                    "id": 5884,
+                    "name": "Spirit Container",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Knight Addon 1 (Sword)",
+                    "npc": "Gregor",
+                    "npcCoords": {
+                        "x": 32406,
+                        "y": 32201,
+                        "z": 12
+                    },
+                    "city": "Thais",
+                    "dialog": "hi > outfit > sword > yes",
+                    "instruction": "Fale com Gregor na guilda dos Knights de Thais e entregue os lingotes de aço especiais.",
+                    "targetCoords": {
+                        "x": 32406,
+                        "y": 32201,
+                        "z": 12
+                    }
+                },
+                {
+                    "step": 2,
+                    "title": "Knight Addon 2 (Helmet)",
+                    "npc": "Gregor",
+                    "npcCoords": {
+                        "x": 32406,
+                        "y": 32201,
+                        "z": 12
+                    },
+                    "city": "Thais",
+                    "dialog": "hi > outfit > helmet > yes",
+                    "instruction": "Entregue 100 Hardened Bones e 100 Turtle Shells para forjar os chifres do elmo.",
+                    "targetCoords": {
+                        "x": 32406,
+                        "y": 32201,
+                        "z": 12
+                    }
+                }
+            ]
+        },
+        {
+            "id": "addon_mage",
+            "name": "Mage / Summoner Outfit & Addons",
+            "category": "addon",
+            "level": 60,
+            "iconItem": 5906,
+            "description": "Varinha Ferumbras Hat (Mage Addon 2) e Capa Mágica do Mage Outfit.",
+            "startNpc": "Lynda",
+            "dialog": "hi > addon > wand > yes",
+            "requiredItems": [
+                {
+                    "id": 5905,
+                    "name": "Vampire Dust",
+                    "count": 100
+                },
+                {
+                    "id": 5906,
+                    "name": "Demon Dust",
+                    "count": 10
+                },
+                {
+                    "id": 5909,
+                    "name": "White Piece of Cloth",
+                    "count": 20
+                },
+                {
+                    "id": 5910,
+                    "name": "Green Piece of Cloth",
+                    "count": 20
+                },
+                {
+                    "id": 5911,
+                    "name": "Red Piece of Cloth",
+                    "count": 20
+                },
+                {
+                    "id": 5912,
+                    "name": "Blue Piece of Cloth",
+                    "count": 20
+                },
+                {
+                    "id": 5913,
+                    "name": "Brown Piece of Cloth",
+                    "count": 20
+                },
+                {
+                    "id": 5914,
+                    "name": "Yellow Piece of Cloth",
+                    "count": 20
+                },
+                {
+                    "id": 5903,
+                    "name": "Ferumbras' Hat",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Mage Addon 1 (Wand / Cloak)",
+                    "npc": "Lynda",
+                    "npcCoords": {
+                        "x": 32331,
+                        "y": 32199,
+                        "z": 14
+                    },
+                    "city": "Thais",
+                    "dialog": "hi > addon > wand > yes",
+                    "instruction": "Fale com Lynda na igreja de Thais e entregue os panos e poeiras místicas.",
+                    "targetCoords": {
+                        "x": 32331,
+                        "y": 32199,
+                        "z": 14
+                    }
+                },
+                {
+                    "step": 2,
+                    "title": "Mage Addon 2 (Ferumbras' Hat)",
+                    "npc": "Zoltan",
+                    "npcCoords": {
+                        "x": 33266,
+                        "y": 31847,
+                        "z": 8
+                    },
+                    "city": "Edron",
+                    "dialog": "hi > ferumbras hat > yes",
+                    "instruction": "Entregue o lendário chapéu de Ferumbras para Zoltan na Academia de Magia em Edron.",
+                    "targetCoords": {
+                        "x": 33266,
+                        "y": 31847,
+                        "z": 8
+                    }
+                }
+            ]
+        },
+        {
+            "id": "addon_assassin",
+            "name": "Assassin Outfit & Addons",
+            "category": "addon",
+            "level": 80,
+            "iconItem": 5804,
+            "description": "Katana Dupla (Addon 1) e Máscara Ninja (Addon 2) do Assassin Outfit.",
+            "startNpc": "A Ghostly Woman",
+            "dialog": "hi > outfit > assassin > yes",
+            "requiredItems": [
+                {
+                    "id": 5804,
+                    "name": "Nose Ring",
+                    "count": 1
+                },
+                {
+                    "id": 5919,
+                    "name": "Dragon Claw",
+                    "count": 1
+                },
+                {
+                    "id": 5911,
+                    "name": "Red Piece of Cloth",
+                    "count": 30
+                },
+                {
+                    "id": 5912,
+                    "name": "Blue Piece of Cloth",
+                    "count": 30
+                },
+                {
+                    "id": 5910,
+                    "name": "Green Piece of Cloth",
+                    "count": 30
+                },
+                {
+                    "id": 5913,
+                    "name": "Brown Piece of Cloth",
+                    "count": 30
+                },
+                {
+                    "id": 5914,
+                    "name": "Yellow Piece of Cloth",
+                    "count": 30
+                },
+                {
+                    "id": 5909,
+                    "name": "White Piece of Cloth",
+                    "count": 30
+                },
+                {
+                    "id": 5881,
+                    "name": "Lizard Scale",
+                    "count": 100
+                },
+                {
+                    "id": 5882,
+                    "name": "Red Dragon Scale",
+                    "count": 100
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Assassin Addon 1 (Katanas)",
+                    "npc": "A Ghostly Woman",
+                    "npcCoords": {
+                        "x": 32834,
+                        "y": 32289,
+                        "z": 28
+                    },
+                    "city": "Venore",
+                    "dialog": "hi > addon > sword > yes",
+                    "instruction": "Encontre a Ghostly Woman na guilda dos assassinos perto de Venore e entregue o Nose Ring e Dragon Claw.",
+                    "targetCoords": {
+                        "x": 32834,
+                        "y": 32289,
+                        "z": 28
+                    }
+                }
+            ]
+        },
+        {
+            "id": "addon_warrior",
+            "name": "Warrior Outfit & Addons",
+            "category": "addon",
+            "level": 50,
+            "iconItem": 5919,
+            "description": "Espada nas Costas (Addon 1) e Elmo com Chifres (Addon 2) do Warrior Outfit.",
+            "startNpc": "Trisha",
+            "dialog": "hi > outfit > warrior > yes",
+            "requiredItems": [
+                {
+                    "id": 5880,
+                    "name": "Iron Ore",
+                    "count": 100
+                },
+                {
+                    "id": 5887,
+                    "name": "Piece of Royal Steel",
+                    "count": 1
+                },
+                {
+                    "id": 5919,
+                    "name": "Dragon Claw",
+                    "count": 1
+                },
+                {
+                    "id": 5925,
+                    "name": "Hardened Bone",
+                    "count": 100
+                },
+                {
+                    "id": 5899,
+                    "name": "Turtle Shell",
+                    "count": 100
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Warrior Addon 1 (Sword on Back)",
+                    "npc": "Trisha",
+                    "npcCoords": {
+                        "x": 32346,
+                        "y": 31749,
+                        "z": 14
+                    },
+                    "city": "Carlin",
+                    "dialog": "hi > addon > sword > yes",
+                    "instruction": "Fale com a Trisha na guilda de guerreiros em Carlin e entregue os materiais para forjar a espada.",
+                    "targetCoords": {
+                        "x": 32346,
+                        "y": 31749,
+                        "z": 14
+                    }
+                }
+            ]
+        },
+        {
+            "id": "addon_barbarian",
+            "name": "Barbarian Outfit & Addons",
+            "category": "addon",
+            "level": 50,
+            "iconItem": 5804,
+            "description": "Machado Selvagem (Addon 1) e Peruca com Chifres (Addon 2) do Barbarian Outfit.",
+            "startNpc": "Hjaern",
+            "dialog": "hi > addon > axe > yes",
+            "requiredItems": [
+                {
+                    "id": 5880,
+                    "name": "Iron Ore",
+                    "count": 100
+                },
+                {
+                    "id": 5884,
+                    "name": "Spirit Container",
+                    "count": 1
+                },
+                {
+                    "id": 5804,
+                    "name": "Nose Ring",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Barbarian Addon 1 (Axe)",
+                    "npc": "Hjaern",
+                    "npcCoords": {
+                        "x": 32351,
+                        "y": 31026,
+                        "z": 14
+                    },
+                    "city": "Svargrond",
+                    "dialog": "hi > addon > axe > yes",
+                    "instruction": "Fale com Hjaern no acampamento xamânico de Svargrond.",
+                    "targetCoords": {
+                        "x": 32351,
+                        "y": 31026,
+                        "z": 14
+                    }
+                }
+            ]
+        },
+        {
+            "id": "addon_shaman",
+            "name": "Shaman Outfit & Addons",
+            "category": "addon",
+            "level": 45,
+            "iconItem": 5884,
+            "description": "Cajado de Mandíbula e Máscara Tribal do Shaman Outfit.",
+            "startNpc": "Chondur",
+            "dialog": "hi > addon > staff > yes",
+            "requiredItems": [
+                {
+                    "id": 5884,
+                    "name": "Spirit Container",
+                    "count": 1
+                },
+                {
+                    "id": 5885,
+                    "name": "Flask of Warrior's Sweat",
+                    "count": 1
+                },
+                {
+                    "id": 3955,
+                    "name": "Voodoo Doll",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Shaman Addons (Staff & Mask)",
+                    "npc": "Chondur",
+                    "npcCoords": {
+                        "x": 32361,
+                        "y": 32550,
+                        "z": 14
+                    },
+                    "city": "Liberty Bay",
+                    "dialog": "hi > addon > staff > yes",
+                    "instruction": "Visite o xamã Chondur na ilha de Meriana (sul de Liberty Bay).",
+                    "targetCoords": {
+                        "x": 32361,
+                        "y": 32550,
+                        "z": 14
+                    }
+                }
+            ]
+        },
+        {
+            "id": "addon_pirate",
+            "name": "Pirate Outfit & Addons",
+            "category": "addon",
+            "level": 60,
+            "iconItem": 6098,
+            "description": "Tapa-olho, Perna de Pau e Sabre de Capitão do Pirate Outfit.",
+            "startNpc": "Duncan",
+            "dialog": "hi > outfit > pirate > yes",
+            "requiredItems": [
+                {
+                    "id": 6098,
+                    "name": "Eye Patch",
+                    "count": 100
+                },
+                {
+                    "id": 6126,
+                    "name": "Peg Leg",
+                    "count": 100
+                },
+                {
+                    "id": 6097,
+                    "name": "Hook",
+                    "count": 100
+                },
+                {
+                    "id": 6100,
+                    "name": "Ron the Ripper's Sabre",
+                    "count": 1
+                },
+                {
+                    "id": 6101,
+                    "name": "Deadeye Devious' Eye Patch",
+                    "count": 1
+                },
+                {
+                    "id": 6102,
+                    "name": "Lethal Lissy's Shirt",
+                    "count": 1
+                },
+                {
+                    "id": 6099,
+                    "name": "Brutus Bloodbeard's Hat",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Pirate Addon 1 (Eye Patch & Peg Leg)",
+                    "npc": "Duncan",
+                    "npcCoords": {
+                        "x": 32330,
+                        "y": 32605,
+                        "z": 14
+                    },
+                    "city": "Liberty Bay",
+                    "dialog": "hi > addon > sabre > yes",
+                    "instruction": "Fale com Duncan na taverna pirata em Liberty Bay e entregue os 100 itens de piratas.",
+                    "targetCoords": {
+                        "x": 32330,
+                        "y": 32605,
+                        "z": 14
+                    }
+                }
+            ]
+        },
+        {
+            "id": "addon_demonhunter",
+            "name": "Demon Hunter Outfit & Addons",
+            "category": "addon",
+            "level": 100,
+            "iconItem": 5906,
+            "description": "Armadura e Elmo Sagrado dos Caçadores de Demônios da Inquisição.",
+            "startNpc": "Henricus",
+            "dialog": "hi > inquisition > outfit > yes",
+            "requiredItems": [
+                {
+                    "id": 5906,
+                    "name": "Demon Dust",
+                    "count": 20
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Demon Hunter Outfit & Addons",
+                    "npc": "Henricus",
+                    "npcCoords": {
+                        "x": 32316,
+                        "y": 32267,
+                        "z": 16
+                    },
+                    "city": "Thais",
+                    "dialog": "hi > inquisition > outfit > yes",
+                    "instruction": "Conclua as missões da The Inquisition Quest com o Inquisidor Chefe Henricus.",
+                    "targetCoords": {
+                        "x": 32316,
+                        "y": 32267,
+                        "z": 16
+                    }
+                }
+            ]
+        },
+        {
+            "id": "mount_widow_queen",
+            "name": "Widow Queen (Aranha Rainha)",
+            "category": "mount",
+            "level": 50,
+            "iconItem": 13293,
+            "tameItem": "Sweet Smelling Bait",
+            "tameCreature": "Widow Queen / Giant Spider",
+            "city": "Venore / Ghostlands",
+            "description": "Doma a lendária Widow Queen usando Sweet Smelling Bait.",
+            "coords": {
+                "x": 32800,
+                "y": 32300,
+                "z": 8
+            },
+            "requiredItems": [
+                {
+                    "id": 13293,
+                    "name": "Sweet Smelling Bait",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Obter o Isca Especial (Sweet Smelling Bait)",
+                    "instruction": "Adquira o Sweet Smelling Bait (drop de Wailing Widow ou comprado no Market).",
+                    "city": "Venore"
+                },
+                {
+                    "step": 2,
+                    "title": "Encontrar e Domar a Widow Queen",
+                    "instruction": "Vá até o respawn de Wailing Widow / Giant Spider nas profundezas de Krailos ou Ghostlands e use o item na criatura.",
+                    "city": "Ghostlands / Krailos",
+                    "targetCoords": {
+                        "x": 32800,
+                        "y": 32300,
+                        "z": 8
+                    }
+                }
+            ]
+        },
+        {
+            "id": "mount_crystal_wolf",
+            "name": "Crystal Wolf (Lobo de Cristal)",
+            "category": "mount",
+            "level": 60,
+            "iconItem": 13938,
+            "tameItem": "Diapason",
+            "tameCreature": "Crystal Wolf",
+            "city": "Shadowthorn (Venore)",
+            "description": "Apague as chamas dos elfos em Shadowthorn para invocar o Crystal Wolf e use o Diapason.",
+            "coords": {
+                "x": 33100,
+                "y": 32180,
+                "z": 7
+            },
+            "requiredItems": [
+                {
+                    "id": 13938,
+                    "name": "Diapason",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Shadowthorn World Event",
+                    "instruction": "Quando Shadowthorn estiver em chamas, use o balde d'água para apagar os focos de fogo.",
+                    "city": "Venore",
+                    "targetCoords": {
+                        "x": 33100,
+                        "y": 32180,
+                        "z": 7
+                    }
+                },
+                {
+                    "step": 2,
+                    "title": "Doma com Diapason",
+                    "instruction": "Use o Diapason no Crystal Wolf até domar a montaria.",
+                    "city": "Shadowthorn"
+                }
+            ]
+        },
+        {
+            "id": "mount_donkey",
+            "name": "Donkey (Burrinho)",
+            "category": "mount",
+            "level": 10,
+            "iconItem": 13295,
+            "tameItem": "Carrot on a Stick",
+            "tameCreature": "Donkey",
+            "city": "Thais",
+            "description": "Use a cenoura na vara para domar o humilde e fiel Burro.",
+            "coords": {
+                "x": 32398,
+                "y": 32185,
+                "z": 7
+            },
+            "requiredItems": [
+                {
+                    "id": 13295,
+                    "name": "Carrot on a Stick",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Transformar em Burro ou Usar Alavanca",
+                    "instruction": "Puxe a alavanca da fazenda de Thais / Venore para transformar goblins em Donkey.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32398,
+                        "y": 32185,
+                        "z": 7
+                    }
+                },
+                {
+                    "step": 2,
+                    "title": "Usar Carrot on a Stick",
+                    "instruction": "Clique com o botão direito na Carrot on a Stick e use no Donkey.",
+                    "city": "Thais"
+                }
+            ]
+        },
+        {
+            "id": "mount_stampor",
+            "name": "Stampor (Elefante Fóssil)",
+            "category": "mount",
+            "level": 70,
+            "iconItem": 13294,
+            "tameItem": "Harness (Ferraduras e Couro)",
+            "tameCreature": "Stampor",
+            "city": "Svargrond",
+            "description": "Crie um arreio ancestral e monte no poderoso Stampor.",
+            "coords": {
+                "x": 32150,
+                "y": 31100,
+                "z": 9
+            },
+            "requiredItems": [
+                {
+                    "id": 13294,
+                    "name": "Harness",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Encontrar Stampors",
+                    "instruction": "Desça nas cavernas subterrâneas de Svargrond ou Muggy Plains.",
+                    "city": "Svargrond",
+                    "targetCoords": {
+                        "x": 32150,
+                        "y": 31100,
+                        "z": 9
+                    }
+                }
+            ]
+        },
+        {
+            "id": "mount_ursagrodon",
+            "name": "Ursagrodon (Urso Glacial)",
+            "category": "mount",
+            "level": 80,
+            "iconItem": 20138,
+            "tameItem": "Melting Horn",
+            "tameCreature": "Frozen Ursagrodon",
+            "city": "Svargrond (Chyllfroest)",
+            "description": "Descongele o urso pré-histórico preso no gelo de Chyllfroest com a trombeta mágica.",
+            "coords": {
+                "x": 32000,
+                "y": 31000,
+                "z": 7
+            },
+            "requiredItems": [
+                {
+                    "id": 20138,
+                    "name": "Melting Horn",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Localizar o Bloco de Gelo",
+                    "instruction": "Vá até o bloco de gelo onde o Ursagrodon está aprisionado.",
+                    "city": "Chyllfroest",
+                    "targetCoords": {
+                        "x": 32000,
+                        "y": 31000,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "mount_dromedary",
+            "name": "Dromedary (Camelo do Deserto)",
+            "category": "mount",
+            "level": 20,
+            "iconItem": 13538,
+            "tameItem": "Fist on a Stick / Dromedary Sceptre",
+            "tameCreature": "Dromedary",
+            "city": "Ankrahmun / Darashia",
+            "description": "Dome um dromedário ágil para cruzar as areias quentes do deserto.",
+            "coords": {
+                "x": 33150,
+                "y": 32400,
+                "z": 7
+            },
+            "requiredItems": [
+                {
+                    "id": 13538,
+                    "name": "Dromedary Sceptre",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Encontrar Dromedary",
+                    "instruction": "Procure os dromedários vagando pelas dunas fora de Ankrahmun ou Darashia.",
+                    "city": "Darashia",
+                    "targetCoords": {
+                        "x": 33150,
+                        "y": 32400,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "access_goroma",
+            "name": "Acesso a Goroma (Ilha do Vulcão)",
+            "category": "access",
+            "level": 50,
+            "iconItem": 6126,
+            "description": "Libere o navio naufragado para viajar até o vulcão de Goroma e Ramoa.",
+            "startNpc": "Jack Fate",
+            "city": "Liberty Bay",
+            "dialog": "hi > passage > goroma > yes",
+            "coords": {
+                "x": 32286,
+                "y": 32891,
+                "z": 12
+            },
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Naufrágio Proposital com Jack Fate",
+                    "npc": "Jack Fate",
+                    "city": "Liberty Bay",
+                    "dialog": "hi > passage > goroma > yes",
+                    "instruction": "Fale com Jack Fate no porto de Liberty Bay e compre uma passagem especial até naufragar na praia de Goroma.",
+                    "targetCoords": {
+                        "x": 32286,
+                        "y": 32891,
+                        "z": 12
+                    }
+                }
+            ]
+        },
+        {
+            "id": "access_meriana",
+            "name": "Acesso a Meriana & Laguna Islands",
+            "category": "access",
+            "level": 35,
+            "iconItem": 5899,
+            "description": "Missões de Eleonore e Raymond Striker para liberar viagem a Meriana e caça de Tartarugas.",
+            "startNpc": "Eleonore",
+            "city": "Liberty Bay",
+            "dialog": "hi > mission > yes",
+            "coords": {
+                "x": 32331,
+                "y": 32763,
+                "z": 10
+            },
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Falar com Eleonore",
+                    "npc": "Eleonore",
+                    "city": "Liberty Bay",
+                    "dialog": "hi > mission > yes",
+                    "instruction": "Visite Eleonore em sua mansão no norte de Liberty Bay.",
+                    "targetCoords": {
+                        "x": 32331,
+                        "y": 32763,
+                        "z": 10
+                    }
+                }
+            ]
+        },
+        {
+            "id": "access_yalahar_gates",
+            "name": "Acesso aos Portões de Yalahar (Gates & Quartéis)",
+            "category": "access",
+            "level": 80,
+            "iconItem": 9741,
+            "description": "Libera os portais e portas que conectam os distritos de Yalahar.",
+            "startNpc": "Palimuth",
+            "city": "Yalahar",
+            "dialog": "hi > mission > pass > yes",
+            "coords": {
+                "x": 13962,
+                "y": 14023,
+                "z": 14
+            },
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Falar com Palimuth",
+                    "npc": "Palimuth",
+                    "city": "Yalahar",
+                    "dialog": "hi > mission > pass > yes",
+                    "instruction": "Fale com Palimuth na entrada sul de Yalahar para receber o passe dos primeiros distritos.",
+                    "targetCoords": {
+                        "x": 13962,
+                        "y": 14023,
+                        "z": 14
+                    }
+                }
+            ]
+        },
+        {
+            "id": "access_feyrist",
+            "name": "Acesso a Feyrist (Ilha das Fadas)",
+            "category": "access",
+            "level": 60,
+            "iconItem": 28243,
+            "description": "Threatened Dreams Quest: Conecte o santuário de Thais a Feyrist.",
+            "startNpc": "Maelyrra",
+            "city": "Ab'Dendriel",
+            "dialog": "hi > mission > feyrist > yes",
+            "coords": {
+                "x": 33485,
+                "y": 32236,
+                "z": 14
+            },
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Threatened Dreams Mission 1",
+                    "npc": "Maelyrra",
+                    "city": "Ab'Dendriel",
+                    "dialog": "hi > mission > yes",
+                    "instruction": "Encontre a fada Maelyrra na floresta ao norte de Ab'Dendriel.",
+                    "targetCoords": {
+                        "x": 33485,
+                        "y": 32236,
+                        "z": 14
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_postman",
+            "name": "The Postman Missions Quest",
+            "category": "quest",
+            "level": 20,
+            "iconItem": 2331,
+            "description": "Desconto em viagens de barco e tapete, além do uso de caixas de correio protegidas por chave.",
+            "startNpc": "Kevin",
+            "city": "Thais (Post Office)",
+            "coords": {
+                "x": 32568,
+                "y": 32018,
+                "z": 12
+            },
+            "dialog": "hi > mission > yes",
+            "requiredItems": [
+                {
+                    "id": 2331,
+                    "name": "Parcel",
+                    "count": 1
+                },
+                {
+                    "id": 2330,
+                    "name": "Letter",
+                    "count": 1
+                },
+                {
+                    "id": 2596,
+                    "name": "Present",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Missão 1: Chapéu do Correio & Juramento",
+                    "npc": "Kevin",
+                    "city": "Thais / Kazordoon Post Office",
+                    "dialog": "hi > mission > advance > yes",
+                    "instruction": "Fale com Kevin na central dos correios entre Thais e Kazordoon.",
+                    "targetCoords": {
+                        "x": 32568,
+                        "y": 32018,
+                        "z": 12
+                    }
+                },
+                {
+                    "step": 2,
+                    "title": "Missão 2: Entregar a Carta em Kazordoon",
+                    "npc": "Kroox",
+                    "city": "Kazordoon",
+                    "dialog": "hi > parcel > yes",
+                    "instruction": "Entregue o pacote especial para o ferreiro Kroox na entrada de Kazordoon.",
+                    "targetCoords": {
+                        "x": 32651,
+                        "y": 31887,
+                        "z": 18
+                    }
+                },
+                {
+                    "step": 3,
+                    "title": "Missão 3: Mensagem Secreta para Markwin (Mintwallin)",
+                    "npc": "Markwin",
+                    "city": "Mintwallin",
+                    "dialog": "hi > letter > yes",
+                    "instruction": "Viaje pelas profundezas de Thais até a cidade dos minotauros (Mintwallin) e fale com o Rei Markwin.",
+                    "targetCoords": {
+                        "x": 32416,
+                        "y": 32145,
+                        "z": 30
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_inquisition",
+            "name": "The Inquisition Quest",
+            "category": "quest",
+            "level": 100,
+            "iconItem": 8889,
+            "description": "Acesso aos 7 selos do inferno, atalhos de teleporte e Demon Hunter Outfit / armas sagradas.",
+            "startNpc": "Henricus",
+            "city": "Thais",
+            "coords": {
+                "x": 32316,
+                "y": 32267,
+                "z": 16
+            },
+            "dialog": "hi > inquisition > mission > yes",
+            "requiredItems": [
+                {
+                    "id": 7494,
+                    "name": "Vampire Lord Token",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "O Juramento da Inquisição",
+                    "npc": "Henricus",
+                    "city": "Thais",
+                    "dialog": "hi > inquisition > mission > yes",
+                    "instruction": "Fale com Henricus no castelo de Thais e aceite a missão de expurgar o mal.",
+                    "targetCoords": {
+                        "x": 32316,
+                        "y": 32267,
+                        "z": 16
+                    }
+                },
+                {
+                    "step": 2,
+                    "title": "Investigação em Carlin & Femor Hills",
+                    "npc": "Walter, The Guard",
+                    "city": "Carlin",
+                    "dialog": "hi > inquisition > yes",
+                    "instruction": "Interrogue o guarda no portão sul de Carlin.",
+                    "targetCoords": {
+                        "x": 32338,
+                        "y": 32277,
+                        "z": 14
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_poi",
+            "name": "Pits of Inferno (PoI)",
+            "category": "quest",
+            "level": 80,
+            "iconItem": 2520,
+            "description": "Os 7 tronos da Nightmare Knights. Recompensa: Soft Boots, Backpack of Holding e arma lendária.",
+            "startNpc": "Avar Tar",
+            "city": "Edron",
+            "coords": {
+                "x": 33251,
+                "y": 31763,
+                "z": 14
+            },
+            "dialog": "hi > pits of inferno > yes",
+            "requiredItems": [
+                {
+                    "id": 2175,
+                    "name": "Holy Orchid",
+                    "count": 1
+                }
+            ],
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Entrada em Necrantis (Plains of Havoc)",
+                    "instruction": "Desça na tumba secreta na Catedral das Trevas / PoH e passe pela barreira de pedras.",
+                    "city": "Plains of Havoc",
+                    "targetCoords": {
+                        "x": 32800,
+                        "y": 32230,
+                        "z": 8
+                    }
+                },
+                {
+                    "step": 2,
+                    "title": "Os 7 Tronos dos Ruthless Seven",
+                    "instruction": "Toque nos 7 tronos (Infernatil, Tafariel, Verminor, Apocalypse, Bazir, Ashfalor, Pumin).",
+                    "city": "Pits of Inferno"
+                }
+            ]
+        },
+        {
+            "id": "quest_banshee",
+            "name": "The Queen of the Banshees (The 7 Seals)",
+            "category": "quest",
+            "level": 60,
+            "iconItem": 2197,
+            "description": "Resolva os 7 selos místicos das Banshees em Ghostlands. Recompensa: Boots of Haste e Stealth Ring.",
+            "startNpc": "The Queen of the Banshees",
+            "city": "Ghostlands (Carlin)",
+            "coords": {
+                "x": 32260,
+                "y": 31850,
+                "z": 12
+            },
+            "dialog": "hi > seal > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Selo 1: The Hidden Seal",
+                    "instruction": "Desça em Ghostlands e quebre o primeiro selo nas profundezas.",
+                    "city": "Ghostlands",
+                    "targetCoords": {
+                        "x": 32260,
+                        "y": 31850,
+                        "z": 12
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_annihilator",
+            "name": "The Annihilator Quest",
+            "category": "quest",
+            "level": 100,
+            "iconItem": 2494,
+            "description": "A mais icônica quest do Tibia: 4 jogadores enfrentam 6 Demons em uma sala claustrofóbica.",
+            "startNpc": "Hero Cave Entrance",
+            "city": "Edron",
+            "coords": {
+                "x": 33200,
+                "y": 31660,
+                "z": 13
+            },
+            "dialog": "Puxe a alavanca com seu time de 4 jogadores no level 100+.",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "A Alavanca da Morte",
+                    "instruction": "Organize 4 guerreiros nos 4 pisos e acione a alavanca para entrar na câmara dos Demons.",
+                    "city": "Edron (Hero Cave)",
+                    "targetCoords": {
+                        "x": 33200,
+                        "y": 31660,
+                        "z": 13
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_djinn_war",
+            "name": "The Djinn War (Green vs Blue)",
+            "category": "quest",
+            "level": 40,
+            "iconItem": 2148,
+            "description": "Escolha seu lado na guerra milenar: Marid (Azul - Haroun) ou Efreet (Verde - Yaman) para negociar itens valiosos.",
+            "startNpc": "Melchior",
+            "city": "Ankrahmun",
+            "coords": {
+                "x": 33142,
+                "y": 32817,
+                "z": 14
+            },
+            "dialog": "hi > djinn > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Falar com o Mendigo Cego Melchior",
+                    "npc": "Melchior",
+                    "city": "Ankrahmun",
+                    "dialog": "hi > djinn > word > yes",
+                    "instruction": "Fale com Melchior em Ankrahmun para aprender a palavra secreta \"DJANNI'HAH\".",
+                    "targetCoords": {
+                        "x": 33142,
+                        "y": 32817,
+                        "z": 14
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_thieves_guild",
+            "name": "The Thieves Guild Quest",
+            "category": "quest",
+            "level": 30,
+            "iconItem": 8704,
+            "description": "Aprenda as artes do furto com Dorian e ganhe acesso ao Black Market.",
+            "startNpc": "Dorian",
+            "city": "Thais",
+            "coords": {
+                "x": 32318,
+                "y": 32209,
+                "z": 16
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Entrar no Esconderijo dos Ladrões",
+                    "npc": "Dorian",
+                    "city": "Thais (Esgoto Sul)",
+                    "dialog": "hi > mission > yes",
+                    "instruction": "Desça no esgoto sul de Thais e fale com o chefe Dorian.",
+                    "targetCoords": {
+                        "x": 32318,
+                        "y": 32209,
+                        "z": 16
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_explorer_society",
+            "name": "The Explorer Society Quest",
+            "category": "quest",
+            "level": 30,
+            "iconItem": 4872,
+            "description": "Torne-se um explorador de renome, libere os teleports astrais e descubra terras exóticas.",
+            "startNpc": "Lurgor",
+            "city": "Thais / Port Hope",
+            "coords": {
+                "x": 32330,
+                "y": 32270,
+                "z": 7
+            },
+            "dialog": "hi > join > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Juntar-se à Sociedade dos Exploradores",
+                    "npc": "Lurgor",
+                    "city": "Thais",
+                    "dialog": "hi > join > yes",
+                    "instruction": "Fale com Lurgor no quartel dos exploradores em Thais.",
+                    "targetCoords": {
+                        "x": 32330,
+                        "y": 32270,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_wrath_emperor",
+            "name": "Wrath of the Emperor Quest",
+            "category": "quest",
+            "level": 130,
+            "iconItem": 12644,
+            "description": "Derrube a tirania do Imperador Dragão em Zao e conquiste os melhores equipamentos do jogo.",
+            "startNpc": "Zalamon",
+            "city": "Farmine (Muggy Plains)",
+            "coords": {
+                "x": 33354,
+                "y": 31410,
+                "z": 16
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "O Pacto dos Lagartos Rebeldes",
+                    "npc": "Zalamon",
+                    "city": "Muggy Plains",
+                    "dialog": "hi > mission > yes",
+                    "instruction": "Atravesse a montanha de Farmine e encontre o sábio Zalamon.",
+                    "targetCoords": {
+                        "x": 33354,
+                        "y": 31410,
+                        "z": 16
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_queen_of_the_banshees",
+            "name": "The Queen of the Banshees",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Queen of the Banshees. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Queen of the Banshees",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Queen of the Banshees.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_paradox_tower",
+            "name": "The Paradox Tower",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Paradox Tower. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Paradox Tower",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Paradox Tower.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_spike_task",
+            "name": "Spike Task",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Spike Task. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Spike Task",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Spike Task.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_a_fathers_burden",
+            "name": "A Father's Burden",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de A Father's Burden. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de A Father's Burden",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de A Father's Burden.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_bigfoots_burden",
+            "name": "Bigfoot's Burden",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Bigfoot's Burden. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Bigfoot's Burden",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Bigfoot's Burden.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_children_of_the_revolution",
+            "name": "Children of the Revolution",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Children of the Revolution. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Children of the Revolution",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Children of the Revolution.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_factions",
+            "name": "Factions",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Factions. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Factions",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Factions.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_friends_and_traders",
+            "name": "Friends and Traders",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Friends and Traders. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Friends and Traders",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Friends and Traders.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_hot_cuisine",
+            "name": "Hot Cuisine",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Hot Cuisine. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Hot Cuisine",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Hot Cuisine.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_in_service_of_yalahar",
+            "name": "In Service of Yalahar",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de In Service of Yalahar. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de In Service of Yalahar",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de In Service of Yalahar.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_killing_in_the_name_of",
+            "name": "Killing in the Name of...",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Killing in the Name of.... Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Killing in the Name of...",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Killing in the Name of....",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_outfit_and_addon_quests",
+            "name": "Outfit and Addon Quests",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Outfit and Addon Quests. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Outfit and Addon Quests",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Outfit and Addon Quests.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_sams_old_backpack",
+            "name": "Sam's Old Backpack",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Sam's Old Backpack. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Sam's Old Backpack",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Sam's Old Backpack.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_sea_of_light",
+            "name": "Sea of Light",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Sea of Light. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Sea of Light",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Sea of Light.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_secret_service",
+            "name": "Secret Service",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Secret Service. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Secret Service",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Secret Service.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_ancient_tombs",
+            "name": "The Ancient Tombs",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Ancient Tombs. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Ancient Tombs",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Ancient Tombs.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_ape_city",
+            "name": "The Ape City",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Ape City. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Ape City",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Ape City.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_beginning",
+            "name": "The Beginning",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Beginning. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Beginning",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Beginning.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_djinn_war__efreet_faction",
+            "name": "The Djinn War - Efreet Faction",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Djinn War - Efreet Faction. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Djinn War - Efreet Faction",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Djinn War - Efreet Faction.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_djinn_war__marid_faction",
+            "name": "The Djinn War - Marid Faction",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Djinn War - Marid Faction. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Djinn War - Marid Faction",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Djinn War - Marid Faction.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_hidden_city_of_beregar",
+            "name": "The Hidden City of Beregar",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Hidden City of Beregar. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Hidden City of Beregar",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Hidden City of Beregar.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_ice_islands_quest",
+            "name": "The Ice Islands Quest",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Ice Islands Quest. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Ice Islands Quest",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Ice Islands Quest.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_inquisition",
+            "name": "The Inquisition",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Inquisition. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Inquisition",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Inquisition.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_postman_missions",
+            "name": "The Postman Missions",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Postman Missions. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Postman Missions",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Postman Missions.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_shattered_isles",
+            "name": "The Shattered Isles",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Shattered Isles. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Shattered Isles",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Shattered Isles.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_thieves_guild",
+            "name": "The Thieves Guild",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Thieves Guild. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Thieves Guild",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Thieves Guild.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_travelling_trader_quest",
+            "name": "The Travelling Trader Quest",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Travelling Trader Quest. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Travelling Trader Quest",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Travelling Trader Quest.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_explorer_society",
+            "name": "The Explorer Society",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Explorer Society. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Explorer Society",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Explorer Society.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_ultimate_challenges",
+            "name": "The Ultimate Challenges",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Ultimate Challenges. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Ultimate Challenges",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Ultimate Challenges.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_white_raven_monastery",
+            "name": "The White Raven Monastery",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The White Raven Monastery. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The White Raven Monastery",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The White Raven Monastery.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_tibia_tales",
+            "name": "Tibia Tales",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Tibia Tales. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Tibia Tales",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Tibia Tales.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_unnatural_selection",
+            "name": "Unnatural Selection",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Unnatural Selection. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Unnatural Selection",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Unnatural Selection.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_what_a_foolish_quest",
+            "name": "What a foolish Quest",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de What a foolish Quest. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de What a foolish Quest",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de What a foolish Quest.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_wrath_of_the_emperor",
+            "name": "Wrath of the Emperor",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Wrath of the Emperor. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Wrath of the Emperor",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Wrath of the Emperor.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_oramond",
+            "name": "Oramond",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Oramond. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Oramond",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Oramond.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_forgotten_knowledge",
+            "name": "Forgotten Knowledge",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Forgotten Knowledge. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Forgotten Knowledge",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Forgotten Knowledge.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_first_dragon",
+            "name": "The First Dragon",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The First Dragon. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The First Dragon",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The First Dragon.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_cults_of_tibia",
+            "name": "Cults of Tibia",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Cults of Tibia. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Cults of Tibia",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Cults of Tibia.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_dangerous_depths",
+            "name": "Dangerous Depths",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Dangerous Depths. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Dangerous Depths",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Dangerous Depths.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_adventurers_guild",
+            "name": "Adventurers Guild",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Adventurers Guild. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Adventurers Guild",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Adventurers Guild.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_dawnport",
+            "name": "Dawnport",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Dawnport. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Dawnport",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Dawnport.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_rookie_guard",
+            "name": "The Rookie Guard",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Rookie Guard. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Rookie Guard",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Rookie Guard.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_new_frontier",
+            "name": "The New Frontier",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The New Frontier. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The New Frontier",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The New Frontier.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_spirithunters_quest",
+            "name": "Spirithunters Quest",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Spirithunters Quest. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Spirithunters Quest",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Spirithunters Quest.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_threatened_dreams",
+            "name": "Threatened Dreams",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Threatened Dreams. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Threatened Dreams",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Threatened Dreams.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_blood_brothers",
+            "name": "Blood Brothers",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Blood Brothers. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Blood Brothers",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Blood Brothers.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_grave_danger",
+            "name": "Grave Danger",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Grave Danger. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Grave Danger",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Grave Danger.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_outlaw_camp",
+            "name": "The Outlaw Camp",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Outlaw Camp. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Outlaw Camp",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Outlaw Camp.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_secret_library",
+            "name": "The Secret Library",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Secret Library. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Secret Library",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Secret Library.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_dream_courts",
+            "name": "The Dream Courts",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Dream Courts. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Dream Courts",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Dream Courts.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_no_rest_for_the_wicked",
+            "name": "No Rest for the Wicked",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de No Rest for the Wicked. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de No Rest for the Wicked",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de No Rest for the Wicked.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_way_of_the_monk",
+            "name": "The Way of the Monk",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Way of the Monk. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Way of the Monk",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Way of the Monk.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_bloody_tusks_quest",
+            "name": "Bloody Tusks Quest",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de Bloody Tusks Quest. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de Bloody Tusks Quest",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de Bloody Tusks Quest.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        },
+        {
+            "id": "quest_the_order_of_the_lion",
+            "name": "The Order of the Lion",
+            "category": "quest",
+            "level": 50,
+            "iconItem": 1988,
+            "description": "Missão oficial de The Order of the Lion. Consulte o guia de missões no seu Quest Log.",
+            "startNpc": "Templo Central",
+            "city": "Thais",
+            "coords": {
+                "x": 32369,
+                "y": 32241,
+                "z": 7
+            },
+            "dialog": "hi > mission > yes",
+            "steps": [
+                {
+                    "step": 1,
+                    "title": "Início de The Order of the Lion",
+                    "instruction": "Abra seu Quest Log para verificar os passos ativos de The Order of the Lion.",
+                    "city": "Thais",
+                    "targetCoords": {
+                        "x": 32369,
+                        "y": 32241,
+                        "z": 7
+                    }
+                }
+            ]
+        }
+    ],
+    "total": 83
+}

@@ -1960,7 +1960,9 @@ function idleMonsterKillEvent.onKill(player, target)
 	session.droppedCounts = session.droppedCounts or {}
 
 	for _, l in ipairs(hunt.lootTable) do
-		if math.random(1, 100) <= l.chance then
+		-- Modo IDLE: 50% de Taxa de Drop (Anti-inflação e respeito ao jogo manual)
+		local idleChance = math.max(1, math.floor(l.chance * 0.5))
+		if math.random(1, 100) <= idleChance then
 			local count = math.random(l.countMin or 1, l.countMax or 1)
 			if l.isMoney then
 				local earned = count * l.price

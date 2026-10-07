@@ -1017,7 +1017,6 @@ function idleHuntController:onInit()
 		self:setupTopMenuButton()
 		self:setupDashboardUI()
 		self:setupCatalogUI()
-		self:setupDetailsUI()
 	end
 
 	if g_game.isOnline() then
@@ -1177,6 +1176,34 @@ end
 -- =========================================================================
 -- 2. SETUP TELA 2: CATALOGO (7 MASMORRAS BASE)
 -- =========================================================================
+local function updateFilterSidebarButtons(cView)
+	if not cView or not cView.filterSidebar then return end
+	local sb = cView.filterSidebar
+
+	local function styleBtn(btn, isActive, activeColor)
+		if not btn then return end
+		if isActive then
+			btn:setColor(activeColor or "#00ff88")
+		else
+			btn:setColor("#e0e0e0")
+		end
+	end
+
+	styleBtn(sb.filterObjAll, activeObjectiveFilter == "all", "#ffd700")
+	styleBtn(sb.filterObjXp, activeObjectiveFilter == "xp", "#00ddff")
+	styleBtn(sb.filterObjProfit, activeObjectiveFilter == "profit", "#ffd700")
+	styleBtn(sb.filterObjItems, activeObjectiveFilter == "items", "#00ff88")
+
+	styleBtn(sb.filterCatImbuement, activeCategoryFilter == "imbuement", "#ff77ee")
+	styleBtn(sb.filterCatAddon, activeCategoryFilter == "addon", "#ffaa33")
+	styleBtn(sb.filterCatEquip, activeCategoryFilter == "equipment", "#ffffff")
+
+	styleBtn(sb.filterTierAll, activeTierFilter == "all", "#ffd700")
+	styleBtn(sb.filterTierEasy, activeTierFilter == "easy", "#00ff88")
+	styleBtn(sb.filterTierMed, activeTierFilter == "medium", "#ffcc00")
+	styleBtn(sb.filterTierHard, activeTierFilter == "hard", "#ff4444")
+end
+
 function idleHuntController:setupCatalogUI()
 	local cView = self.ui.catalogView
 	if not cView then return end
@@ -1194,8 +1221,72 @@ function idleHuntController:setupCatalogUI()
 		end
 	end
 
+	-- Conectar Filtros da Sidebar (Estilo Market)
+	local sb = cView.filterSidebar
+	if sb then
+		sb.filterObjAll.onClick = function()
+			activeObjectiveFilter = "all"
+			updateFilterSidebarButtons(cView)
+			self:filterHunts()
+		end
+		sb.filterObjXp.onClick = function()
+			activeObjectiveFilter = "xp"
+			updateFilterSidebarButtons(cView)
+			self:filterHunts()
+		end
+		sb.filterObjProfit.onClick = function()
+			activeObjectiveFilter = "profit"
+			updateFilterSidebarButtons(cView)
+			self:filterHunts()
+		end
+		sb.filterObjItems.onClick = function()
+			activeObjectiveFilter = "items"
+			updateFilterSidebarButtons(cView)
+			self:filterHunts()
+		end
+
+		sb.filterCatImbuement.onClick = function()
+			activeCategoryFilter = (activeCategoryFilter == "imbuement") and "all" or "imbuement"
+			updateFilterSidebarButtons(cView)
+			self:filterHunts()
+		end
+		sb.filterCatAddon.onClick = function()
+			activeCategoryFilter = (activeCategoryFilter == "addon") and "all" or "addon"
+			updateFilterSidebarButtons(cView)
+			self:filterHunts()
+		end
+		sb.filterCatEquip.onClick = function()
+			activeCategoryFilter = (activeCategoryFilter == "equipment") and "all" or "equipment"
+			updateFilterSidebarButtons(cView)
+			self:filterHunts()
+		end
+
+		sb.filterTierAll.onClick = function()
+			activeTierFilter = "all"
+			updateFilterSidebarButtons(cView)
+			self:filterHunts()
+		end
+		sb.filterTierEasy.onClick = function()
+			activeTierFilter = "easy"
+			updateFilterSidebarButtons(cView)
+			self:filterHunts()
+		end
+		sb.filterTierMed.onClick = function()
+			activeTierFilter = "medium"
+			updateFilterSidebarButtons(cView)
+			self:filterHunts()
+		end
+		sb.filterTierHard.onClick = function()
+			activeTierFilter = "hard"
+			updateFilterSidebarButtons(cView)
+			self:filterHunts()
+		end
+	end
+
+	updateFilterSidebarButtons(cView)
+
 	if cView.catalogTipBox and cView.catalogTipBox.tipText then
-		cView.catalogTipBox.tipText:setText(tr("Selecione uma masmorra e clique em [Configurar] para ajustar a dificuldade (Facil, Medio, Dificil) e itens de loot."))
+		cView.catalogTipBox.tipText:setText(tr("Busca Inteligente: Digite o nome de um monstro ou drop (ex: charm, leather, dragon shield), ou selecione os filtros ao lado."))
 	end
 end
 
@@ -1212,14 +1303,50 @@ function idleHuntController:filterHunts()
 	end
 
 	for _, theme in ipairs(DUNGEON_THEMES) do
-		local nameMatch = true
+		local matchesSearch = true
 		if searchText ~= "" then
 			local n = string.lower(theme.name)
 			local d = string.lower(theme.desc)
-			nameMatch = (string.find(n, searchText, 1, true) ~= nil or string.find(d, searchText, 1, true) ~= nil)
+			local tagMatch = false
+			if theme.tags then
+				for _, t in ipairs(theme.tags) do
+					if string.find(string.lower(t), searchText, 1, true) then
+						tagMatch = true
+						break
+					end
+				end
+			end
+			matchesSearch = (string.find(n, searchText, 1, true) ~= nil or string.find(d, searchText, 1, true) ~= nil or tagMatch)
 		end
 
-		if nameMatch then
+		local matchesObjective = true
+		if activeObjectiveFilter == "xp" then
+			matchesObjective = (theme.category == "xp" or string.find(theme.focus, "EXP") ~= nil or string.find(theme.focus, "Equilibrado") ~= nil)
+		elseif activeObjectiveFilter == "profit" then
+			matchesObjective = (theme.category == "profit" or string.find(theme.focus, "Loot") ~= nil or string.find(theme.focus, "Avancado") ~= nil)
+		elseif activeObjectiveFilter == "items" then
+			matchesObjective = (theme.category == "items" or table.contains(theme.tags or {}, "imbuement") or table.contains(theme.tags or {}, "addon"))
+		end
+
+		local matchesCategory = true
+		if activeCategoryFilter == "imbuement" then
+			matchesCategory = table.contains(theme.tags or {}, "imbuement")
+		elseif activeCategoryFilter == "addon" then
+			matchesCategory = table.contains(theme.tags or {}, "addon")
+		elseif activeCategoryFilter == "equipment" then
+			matchesCategory = (table.contains(theme.tags or {}, "sword") or table.contains(theme.tags or {}, "axe") or table.contains(theme.tags or {}, "club") or table.contains(theme.tags or {}, "shield") or table.contains(theme.tags or {}, "armor") or table.contains(theme.tags or {}, "helmet"))
+		end
+
+		local matchesTier = true
+		if activeTierFilter == "easy" then
+			matchesTier = (theme.level <= 15)
+		elseif activeTierFilter == "medium" then
+			matchesTier = (theme.level > 15 and theme.level <= 30)
+		elseif activeTierFilter == "hard" then
+			matchesTier = (theme.level > 30)
+		end
+
+		if matchesSearch and matchesObjective and matchesCategory and matchesTier then
 			local card = g_ui.createWidget("HuntCard", huntList)
 			if card then
 				if card.monsterFrame and card.monsterFrame.monsterCreature then
@@ -1234,6 +1361,21 @@ function idleHuntController:filterHunts()
 				card.focusTag:setText(theme.focus)
 				card.huntDesc:setText(theme.desc)
 				card.huntCost:setText(string.format("Nivel Minimo: %d", theme.level))
+
+				-- Preencher mini-vitrine de drops (Prey style)
+				if card.dropsShowcase and theme.topDrops then
+					for i = 1, 3 do
+						local dropW = card.dropsShowcase["dropItem" .. i]
+						local itemId = theme.topDrops[i]
+						if dropW and itemId then
+							dropW:setItemId(itemId)
+							local itInfo = ITEM_TAGS[itemId]
+							if itInfo then
+								dropW:setTooltip(string.format("%s (%s)", itInfo.name or "Item", string.upper(itInfo.category or "Drop")))
+							end
+						end
+					end
+				end
 
 				-- Melhor recorde da masmorra
 				local hEasy = self:getHuntById(theme.easyId)
@@ -1250,28 +1392,10 @@ function idleHuntController:filterHunts()
 				end
 
 				card.configButton.onClick = function()
-					self:showDetails(theme.id, "easy")
+					self:showDetails(theme.id)
 				end
 			end
 		end
-	end
-end
-
--- =========================================================================
--- 3. SETUP TELA 3: CONFIGURAR CACADA (2 COLUNAS: DIFICULDADE + LOOT COM CHECKBOX)
--- =========================================================================
-function idleHuntController:setupDetailsUI()
-	local dtView = self.ui.detailsView
-	if not dtView then return end
-
-	if dtView.detailsTopBar and dtView.detailsTopBar.backToCatalogBtn then
-		dtView.detailsTopBar.backToCatalogBtn.onClick = function()
-			self:switchView("catalog")
-		end
-	end
-
-	if dtView.detailsTipBox and dtView.detailsTipBox.tipText then
-		dtView.detailsTipBox.tipText:setText(tr("Selecione [PEGAR] para guardar na mochila ou [VENDER] para enviar o ouro direto ao banco."))
 	end
 end
 

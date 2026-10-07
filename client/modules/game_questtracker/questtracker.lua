@@ -248,24 +248,36 @@ local function updateGpsDisplay()
         table.insert(pathPoints, {x = px, y = py, z = playerPos.z})
     end
 
+    -- Screen map dimensions and camera position for pure math coordinate translation
+    local mapRect = mapPanel:getRect()
+    local dim = mapPanel:getVisibleDimension() or {width = 15, height = 11}
+    local cam = mapPanel:getCameraPosition() or playerPos
+    local tileW = mapRect.width / dim.width
+    local tileH = mapRect.height / dim.height
+    local cx = mapRect.x + (mapRect.width / 2)
+    local cy = mapRect.y + (mapRect.height / 2)
+
     -- Render Breadcrumb Dots on MapPanel tiles
     local dotIndex = 1
     for _, pt in ipairs(pathPoints) do
         if dotIndex > MAX_GPS_DOTS then break end
 
-        if mapPanel:isInRange(pt) then
-            local rect = mapPanel:getTileRect(pt)
-            if rect and rect.width and rect.width > 0 and rect.height and rect.height > 0 then
-                local dot = gpsDots[dotIndex]
-                if dot then
-                    local dotSize = (dotIndex == #pathPoints and dist <= 10) and 20 or 14
-                    dot:setSize({width = dotSize, height = dotSize})
-                    dot:setX(rect.x + math.floor((rect.width - dotSize) / 2))
-                    dot:setY(rect.y + math.floor((rect.height - dotSize) / 2))
-                    dot:show()
-                    dot:raise()
-                    dotIndex = dotIndex + 1
-                end
+        local diffX = pt.x - cam.x
+        local diffY = pt.y - cam.y
+        if math.abs(diffX) <= (dim.width / 2) + 0.5 and math.abs(diffY) <= (dim.height / 2) + 0.5 then
+            local dot = gpsDots[dotIndex]
+            if dot then
+                local screenX = cx + (diffX * tileW)
+                local screenY = cy + (diffY * tileH)
+                local dotSize = (dotIndex == #pathPoints and dist <= 10) and 20 or 14
+                dot:setSize({width = dotSize, height = dotSize})
+                dot:setPosition({
+                    x = math.floor(screenX - dotSize / 2),
+                    y = math.floor(screenY - dotSize / 2)
+                })
+                dot:show()
+                dot:raise()
+                dotIndex = dotIndex + 1
             end
         end
     end
@@ -275,21 +287,22 @@ local function updateGpsDisplay()
     end
 
     -- Render Target Beacon if target is visible on screen and on the same floor
-    if dz == 0 and mapPanel:isInRange(targetPos) then
-        local rect = mapPanel:getTileRect(targetPos)
-        if rect and rect.width and rect.width > 0 and rect.height and rect.height > 0 then
-            local bSize = 34
-            gpsBeacon:show()
-            gpsBeacon:setSize({width = bSize, height = bSize})
-            gpsBeacon:setX(rect.x + math.floor((rect.width - bSize) / 2))
-            gpsBeacon:setY(rect.y + math.floor((rect.height - bSize) / 2))
-            gpsBeacon:raise()
-            local lbl = gpsBeacon:getChildById('label')
-            if lbl then
-                lbl:setText(activeGuide.startNpc or activeGuide.name or 'Target')
-            end
-        else
-            gpsBeacon:hide()
+    local targetDiffX = targetPos.x - cam.x
+    local targetDiffY = targetPos.y - cam.y
+    if dz == 0 and math.abs(targetDiffX) <= (dim.width / 2) + 0.5 and math.abs(targetDiffY) <= (dim.height / 2) + 0.5 then
+        local bSize = 34
+        local screenX = cx + (targetDiffX * tileW)
+        local screenY = cy + (targetDiffY * tileH)
+        gpsBeacon:show()
+        gpsBeacon:setSize({width = bSize, height = bSize})
+        gpsBeacon:setPosition({
+            x = math.floor(screenX - bSize / 2),
+            y = math.floor(screenY - bSize / 2)
+        })
+        gpsBeacon:raise()
+        local lbl = gpsBeacon:getChildById('label')
+        if lbl then
+            lbl:setText(activeGuide.startNpc or activeGuide.name or 'Target')
         end
     else
         gpsBeacon:hide()
@@ -477,7 +490,7 @@ function questTracker.stopGps()
     updateTrackerMiniWindow()
     questTracker.refreshActiveCardHighlights()
     if modules.game_textmessage then
-        modules.game_textmessage.displayStatusConsole('[GPS Guide] Navigation stopped.')
+        modules.game_textmessage.displayStatusMessage('[GPS Guide] Navigation stopped.')
     end
 end
 
@@ -535,9 +548,6 @@ end
 local function createDetailsWindow()
     if questDetailsWindow then return end
     questDetailsWindow = g_ui.createWidget('QuestDetailsWindow', rootWidget)
-    if questDetailsWindow.centerIn then
-        questDetailsWindow:centerIn('parent')
-    end
     questDetailsWindow:hide()
 end
 
@@ -616,10 +626,10 @@ function questTracker.showDetails(guide)
             if content.loreText then
                 content.loreText:setText(guide.lore or guide.description or 'No lore available.')
             end
-            if content.dialogueBox and content.dialogueBox.dialogueText then
-                content.dialogueBox.dialogueText:setText(guide.dialogTranscript or 'Speak with the starting NPC to begin.')
-            elseif content.dialogueText then
+            if content.dialogueText then
                 content.dialogueText:setText(guide.dialogTranscript or 'Speak with the starting NPC to begin.')
+            elseif content.dialogueBox and content.dialogueBox.dialogueText then
+                content.dialogueBox.dialogueText:setText(guide.dialogTranscript or 'Speak with the starting NPC to begin.')
             end
 
             -- Rewards text (Clean formatting without mojibake)
@@ -642,7 +652,9 @@ function questTracker.showDetails(guide)
             if footer.btnDetailTrack then
                 footer.btnDetailTrack.onClick = function()
                     questTracker.setTrackedGuide(guide, false)
-                    modules.game_textmessage.displayStatusConsole(string.format('[Quest Tracker] Now tracking: %s on your map.', guide.name))
+                    if modules.game_textmessage then
+                        modules.game_textmessage.displayStatusMessage(string.format('[Quest Tracker] Now tracking: %s on your map.', guide.name))
+                    end
                 end
             end
             if footer.btnDetailGps then
@@ -652,7 +664,9 @@ function questTracker.showDetails(guide)
                     if guideExplorerWindow then
                         guideExplorerWindow:hide()
                     end
-                    modules.game_textmessage.displayStatusConsole(string.format('[GPS Guide] Navigating to %s in %s.', guide.startNpc or guide.name, guide.city or 'world'))
+                    if modules.game_textmessage then
+                        modules.game_textmessage.displayStatusMessage(string.format('[GPS Guide] Navigating to %s in %s.', guide.startNpc or guide.name, guide.city or 'world'))
+                    end
                 end
             end
         end
@@ -739,13 +753,17 @@ local function createGuideCard(guide)
             if guideExplorerWindow then
                 guideExplorerWindow:hide()
             end
-            modules.game_textmessage.displayStatusConsole(string.format('[GPS Guide] Navigating to %s in %s.', guide.startNpc or guide.name, guide.city or 'world'))
+            if modules.game_textmessage then
+                modules.game_textmessage.displayStatusMessage(string.format('[GPS Guide] Navigating to %s in %s.', guide.startNpc or guide.name, guide.city or 'world'))
+            end
         end
     end
 
     card.actionButtons.btnTrack.onClick = function()
         questTracker.setTrackedGuide(guide, false)
-        modules.game_textmessage.displayStatusConsole(string.format('[Quest Tracker] Now tracking: %s.', guide.name))
+        if modules.game_textmessage then
+            modules.game_textmessage.displayStatusMessage(string.format('[Quest Tracker] Now tracking: %s.', guide.name))
+        end
     end
 
     card.actionButtons.btnDetails.onClick = function()
@@ -806,9 +824,6 @@ end
 local function createExplorerWindow()
     if guideExplorerWindow then return end
     guideExplorerWindow = g_ui.createWidget('GuideExplorerWindow', rootWidget)
-    if guideExplorerWindow.centerIn then
-        guideExplorerWindow:centerIn('parent')
-    end
     guideExplorerWindow:hide()
 
     -- Connect Explorer Search & Category Filters
@@ -834,6 +849,9 @@ local function createExplorerWindow()
 end
 
 function questTracker.showExplorer()
+    if not guidesDatabase or not guidesDatabase.entries or #guidesDatabase.entries == 0 then
+        loadDatabase()
+    end
     createExplorerWindow()
     if not guideExplorerWindow then return end
     guideExplorerWindow:show()

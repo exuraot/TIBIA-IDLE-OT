@@ -458,7 +458,6 @@ QuestDetailsWindow < MainWindow
     vertical-scrollbar: detailScrollBar
     layout:
       type: verticalBox
-      fit-children: true
 
     Label
       id: loreTitle
@@ -473,6 +472,7 @@ QuestDetailsWindow < MainWindow
       color: #cccccc
       margin-top: 4
       text-wrap: true
+      text-auto-resize: true
 
     Label
       id: dialogueTitle
@@ -481,22 +481,17 @@ QuestDetailsWindow < MainWindow
       color: #ffd700
       margin-top: 10
 
-    Panel
-      id: dialogueBox
+    Label
+      id: dialogueText
+      font: verdana-11px-rounded
+      color: #00ffcc
       background-color: #0f141c
       border-width: 1
       border-color: #253242
       padding: 8
       margin-top: 4
-      layout:
-        type: verticalBox
-        fit-children: true
-
-      Label
-        id: dialogueText
-        font: verdana-11px-rounded
-        color: #00ffcc
-        text-wrap: true
+      text-wrap: true
+      text-auto-resize: true
 
     Label
       id: rewardsTitle
@@ -511,6 +506,7 @@ QuestDetailsWindow < MainWindow
       color: #88ff88
       margin-top: 4
       text-wrap: true
+      text-auto-resize: true
 
 GpsOverlay < Panel
   anchors.fill: parent

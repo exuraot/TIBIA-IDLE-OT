@@ -104,6 +104,16 @@ local function hideGpsVisuals()
     if gpsBeacon then gpsBeacon:hide() end
     if gpsTopBanner then gpsTopBanner:hide() end
     if gpsEdgeArrow then gpsEdgeArrow:hide() end
+    if questMinimapMarker then questMinimapMarker:hide() end
+    pcall(function()
+        local mm = modules.game_minimap and (
+            (modules.game_minimap.getMiniMapUi and modules.game_minimap.getMiniMapUi()) or
+            (modules.game_minimap.mapController and modules.game_minimap.mapController.ui and modules.game_minimap.mapController.ui.minimapBorder and modules.game_minimap.mapController.ui.minimapBorder.minimap)
+        )
+        if mm and mm.setCrossPosition then
+            mm:setCrossPosition(nil)
+        end
+    end)
 end
 
 --[[=================================================
@@ -111,27 +121,99 @@ end
 =================================================== ]]
 local function updateMinimapMarker(pos, guide)
     pcall(function()
-        if not modules.game_minimap or not modules.game_minimap.mapController then return end
-        local mm = modules.game_minimap.mapController.ui.minimapBorder.minimap
+        local mm = modules.game_minimap and (
+            (modules.game_minimap.getMiniMapUi and modules.game_minimap.getMiniMapUi()) or
+            (modules.game_minimap.mapController and modules.game_minimap.mapController.ui and modules.game_minimap.mapController.ui.minimapBorder and modules.game_minimap.mapController.ui.minimapBorder.minimap)
+        )
         if not mm then return end
 
-        -- Always clear old marker first (Ensures single active marker)
-        if questMinimapMarker then
-            questMinimapMarker:destroy()
-            questMinimapMarker = nil
+        if not pos or not guide then
+            if questMinimapMarker then
+                questMinimapMarker:hide()
+            end
+            if mm.setCrossPosition then
+                mm:setCrossPosition(nil)
+            end
+            return
         end
 
-        if not pos or not guide then return end
+        if not questMinimapMarker then
+            questMinimapMarker = g_ui.createWidget('GpsMinimapMarker', mm)
+        end
 
-        -- Create dedicated pulsating quest marker widget on minimap
-        questMinimapMarker = g_ui.createWidget('UIWidget', mm)
-        questMinimapMarker:setSize({width = 18, height = 18})
-        questMinimapMarker:setImageSource('/images/topbuttons/icon-questtracker-widget')
-        questMinimapMarker:setTooltip(string.format('%s\nNPC: %s (%s)', guide.name or 'Quest', guide.startNpc or 'Objective', guide.city or 'World'))
-        questMinimapMarker:setPhantom(false)
+        local player = g_game.getLocalPlayer()
+        local playerPos = player and player:getPosition()
+        local mmRect = mm:getRect()
+        local mmW = (mmRect and mmRect.width > 20) and mmRect.width or 106
+        local mmH = (mmRect and mmRect.height > 20) and mmRect.height or 106
+        local cx = mmW / 2
+        local cy = mmH / 2
 
-        mm:centerInPosition(questMinimapMarker, pos)
+        if playerPos then
+            local dx = pos.x - playerPos.x
+            local dy = pos.y - playerPos.y
+            local scale = (mm.getScale and mm:getScale()) or 1
+            if scale > 1 then scale = 1 end
+
+            local px = dx * scale
+            local py = dy * scale
+            local margin = 12
+            local maxX = cx - margin
+            local maxY = cy - margin
+
+            if math.abs(px) <= maxX and math.abs(py) <= maxY and pos.z == playerPos.z then
+                questMinimapMarker:setPosition({
+                    x = math.floor(mmRect.x + cx + px - 10),
+                    y = math.floor(mmRect.y + cy + py - 10)
+                })
+            else
+                local angle = math.atan2(dy, dx)
+                local edgeX = math.cos(angle) * maxX
+                local edgeY = math.sin(angle) * maxY
+
+                if math.abs(edgeX) > maxX then
+                    edgeX = (edgeX > 0 and maxX or -maxX)
+                    edgeY = edgeX * math.tan(angle)
+                end
+                if math.abs(edgeY) > maxY then
+                    edgeY = (edgeY > 0 and maxY or -maxY)
+                    edgeX = edgeY / math.tan(angle)
+                end
+
+                questMinimapMarker:setPosition({
+                    x = math.floor(mmRect.x + cx + edgeX - 10),
+                    y = math.floor(mmRect.y + cy + edgeY - 10)
+                })
+            end
+
+            local dist = math.floor(math.sqrt(dx * dx + dy * dy))
+            local dirStr = getCompassDirection(dx, dy)
+            questMinimapMarker:setTooltip(string.format('%s\nTarget: %s (%s)\nDistance: %dm [%s]', guide.name or 'Quest', guide.startNpc or 'Objective', guide.city or 'World', dist, dirStr))
+            questMinimapMarker:show()
+            questMinimapMarker:raise()
+
+            if mm.setCrossPosition and pos.z == playerPos.z then
+                mm:setCrossPosition(pos)
+            end
+            if mm.addFlag then
+                mm:addFlag(pos, 11, guide.name, true)
+            end
+        end
     end)
+end
+
+local function getNextStepPos(pos, dir)
+    local p = {x = pos.x, y = pos.y, z = pos.z}
+    if dir == North then p.y = p.y - 1
+    elseif dir == East then p.x = p.x + 1
+    elseif dir == South then p.y = p.y + 1
+    elseif dir == West then p.x = p.x - 1
+    elseif dir == NorthEast then p.x = p.x + 1; p.y = p.y - 1
+    elseif dir == SouthEast then p.x = p.x + 1; p.y = p.y + 1
+    elseif dir == SouthWest then p.x = p.x - 1; p.y = p.y + 1
+    elseif dir == NorthWest then p.x = p.x - 1; p.y = p.y - 1
+    end
+    return p
 end
 
 local function updateGpsDisplay()
@@ -190,29 +272,13 @@ local function updateGpsDisplay()
         end
     end
 
-    -- Update Top Banner
+    -- Keep top banner hidden to preserve clean, uncluttered game view
     if gpsTopBanner then
-        gpsTopBanner:show()
-        gpsTopBanner:raise()
-        if gpsTopBanner.targetLabel then
-            gpsTopBanner.targetLabel:setText(string.format('Navigating: %s (%s)', activeGuide.startNpc or activeGuide.name, activeGuide.city or 'World'))
-        end
-        if gpsTopBanner.distanceLabel then
-            gpsTopBanner.distanceLabel:setText(string.format('%dm [%s]', dist, dirStr))
-        end
-        if gpsTopBanner.floorLabel then
-            if dz == 0 then
-                gpsTopBanner.floorLabel:setText('[Same Floor]')
-                gpsTopBanner.floorLabel:setColor('#00ff88')
-            elseif dz > 0 then
-                gpsTopBanner.floorLabel:setText(string.format('[Down %d fl]', dz))
-                gpsTopBanner.floorLabel:setColor('#ffaa00')
-            else
-                gpsTopBanner.floorLabel:setText(string.format('[Up %d fl]', math.abs(dz)))
-                gpsTopBanner.floorLabel:setColor('#ffaa00')
-            end
-        end
+        gpsTopBanner:hide()
     end
+
+    -- Update minimap marker and compass edge pointer
+    updateMinimapMarker(targetPos, activeGuide)
 
     -- Check if arrived at exact position
     if dist <= 1 and dz == 0 then
@@ -226,7 +292,7 @@ local function updateGpsDisplay()
         return
     end
 
-    -- Ensure GPS Overlay exists and is raised
+    -- Ensure GPS Overlay exists
     if not gpsOverlay then
         initGpsOverlay()
     end
@@ -235,20 +301,82 @@ local function updateGpsDisplay()
         gpsOverlay:raise()
     end
 
-    -- Always calculate local breadcrumb points on player's current floor towards target (x,y)
+    -- Intelligent Pathfinding: Curve around buildings & walls using walkable map tiles
     local pathPoints = {}
-    local norm = math.sqrt(dx * dx + dy * dy)
-    local udx = norm > 0 and (dx / norm) or 0
-    local udy = norm > 0 and (dy / norm) or 0
+    local foundPath = false
 
-    local stepsToDraw = math.min(dist, MAX_GPS_DOTS)
-    for i = 1, stepsToDraw do
-        local px = math.floor(playerPos.x + udx * i + 0.5)
-        local py = math.floor(playerPos.y + udy * i + 0.5)
-        table.insert(pathPoints, {x = px, y = py, z = playerPos.z})
+    if dist <= 14 and dz == 0 then
+        local dirs, result = g_map.findPath(playerPos, targetPos, 150, 0)
+        if dirs and #dirs > 0 then
+            local curr = {x = playerPos.x, y = playerPos.y, z = playerPos.z}
+            for _, d in ipairs(dirs) do
+                curr = getNextStepPos(curr, d)
+                local t = g_map.getTile(curr)
+                if t and t:isWalkable() then
+                    table.insert(pathPoints, curr)
+                end
+            end
+            foundPath = true
+        end
     end
 
-    -- Screen map dimensions and camera position for pure math coordinate translation
+    if not foundPath then
+        local norm = math.sqrt(dx * dx + dy * dy)
+        local udx = norm > 0 and (dx / norm) or 0
+        local udy = norm > 0 and (dy / norm) or 0
+        local baseAngle = math.atan2(udy, udx)
+
+        local angleOffsets = {0, 0.25, -0.25, 0.5, -0.5, 0.75, -0.75, 1.0, -1.0}
+        local bestDirs = nil
+
+        for _, offset in ipairs(angleOffsets) do
+            local ang = baseAngle + offset
+            local cosA = math.cos(ang)
+            local sinA = math.sin(ang)
+
+            for r = 8, 4, -1 do
+                local candPos = {
+                    x = math.floor(playerPos.x + cosA * r + 0.5),
+                    y = math.floor(playerPos.y + sinA * r + 0.5),
+                    z = playerPos.z
+                }
+                local t = g_map.getTile(candPos)
+                if t and t:isWalkable() then
+                    local dirs, result = g_map.findPath(playerPos, candPos, 100, 0)
+                    if dirs and #dirs > 0 then
+                        bestDirs = dirs
+                        break
+                    end
+                end
+            end
+            if bestDirs then break end
+        end
+
+        if bestDirs then
+            local curr = {x = playerPos.x, y = playerPos.y, z = playerPos.z}
+            for _, d in ipairs(bestDirs) do
+                curr = getNextStepPos(curr, d)
+                local t = g_map.getTile(curr)
+                if t and t:isWalkable() then
+                    table.insert(pathPoints, curr)
+                end
+            end
+        else
+            for i = 1, math.min(dist, 8) do
+                local candPos = {
+                    x = math.floor(playerPos.x + udx * i + 0.5),
+                    y = math.floor(playerPos.y + udy * i + 0.5),
+                    z = playerPos.z
+                }
+                local t = g_map.getTile(candPos)
+                if t and t:isWalkable() then
+                    table.insert(pathPoints, candPos)
+                end
+            end
+        end
+    end
+
+    -- Render Breadcrumb Dots on MapPanel tiles
     local mapRect = mapPanel:getRect()
     local dim = mapPanel:getVisibleDimension() or {width = 15, height = 11}
     local cam = mapPanel:getCameraPosition() or playerPos
@@ -257,8 +385,9 @@ local function updateGpsDisplay()
     local cx = mapRect.x + (mapRect.width / 2)
     local cy = mapRect.y + (mapRect.height / 2)
 
-    -- Render Breadcrumb Dots on MapPanel tiles
+    local millis = g_clock.millis()
     local dotIndex = 1
+
     for _, pt in ipairs(pathPoints) do
         if dotIndex > MAX_GPS_DOTS then break end
 
@@ -269,12 +398,17 @@ local function updateGpsDisplay()
             if dot then
                 local screenX = cx + (diffX * tileW)
                 local screenY = cy + (diffY * tileH)
-                local dotSize = (dotIndex == #pathPoints and dist <= 10) and 20 or 14
+                local dotSize = 22
+
                 dot:setSize({width = dotSize, height = dotSize})
                 dot:setPosition({
                     x = math.floor(screenX - dotSize / 2),
                     y = math.floor(screenY - dotSize / 2)
                 })
+
+                local wave = 0.65 + 0.35 * math.sin((millis / 200) - (dotIndex * 0.5))
+                dot:setOpacity(math.max(0.3, math.min(1.0, wave)))
+
                 dot:show()
                 dot:raise()
                 dotIndex = dotIndex + 1
@@ -290,7 +424,7 @@ local function updateGpsDisplay()
     local targetDiffX = targetPos.x - cam.x
     local targetDiffY = targetPos.y - cam.y
     if dz == 0 and math.abs(targetDiffX) <= (dim.width / 2) + 0.5 and math.abs(targetDiffY) <= (dim.height / 2) + 0.5 then
-        local bSize = 34
+        local bSize = 38
         local screenX = cx + (targetDiffX * tileW)
         local screenY = cy + (targetDiffY * tileH)
         gpsBeacon:show()
@@ -319,10 +453,15 @@ local function initTrackerMiniWindow()
     local rightPanel = modules.game_interface and (modules.game_interface.getRightPanel() or modules.game_interface.getMainRightPanel())
     if not rightPanel then return end
 
-    trackerMiniWindow = g_ui.createWidget('QuestTrackerMiniWindow', rightPanel)
-    trackerMiniWindow:setup()
-    if trackerMiniWindow.setupOnStart then
-        trackerMiniWindow:setupOnStart()
+    local existing = rightPanel:getChildById('questTrackerMiniWindow')
+    if existing then
+        trackerMiniWindow = existing
+    else
+        trackerMiniWindow = g_ui.createWidget('QuestTrackerMiniWindow', rightPanel)
+        trackerMiniWindow:setup()
+        if trackerMiniWindow.setupOnStart then
+            trackerMiniWindow:setupOnStart()
+        end
     end
 
     local activeBox = trackerMiniWindow.contentsPanel and trackerMiniWindow.contentsPanel.activeBox
@@ -517,7 +656,7 @@ function questTracker.refreshActiveCardHighlights()
         local btnGps = card.actionButtons and card.actionButtons.btnGps
         if btnTrack and card.guideData then
             if activeGuide and activeGuide.id == card.guideData.id then
-                btnTrack:setText('[✓ Active]')
+                btnTrack:setText('[Tracking]')
                 btnTrack:setColor('#00ff88')
                 btnTrack:setBorderColor('#00aa55')
                 if btnGps then

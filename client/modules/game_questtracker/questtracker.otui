@@ -93,12 +93,15 @@ GuideCard < Panel
   Label
     id: npcInfo
     anchors.left: previewBox.right
+    anchors.right: actionButtons.left
     anchors.bottom: parent.bottom
     margin-left: 10
+    margin-right: 8
     margin-bottom: 2
+    height: 16
     font: verdana-11px-rounded
     color: #00ffcc
-    text-auto-resize: true
+    text-auto-resize: false
 
   Panel
     id: actionButtons
@@ -515,49 +518,19 @@ GpsOverlay < Panel
   focusable: false
   visible: false
 
-GpsDot < Panel
-  size: 16 16
-  background-color: alpha
+GpsDot < UIWidget
+  size: 24 24
+  image-source: /modules/game_questtracker/images/gps_dot
   phantom: true
   focusable: false
   visible: false
 
-  Panel
-    id: ring
-    anchors.fill: parent
-    background-color: #00ffff33
-    border-width: 2
-    border-color: #00ffffff
-    phantom: true
-
-  Panel
-    id: core
-    size: 6 6
-    anchors.centerIn: parent
-    background-color: #ffffff
-    phantom: true
-
-GpsBeacon < Panel
-  size: 34 34
-  background-color: alpha
+GpsBeacon < UIWidget
+  size: 38 38
+  image-source: /modules/game_questtracker/images/gps_beacon
   phantom: true
   focusable: false
   visible: false
-
-  Panel
-    id: ring
-    anchors.fill: parent
-    background-color: #ffd70044
-    border-width: 2
-    border-color: #ffd700
-    phantom: true
-
-  Panel
-    id: core
-    size: 10 10
-    anchors.centerIn: parent
-    background-color: #ffffff
-    phantom: true
 
   Label
     id: label
@@ -567,6 +540,13 @@ GpsBeacon < Panel
     font: verdana-11px-rounded
     color: #ffd700
     text-auto-resize: true
+
+GpsMinimapMarker < UIWidget
+  size: 20 20
+  image-source: /modules/game_questtracker/images/gps_minimap_pointer
+  phantom: false
+  focusable: false
+  visible: false
 
 QuestTrackerMiniWindow < MiniWindow
   id: questTrackerMiniWindow
@@ -701,14 +681,16 @@ QuestTrackerMiniWindow < MiniWindow
 
       Panel
         id: miniControls
-        height: 22
+        height: 24
         margin-top: 6
+        anchors.left: parent.left
+        anchors.right: parent.right
 
         Button
           id: btnToggleGps
           height: 22
           anchors.left: parent.left
-          anchors.right: btnUntrack.left
+          anchors.right: btnMiniDetails.left
           margin-right: 4
           font: verdana-11px-rounded
           text: GPS: ON
@@ -716,27 +698,27 @@ QuestTrackerMiniWindow < MiniWindow
           border-color: #00aa55
 
         Button
-          id: btnUntrack
-          width: 22
+          id: btnMiniDetails
+          width: 46
           height: 22
-          anchors.right: btnMiniDetails.left
+          anchors.right: btnUntrack.left
           margin-right: 4
+          font: verdana-11px-rounded
+          text: Info
+          color: #ffd700
+          border-color: #ccaa00
+          @onClick: modules.game_questtracker.showDetailsForActive()
+
+        Button
+          id: btnUntrack
+          width: 20
+          height: 22
+          anchors.right: parent.right
           font: verdana-11px-rounded
           text: X
           color: #ff5555
           border-color: #aa3333
           tooltip: Untrack quest
-
-        Button
-          id: btnMiniDetails
-          width: 52
-          height: 22
-          anchors.right: parent.right
-          font: verdana-11px-rounded
-          text: Details
-          color: #ffd700
-          border-color: #ccaa00
-          @onClick: modules.game_questtracker.showDetailsForActive()
 
 GpsTopBanner < Panel
   id: gpsTopBanner

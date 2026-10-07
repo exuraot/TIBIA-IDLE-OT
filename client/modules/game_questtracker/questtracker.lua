@@ -804,15 +804,23 @@ end
 
 local function ensureMainPanelButton()
     if mainPanelButton then return end
-    if not modules.game_mainpanel then return end
 
-    -- Register single clean button in MainPanel (index 1002 places it directly below Idle Hunt)
-    mainPanelButton = modules.game_mainpanel.addSpecialToggleButton('questTrackerMainBtn', tr('Quest & GPS Tracker'), '/images/topbuttons/icon-questtracker-widget', questTracker.toggleExplorer, false),
-        '/images/topbuttons/icon-questtracker-widget',
-        questTracker.toggleExplorer,
-        false,
-        1002
-    )
+    if modules.client_topmenu and modules.client_topmenu.addLeftGameButton then
+        mainPanelButton = modules.client_topmenu.addLeftGameButton(
+            'questTrackerMainBtn',
+            tr('Quest & GPS Tracker'),
+            '/images/options/button_questlog_tracker',
+            function() questTracker.toggleExplorer() end
+        )
+    elseif modules.game_mainpanel and modules.game_mainpanel.addSpecialToggleButton then
+        mainPanelButton = modules.game_mainpanel.addSpecialToggleButton(
+            'questTrackerMainBtn',
+            tr('Quest & GPS Tracker'),
+            '/images/options/button_questlog_tracker',
+            function() questTracker.toggleExplorer() end,
+            false
+        )
+    end
 end
 
 --[[=================================================
@@ -820,8 +828,23 @@ end
 =================================================== ]]
 function init()
     g_ui.importStyle('questtracker.otui')
-
     loadDatabase()
+
+    -- Try to add button during init or shortly after mainpanel loads
+    scheduleEvent(function()
+        ensureMainPanelButton()
+    end, 150)
+
+    -- Global hotkey Ctrl+U to show/hide Quest Tracker
+    pcall(function()
+        Keybind.new("Windows", "Show/hide Quest Tracker", "Ctrl+U", "")
+        Keybind.bind("Windows", "Show/hide Quest Tracker", {{
+            type = KEY_DOWN,
+            callback = function()
+                questTracker.toggleExplorer()
+            end
+        }})
+    end)
 
     -- Register LocalPlayer position event for real-time GPS update
     connect(LocalPlayer, {

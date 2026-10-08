@@ -1,10 +1,10 @@
-local UI = nil
+﻿local UI = nil
 local virtualFloor = 7
 local viewRadioGroup = nil
 local loadedAssetsDir = nil
 local loadedFloorSet = {} -- floors already indexed for loadedAssetsDir
 
--- Forward declaration — defined later in the file.
+-- Forward declaration â€” defined later in the file.
 local refreshVirtualFloors
 
 -- Surface View is only available for floors 0-7 (surface and above).
@@ -129,7 +129,7 @@ function Cyclopedia.loadMap()
         print("Minimap couldn't be loaded, file missing?")
     end
 
-    -- Preserve the zoom declared in the OTUI style — load() overwrites it with the
+    -- Preserve the zoom declared in the OTUI style â€” load() overwrites it with the
     -- HUD minimap's saved settings zoom, which we don't want for Cyclopedia.
     local initialZoom = minimapWidget:getZoom()
     minimapWidget:load()
@@ -380,4 +380,28 @@ function Cyclopedia.upLayer()
     ensureViewFloorsLoaded()
     refreshVirtualFloors()
     updateViewMode()
+end
+
+function Cyclopedia.centerMapOn(pos, description)
+    if not pos or not pos.x or not pos.y then return end
+    if not UI or not UI.MapBase or not UI.MapBase.minimap then return end
+
+    local targetZ = pos.z or 7
+    local minimapWidget = UI.MapBase.minimap
+
+    virtualFloor = targetZ
+    ensureViewFloorsLoaded()
+    refreshVirtualFloors()
+    updateViewMode()
+
+    minimapWidget:setCameraPosition(pos)
+    minimapWidget:setZoom(10)
+
+    local flagDesc = description or "Quest Objective"
+    if modules.game_minimap and modules.game_minimap.addFlag then
+        pcall(function() modules.game_minimap.addFlag(pos, 4, flagDesc) end)
+    end
+    if not minimapWidget:getFlag(pos) then
+        minimapWidget:addFlag(pos, 4, flagDesc)
+    end
 end

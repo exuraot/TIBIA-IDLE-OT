@@ -1,4 +1,4 @@
-Cyclopedia = {}
+﻿Cyclopedia = {}
 
 trackerButton = nil
 trackerMiniWindow = nil
@@ -484,4 +484,14 @@ end
 
 function isVisible()
     return controllerCyclopedia and controllerCyclopedia.ui and controllerCyclopedia.ui:isVisible()
+end
+
+function Cyclopedia.showMapAt(pos, description)
+    if not pos or not pos.x or not pos.y then return end
+    Cyclopedia.openTab("map")
+    scheduleEvent(function()
+        if Cyclopedia.centerMapOn then
+            Cyclopedia.centerMapOn(pos, description)
+        end
+    end, 100)
 end

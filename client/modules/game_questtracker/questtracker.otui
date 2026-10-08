@@ -1,7 +1,7 @@
 GuideCategoryButton < UIButton
-  height: 28
+  height: 26
   text-align: left
-  text-offset: 28 0
+  text-offset: 26 0
   font: verdana-11px-rounded
   color: #cccccc
   background-color: #1a222d
@@ -19,26 +19,42 @@ GuideCategoryButton < UIButton
     color: #ffd700
     border-color: #e5a720
 
+WalkthroughItemSlot < UIItem
+  size: 34 34
+  image-source: /images/ui/2pixel_up_frame_borderimage
+  image-border: 10
+  padding: 1
+  virtual: true
+
+  Label
+    id: countLabel
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin-right: 2
+    margin-bottom: -1
+    font: verdana-11px-rounded
+    color: #BFBFBF
+    text-auto-resize: true
+    visible: false
+
 GuideCard < Panel
   height: 86
-  background-color: #161c24
-  border-width: 1
-  border-color: #252f3d
+  image-source: /images/ui/panel_flat
+  image-border: 10
   margin-bottom: 6
   padding: 6
   $hover:
     border-color: #3d4f66
-    background-color: #1a222c
 
   Panel
     id: previewBox
-    size: 56 60
+    size: 54 54
     anchors.left: parent.left
     anchors.verticalCenter: parent.verticalCenter
     margin-left: 2
-    background-color: #11151b
-    border-width: 1
-    border-color: #252f3d
+    image-source: /images/ui/outfits/minipanel
+    image-border: 20
+    padding: 3
 
     UICreature
       id: creaturePreview
@@ -49,7 +65,7 @@ GuideCard < Panel
 
     UIItem
       id: itemPreview
-      size: 38 38
+      size: 36 36
       anchors.centerIn: parent
       virtual: true
       visible: false
@@ -66,15 +82,15 @@ GuideCard < Panel
 
   UIWidget
     id: categoryBadge
-    size: 58 16
+    size: 60 16
     anchors.left: name.right
     anchors.top: parent.top
     margin-left: 8
     margin-top: 1
     font: verdana-9px-bold
     text-align: center
-    color: #ffffff
-    background-color: #2b3a4a
+    color: #C0C0C0
+    background-color: #222b38
     border-width: 1
     border-color: #3b5066
 
@@ -100,84 +116,118 @@ GuideCard < Panel
     margin-bottom: 2
     height: 16
     font: verdana-11px-rounded
-    color: #00ffcc
+    color: #00ffff
     text-auto-resize: false
 
   Panel
     id: actionButtons
-    width: 185
+    width: 195
     anchors.right: parent.right
     anchors.top: parent.top
     anchors.bottom: parent.bottom
-    margin-right: 22
+    margin-right: 24
 
     Button
-      id: btnTrack
-      width: 90
-      height: 24
+      id: btnWalkthrough
+      width: 92
+      height: 22
       anchors.left: parent.left
       anchors.top: parent.top
       margin-top: 4
-      font: verdana-11px-rounded
-      text: Track Map
+      font: small-9px
+      text: Walkthrough
+      text-offset: 0 -1
       color: #ffd700
-      border-color: #ccaa00
-      $hover:
-        color: #ffffff
-        border-color: #ffd700
 
     Button
-      id: btnGps
-      width: 85
-      height: 24
-      anchors.right: parent.right
-      anchors.top: parent.top
-      margin-top: 4
-      font: verdana-11px-rounded
-      text: Start GPS
-      color: #00ffff
-      border-color: #00aaaa
-      $hover:
-        color: #ffffff
-        border-color: #00ffff
-
-    Button
-      id: btnDetails
-      width: 181
+      id: btnMarkMap
+      width: 92
       height: 22
-      anchors.right: parent.right
-      anchors.bottom: parent.bottom
-      margin-bottom: 4
-      font: verdana-11px-rounded
-      text: Quest Details
-      color: #e0e0e0
-      $hover:
-        color: #ffffff
+      anchors.left: prev.right
+      anchors.top: parent.top
+      margin-left: 6
+      margin-top: 4
+      font: small-9px
+      text: Mark on Map
+      text-offset: 0 -1
+      color: #00e0e0
+
+    Button
+      id: btnPin
+      width: 92
+      height: 22
+      anchors.left: parent.left
+      anchors.top: prev.bottom
+      margin-top: 6
+      font: small-9px
+      text: Pin to HUD
+      text-offset: 0 -1
+
+    Button
+      id: btnQuickDetails
+      width: 92
+      height: 22
+      anchors.left: prev.right
+      anchors.top: prev.top
+      margin-left: 6
+      font: small-9px
+      text: Details
+      text-offset: 0 -1
 
 GuideExplorerWindow < MainWindow
   id: guideExplorerWindow
-  !text: tr('Quests, Addons, Mounts & Access Explorer')
-  size: 850 590
+  !text: tr('Quest & Guide Explorer')
+  size: 680 520
   anchors.centerIn: parent
   @onEscape: self:hide()
 
   Panel
-    id: sidebar
-    width: 185
+    id: searchPanel
+    height: 28
     anchors.left: parent.left
+    anchors.right: parent.right
     anchors.top: parent.top
-    anchors.bottom: parent.bottom
-    margin-right: 8
+
+    Label
+      id: searchLabel
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      font: verdana-11px-rounded
+      color: #C0C0C0
+      text: Search:
+      margin-right: 6
+
+    TextEdit
+      id: searchEdit
+      anchors.left: prev.right
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 6
+      font: verdana-11px-monochrome
+      color: #ffffff
+      placeholder: Type quest, addon, mount, city or NPC name...
+      placeholder-color: #6E706F
+
+  Panel
+    id: sidebar
+    width: 140
+    anchors.left: parent.left
+    anchors.top: searchPanel.bottom
+    anchors.bottom: footerPanel.top
+    margin-top: 8
+    margin-bottom: 8
+    image-source: /images/ui/panel_flat
+    image-border: 10
+    padding: 6
 
     Label
       id: sidebarTitle
-      text: CATEGORIES
-      font: verdana-11px-rounded
-      color: #ffd700
-      anchors.left: parent.left
       anchors.top: parent.top
-      margin-top: 4
-      margin-left: 4
+      anchors.horizontalCenter: parent.horizontalCenter
+      font: small-9px
+      color: #ffd700
+      text: CATEGORIES
+      margin-top: 2
 
     GuideCategoryButton
       id: catAll
@@ -200,7 +250,7 @@ GuideExplorerWindow < MainWindow
       anchors.left: parent.left
       anchors.right: parent.right
       anchors.top: prev.bottom
-      text: Addons & Outfits
+      text: Outfits & Addons
 
     GuideCategoryButton
       id: catMount
@@ -216,141 +266,92 @@ GuideExplorerWindow < MainWindow
       anchors.top: prev.bottom
       text: Access & Gates
 
-    Panel
-      id: trackerStatusBox
-      height: 124
-      anchors.left: parent.left
-      anchors.right: parent.right
-      anchors.bottom: parent.bottom
-      background-color: #12171e
-      border-width: 1
-      border-color: #2b3a4a
-      padding: 6
+  VerticalScrollBar
+    id: explorerScrollBar
+    anchors.top: searchPanel.bottom
+    anchors.bottom: footerPanel.top
+    anchors.right: parent.right
+    margin-top: 8
+    margin-bottom: 8
+    step: 40
+    pixels-scroll: true
 
-      Label
-        text: ACTIVE GUIDE
-        font: verdana-9px-bold
-        color: #ffd700
-        anchors.top: parent.top
-        anchors.left: parent.left
-
-      Label
-        id: activeGuideName
-        text: None Selected
-        font: verdana-11px-rounded
-        color: #ffffff
-        anchors.top: prev.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        margin-top: 4
-        text-auto-resize: true
-
-      Label
-        id: activeGpsStatus
-        text: GPS: Disabled
-        font: verdana-11px-rounded
-        color: #888888
-        anchors.top: prev.bottom
-        anchors.left: parent.left
-        margin-top: 4
-
-      Button
-        id: btnStopAllGps
-        text: Clear Active Guide
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        height: 22
-        font: verdana-11px-rounded
-        color: #ff5555
-        border-color: #aa3333
+  ScrollablePanel
+    id: cardsContainer
+    anchors.left: sidebar.right
+    anchors.right: explorerScrollBar.left
+    anchors.top: searchPanel.bottom
+    anchors.bottom: footerPanel.top
+    margin-left: 8
+    margin-right: 4
+    margin-top: 8
+    margin-bottom: 8
+    vertical-scrollbar: explorerScrollBar
+    layout:
+      type: verticalBox
 
   Panel
-    id: mainContent
-    anchors.left: sidebar.right
+    id: footerPanel
+    height: 26
+    anchors.left: parent.left
     anchors.right: parent.right
-    anchors.top: parent.top
     anchors.bottom: parent.bottom
-    margin-left: 8
 
-    TextEdit
-      id: searchInput
+    Label
+      id: countLabel
       anchors.left: parent.left
-      anchors.right: btnClose.left
-      anchors.top: parent.top
-      margin-right: 8
-      height: 26
+      anchors.verticalCenter: parent.verticalCenter
       font: verdana-11px-rounded
-      placeholder: Search quest, NPC, city, addon or mount...
-      placeholder-color: #667788
+      color: #999999
+      text: Showing all guides.
 
     Button
       id: btnClose
-      width: 70
-      height: 26
+      width: 74
+      height: 22
       anchors.right: parent.right
-      anchors.top: parent.top
+      anchors.verticalCenter: parent.verticalCenter
+      font: small-9px
       text: Close
+      text-offset: 0 -1
       @onClick: self:getParent():getParent():hide()
 
-    VerticalScrollBar
-      id: guideScrollBar
-      anchors.top: searchInput.bottom
-      anchors.bottom: parent.bottom
-      anchors.right: parent.right
-      margin-top: 8
-      step: 40
-      pixels-scroll: true
-
-    ScrollablePanel
-      id: guideList
-      anchors.left: parent.left
-      anchors.right: guideScrollBar.left
-      anchors.top: searchInput.bottom
-      anchors.bottom: parent.bottom
-      margin-top: 8
-      margin-right: 4
-      vertical-scrollbar: guideScrollBar
-      layout:
-        type: verticalBox
-
-QuestDetailsWindow < MainWindow
-  id: questDetailsWindow
-  !text: tr('Quest Guide & Dialogue Walkthrough')
-  size: 600 520
+QuestWalkthroughWindow < MainWindow
+  id: questWalkthroughWindow
+  !text: tr('Quest Walkthrough & In-Game Wiki')
+  size: 470 540
   anchors.centerIn: parent
   @onEscape: self:hide()
 
   Panel
     id: headerBox
-    height: 68
+    height: 60
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: parent.top
-    background-color: #161c24
-    border-width: 1
-    border-color: #2b3848
-    padding: 6
+    image-source: /images/ui/panel_flat
+    image-border: 10
+    padding: 5
 
     Panel
       id: detailAvatarBox
-      size: 54 54
+      size: 48 48
       anchors.left: parent.left
       anchors.verticalCenter: parent.verticalCenter
-      background-color: #10141a
-      border-width: 1
-      border-color: #222b38
+      image-source: /images/ui/outfits/minipanel
+      image-border: 20
+      padding: 2
 
       UICreature
         id: detailCreature
-        size: 48 48
+        size: 42 42
         anchors.centerIn: parent
         phantom: true
         visible: false
 
       UIItem
         id: detailItem
-        size: 38 38
+        size: 32 32
         anchors.centerIn: parent
         virtual: true
         visible: false
@@ -361,197 +362,330 @@ QuestDetailsWindow < MainWindow
       color: #ffd700
       anchors.left: detailAvatarBox.right
       anchors.top: parent.top
-      margin-left: 12
+      margin-left: 10
       margin-top: 4
       text-auto-resize: true
 
-    UIWidget
-      id: detailBadge
-      size: 60 16
-      anchors.left: detailTitle.right
-      anchors.top: parent.top
-      margin-left: 8
-      margin-top: 4
-      font: verdana-9px-bold
-      text-align: center
-      color: #ffffff
-      background-color: #2b3a4a
-      border-width: 1
-      border-color: #3b5066
-
     Label
-      id: detailNpcInfo
-      font: verdana-11px-rounded
-      color: #00ffcc
+      id: detailSubtitle
+      font: small-9px
+      color: #00ffff
       anchors.left: detailAvatarBox.right
       anchors.top: detailTitle.bottom
-      margin-left: 12
-      margin-top: 4
+      margin-left: 10
+      margin-top: 2
       text-auto-resize: true
 
-    Label
-      id: detailLevelInfo
+    Button
+      id: btnHeaderMarkMap
+      width: 96
+      height: 22
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 4
+      font: small-9px
+      text: Mark on Map
+      text-offset: 0 -1
+      color: #00e0e0
+
+  UIWidget
+    id: separatorTop
+    height: 2
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: headerBox.bottom
+    margin-top: 6
+    image-source: /images/ui/separator_horizontal
+
+  Panel
+    id: stepNavBar
+    height: 24
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: separatorTop.bottom
+    margin-top: 6
+
+    Button
+      id: prevStepBtn
+      size: 20 20
+      anchors.right: stepProgressLabel.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 6
+      icon-source: /game_cyclopedia/images/icon-left-arrow
+      $disabled:
+        icon-source: /game_cyclopedia/images/icon-left-arrow-disabled
+      $pressed:
+        icon-source: /game_cyclopedia/images/icon-left-arrow-disabled
+
+    UIWidget
+      id: stepProgressLabel
+      size: 90 20
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.verticalCenter: parent.verticalCenter
+      text-align: center
       font: verdana-11px-rounded
-      color: #e0e0e0
-      anchors.left: detailAvatarBox.right
-      anchors.bottom: parent.bottom
-      margin-left: 12
-      margin-bottom: 4
+      color: #C2C2C2
+      !text: tr('1 / 1')
+
+    Button
+      id: nextStepBtn
+      size: 20 20
+      anchors.left: stepProgressLabel.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 6
+      icon-source: /game_cyclopedia/images/icon-right-arrow
+      $disabled:
+        icon-source: /game_cyclopedia/images/icon-right-arrow-disabled
+      $pressed:
+        icon-source: /game_cyclopedia/images/icon-right-arrow
+
+  Label
+    id: stepTitleLabel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: stepNavBar.bottom
+    margin-top: 4
+    font: verdana-11px-rounded
+    color: #ffffff
+    text-align: center
+    text-auto-resize: false
+    height: 18
+
+  VerticalScrollBar
+    id: walkthroughScrollBar
+    anchors.top: stepTitleLabel.bottom
+    anchors.bottom: rewardsBox.top
+    anchors.right: parent.right
+    margin-top: 6
+    margin-bottom: 6
+    step: 25
+    pixels-scroll: true
+
+  ScrollablePanel
+    id: stepContentPanel
+    anchors.left: parent.left
+    anchors.right: walkthroughScrollBar.left
+    anchors.top: stepTitleLabel.bottom
+    anchors.bottom: rewardsBox.top
+    margin-top: 6
+    margin-bottom: 6
+    margin-right: 4
+    vertical-scrollbar: walkthroughScrollBar
+    image-source: /images/ui/panel_flat
+    image-border: 10
+    padding: 8
+    layout:
+      type: verticalBox
+
+    Panel
+      id: stepTargetBox
+      height: 52
+      image-source: /images/ui/panel_flat
+      image-border: 6
+      padding: 4
+      margin-bottom: 6
+
+      Panel
+        id: stepCreatureBox
+        size: 42 42
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        image-source: /images/ui/outfits/minipanel
+        image-border: 15
+        padding: 2
+
+        UICreature
+          id: stepCreature
+          size: 38 38
+          anchors.centerIn: parent
+          phantom: true
+          visible: false
+
+        UIItem
+          id: stepItem
+          size: 32 32
+          anchors.centerIn: parent
+          virtual: true
+          visible: false
+
+      Label
+        id: stepNpcLabel
+        font: verdana-11px-rounded
+        color: #00ffff
+        anchors.left: stepCreatureBox.right
+        anchors.top: parent.top
+        margin-left: 8
+        margin-top: 2
+        text-auto-resize: true
+
+      Label
+        id: stepLocationLabel
+        font: small-9px
+        color: #C0C0C0
+        anchors.left: stepCreatureBox.right
+        anchors.top: stepNpcLabel.bottom
+        margin-left: 8
+        margin-top: 2
+        text-auto-resize: true
+
+      Button
+        id: btnStepMarkMap
+        width: 90
+        height: 22
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-right: 4
+        font: small-9px
+        text: Mark on Map
+        text-offset: 0 -1
+        color: #00e0e0
+
+    Label
+      id: objHeader
+      font: small-9px
+      color: #ffd700
+      text: OBJECTIVE & INSTRUCTIONS:
+      margin-bottom: 2
+
+    Label
+      id: stepInstructionText
+      font: verdana-11px-rounded
+      color: #C0C0C0
+      text-wrap: true
       text-auto-resize: true
+      margin-bottom: 8
+
+    Label
+      id: dialogueHeader
+      font: small-9px
+      color: #00ffff
+      text: NPC DIALOGUE TRANSCRIPT:
+      margin-bottom: 2
+      visible: false
+
+    Label
+      id: stepDialogueText
+      font: verdana-11px-rounded
+      color: #00e0e0
+      background-color: #0e141c
+      border-width: 1
+      border-color: #253342
+      padding: 6
+      text-wrap: true
+      text-auto-resize: true
+      margin-bottom: 6
+      visible: false
+
+  Panel
+    id: rewardsBox
+    height: 72
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: footerPanel.top
+    margin-bottom: 6
+    image-source: /images/ui/panel_flat
+    image-border: 10
+    padding: 6
+
+    Label
+      id: rewardsTitle
+      font: small-9px
+      color: #ffd700
+      text: REWARDS & UNLOCKS:
+      anchors.left: parent.left
+      anchors.top: parent.top
+      margin-left: 2
+      margin-top: 1
+      text-auto-resize: true
+
+    Panel
+      id: rewardOutfitBox
+      size: 40 40
+      anchors.left: parent.left
+      anchors.bottom: parent.bottom
+      margin-left: 2
+      margin-bottom: 2
+      image-source: /images/ui/outfits/minipanel
+      image-border: 15
+      padding: 2
+      visible: false
+
+      UICreature
+        id: rewardCreature
+        size: 36 36
+        anchors.centerIn: parent
+        phantom: true
+
+    Panel
+      id: rewardItemsContainer
+      anchors.left: rewardOutfitBox.right
+      anchors.top: rewardsTitle.bottom
+      anchors.bottom: parent.bottom
+      margin-left: 6
+      margin-top: 2
+      margin-bottom: 2
+      width: 150
+      layout:
+        type: horizontalBox
+        spacing: 4
+
+    Label
+      id: rewardsSummaryText
+      font: verdana-11px-rounded
+      color: #88ff88
+      anchors.left: rewardItemsContainer.right
+      anchors.right: parent.right
+      anchors.top: rewardsTitle.bottom
+      anchors.bottom: parent.bottom
+      margin-left: 8
+      margin-top: 4
+      margin-bottom: 2
+      text-wrap: true
+      text-auto-resize: false
 
   Panel
     id: footerPanel
-    height: 32
+    height: 26
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.bottom: parent.bottom
 
     Button
-      id: btnDetailTrack
-      width: 130
-      height: 26
+      id: btnPrevStepBottom
+      width: 90
+      height: 22
       anchors.left: parent.left
-      anchors.top: parent.top
-      font: verdana-11px-rounded
-      text: Track on Map
-      color: #ffd700
-      border-color: #ccaa00
+      anchors.verticalCenter: parent.verticalCenter
+      font: small-9px
+      text: < Prev Step
+      text-offset: 0 -1
 
     Button
-      id: btnDetailGps
-      width: 120
-      height: 26
+      id: btnNextStepBottom
+      width: 90
+      height: 22
       anchors.left: prev.right
-      anchors.top: parent.top
-      margin-left: 8
-      font: verdana-11px-rounded
-      text: Start GPS
-      color: #00ffff
-      border-color: #00aaaa
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 6
+      font: small-9px
+      text: Next Step >
+      text-offset: 0 -1
 
     Button
-      id: btnDetailClose
-      width: 80
-      height: 26
+      id: btnClose
+      width: 74
+      height: 22
       anchors.right: parent.right
-      anchors.top: parent.top
-      font: verdana-11px-rounded
+      anchors.verticalCenter: parent.verticalCenter
+      font: small-9px
       text: Close
+      text-offset: 0 -1
       @onClick: self:getParent():getParent():hide()
-
-  VerticalScrollBar
-    id: detailScrollBar
-    anchors.top: headerBox.bottom
-    anchors.bottom: footerPanel.top
-    anchors.right: parent.right
-    margin-top: 8
-    margin-bottom: 8
-    step: 40
-    pixels-scroll: true
-
-  ScrollablePanel
-    id: detailsContent
-    anchors.left: parent.left
-    anchors.right: detailScrollBar.left
-    anchors.top: headerBox.bottom
-    anchors.bottom: footerPanel.top
-    margin-top: 8
-    margin-bottom: 8
-    margin-right: 4
-    vertical-scrollbar: detailScrollBar
-    layout:
-      type: verticalBox
-
-    Label
-      id: loreTitle
-      text: STORY & OVERVIEW
-      font: verdana-11px-rounded
-      color: #ffd700
-      margin-top: 4
-
-    Label
-      id: loreText
-      font: verdana-11px-rounded
-      color: #cccccc
-      margin-top: 4
-      text-wrap: true
-      text-auto-resize: true
-
-    Label
-      id: dialogueTitle
-      text: DIALOGUE & WALKTHROUGH
-      font: verdana-11px-rounded
-      color: #ffd700
-      margin-top: 10
-
-    Label
-      id: dialogueText
-      font: verdana-11px-rounded
-      color: #00ffcc
-      background-color: #0f141c
-      border-width: 1
-      border-color: #253242
-      padding: 8
-      margin-top: 4
-      text-wrap: true
-      text-auto-resize: true
-
-    Label
-      id: rewardsTitle
-      text: REWARDS & UNLOCKS
-      font: verdana-11px-rounded
-      color: #ffd700
-      margin-top: 10
-
-    Label
-      id: rewardsText
-      font: verdana-11px-rounded
-      color: #88ff88
-      margin-top: 4
-      text-wrap: true
-      text-auto-resize: true
-
-GpsOverlay < Panel
-  anchors.fill: parent
-  background-color: alpha
-  phantom: true
-  focusable: false
-  visible: false
-
-GpsDot < UIWidget
-  size: 24 24
-  image-source: /modules/game_questtracker/images/gps_dot
-  phantom: true
-  focusable: false
-  visible: false
-
-GpsBeacon < UIWidget
-  size: 38 38
-  image-source: /modules/game_questtracker/images/gps_beacon
-  phantom: true
-  focusable: false
-  visible: false
-
-  Label
-    id: label
-    anchors.bottom: parent.top
-    anchors.horizontalCenter: parent.horizontalCenter
-    margin-bottom: 4
-    font: verdana-11px-rounded
-    color: #ffd700
-    text-auto-resize: true
-
-GpsMinimapMarker < UIWidget
-  size: 20 20
-  image-source: /modules/game_questtracker/images/gps_minimap_pointer
-  phantom: false
-  focusable: false
-  visible: false
 
 QuestTrackerMiniWindow < MiniWindow
   id: questTrackerMiniWindow
   !text: tr('Quest Tracker')
-  height: 190
+  height: 180
   icon: /images/topbuttons/icon-questtracker-widget
   @onOpen: modules.game_questtracker.onMiniWindowOpen()
   @onClose: modules.game_questtracker.onMiniWindowClose()
@@ -593,7 +727,7 @@ QuestTrackerMiniWindow < MiniWindow
 
     Panel
       id: emptyBox
-      height: 110
+      height: 100
       visible: true
       layout: verticalBox
 
@@ -611,33 +745,36 @@ QuestTrackerMiniWindow < MiniWindow
         font: verdana-11px-rounded
         color: #667788
         margin-top: 4
-        margin-left: 6
-        margin-right: 6
 
       Button
-        id: btnOpenExplorer
-        height: 24
+        id: btnOpenExplorerEmpty
+        text: Browse Guides
+        width: 120
+        height: 22
+        anchors.horizontalCenter: parent.horizontalCenter
         margin-top: 10
-        margin-left: 10
-        margin-right: 10
-        font: verdana-11px-rounded
-        text: Open Quest Explorer
-        color: #ffd700
-        border-color: #ccaa00
+        font: small-9px
+        text-offset: 0 -1
         @onClick: modules.game_questtracker.showExplorer()
 
     Panel
       id: activeBox
-      height: 155
+      height: 140
       visible: false
-      layout:
-        type: verticalBox
-        fit-children: true
 
       Label
         id: trackedTitle
         font: verdana-11px-rounded
         color: #ffd700
+        text-wrap: true
+        margin-top: 2
+        margin-left: 2
+        margin-right: 2
+
+      Label
+        id: trackedCity
+        font: small-9px
+        color: #888888
         text-wrap: true
         margin-top: 1
         margin-left: 2
@@ -646,7 +783,7 @@ QuestTrackerMiniWindow < MiniWindow
       Label
         id: trackedTarget
         font: verdana-11px-rounded
-        color: #00ffcc
+        color: #00ffff
         text-wrap: true
         margin-top: 2
         margin-left: 2
@@ -661,24 +798,6 @@ QuestTrackerMiniWindow < MiniWindow
         margin-left: 2
         margin-right: 2
 
-      Label
-        id: trackedHint
-        font: verdana-11px-rounded
-        color: #ffd966
-        text-wrap: true
-        margin-top: 2
-        margin-left: 2
-        margin-right: 2
-
-      Label
-        id: trackedDistance
-        font: verdana-11px-rounded
-        color: #00ffff
-        text-wrap: true
-        margin-top: 3
-        margin-left: 2
-        margin-right: 2
-
       Panel
         id: miniControls
         height: 24
@@ -687,103 +806,24 @@ QuestTrackerMiniWindow < MiniWindow
         anchors.right: parent.right
 
         Button
-          id: btnToggleGps
+          id: btnMiniMap
+          text: Mark Map
+          width: 80
           height: 22
           anchors.left: parent.left
-          anchors.right: btnMiniDetails.left
-          margin-right: 4
-          font: verdana-11px-rounded
-          text: GPS: ON
-          color: #00ff88
-          border-color: #00aa55
+          anchors.verticalCenter: parent.verticalCenter
+          font: small-9px
+          text-offset: 0 -1
+          color: #00e0e0
 
         Button
           id: btnMiniDetails
-          width: 46
+          text: Walkthrough
+          width: 80
           height: 22
-          anchors.right: btnUntrack.left
-          margin-right: 4
-          font: verdana-11px-rounded
-          text: Info
+          anchors.left: prev.right
+          anchors.verticalCenter: parent.verticalCenter
+          margin-left: 4
+          font: small-9px
+          text-offset: 0 -1
           color: #ffd700
-          border-color: #ccaa00
-          @onClick: modules.game_questtracker.showDetailsForActive()
-
-        Button
-          id: btnUntrack
-          width: 20
-          height: 22
-          anchors.right: parent.right
-          font: verdana-11px-rounded
-          text: X
-          color: #ff5555
-          border-color: #aa3333
-          tooltip: Untrack quest
-
-GpsTopBanner < Panel
-  id: gpsTopBanner
-  size: 460 34
-  anchors.horizontalCenter: parent.horizontalCenter
-  anchors.top: parent.top
-  margin-top: 38
-  background-color: #0b0f16f0
-  border-width: 1
-  border-color: #00ffff
-  phantom: false
-  focusable: false
-  visible: false
-
-  UIWidget
-    id: gpsIcon
-    size: 18 18
-    anchors.left: parent.left
-    anchors.verticalCenter: parent.verticalCenter
-    margin-left: 10
-    image-source: /images/topbuttons/minimap
-    phantom: true
-
-  Label
-    id: targetLabel
-    anchors.left: gpsIcon.right
-    anchors.verticalCenter: parent.verticalCenter
-    margin-left: 8
-    font: verdana-11px-rounded
-    color: #00ffff
-    text: Navigating to Target...
-    text-auto-resize: true
-
-  Label
-    id: distanceLabel
-    anchors.left: targetLabel.right
-    anchors.verticalCenter: parent.verticalCenter
-    margin-left: 10
-    font: verdana-11px-rounded
-    color: #ffd700
-    text: 0m [NE]
-    text-auto-resize: true
-
-  Label
-    id: floorLabel
-    anchors.left: distanceLabel.right
-    anchors.verticalCenter: parent.verticalCenter
-    margin-left: 8
-    font: verdana-11px-rounded
-    color: #00ff88
-    text: [Surface]
-    text-auto-resize: true
-
-  Button
-    id: btnStopGps
-    width: 24
-    height: 22
-    anchors.right: parent.right
-    anchors.verticalCenter: parent.verticalCenter
-    margin-right: 6
-    font: verdana-11px-rounded
-    text: X
-    color: #ff5555
-    border-color: #aa3333
-    $hover:
-      color: #ffffff
-      border-color: #ff5555
-    @onClick: modules.game_questtracker.questTracker.stopGps()

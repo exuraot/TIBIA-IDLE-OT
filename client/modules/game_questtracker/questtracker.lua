@@ -288,6 +288,12 @@ end
 
 function questTracker.showWalkthrough(guide, initialStep)
     if not guide then return end
+
+    -- 1. Close Guide Explorer Window when Walkthrough opens
+    if guideExplorerWindow and guideExplorerWindow:isVisible() then
+        guideExplorerWindow:hide()
+    end
+
     createWalkthroughWindow()
 
     walkthroughGuide = guide
@@ -297,6 +303,16 @@ function questTracker.showWalkthrough(guide, initialStep)
     p:show()
     p:raise()
     p:focus()
+
+    -- 2. Position cleanly docked on the left/corner of the screen
+    -- so player can play and view the guide simultaneously
+    local root = rootWidget
+    if root then
+        local rootH = root:getHeight()
+        local winH = p:getHeight()
+        local posY = math.max(25, math.floor((rootH - winH) / 2))
+        p:setPosition({ x = 25, y = posY })
+    end
 
     -- Setup Header
     p.headerBox.detailTitle:setText(guide.name or 'Quest Guide')
@@ -402,20 +418,21 @@ function questTracker.updateWalkthroughDisplay()
         p.stepContentPanel.stepDialogueText:hide()
     end
 
-    -- 5. Rewards & Unlocks Panel (Bottom)
-    p.rewardsBox.rewardItemsContainer:destroyChildren()
+    -- 5. Rewards & Unlocks Panel (Bottom) - Large uniform 48x48 squares
+    p.rewardsBox.rewardSlotsContainer:destroyChildren()
 
-    local hasOutfit = false
-    if walkthroughGuide.creatureLookType and walkthroughGuide.creatureLookType > 0 and (walkthroughGuide.category == 'addon' or walkthroughGuide.category == 'mount' or walkthroughGuide.category == 'quest') then
-        p.rewardsBox.rewardOutfitBox:show()
-        p.rewardsBox.rewardOutfitBox.rewardCreature:setOutfit({
+    -- Check if quest rewards outfit/addon
+    if walkthroughGuide.creatureLookType and walkthroughGuide.creatureLookType > 0 and 
+       (walkthroughGuide.category == 'addon' or walkthroughGuide.category == 'mount' or walkthroughGuide.category == 'quest') then
+        local outfitSlot = g_ui.createWidget('WalkthroughRewardSlot', p.rewardsBox.rewardSlotsContainer)
+        outfitSlot.creaturePreview:setOutfit({
             type = walkthroughGuide.creatureLookType,
             addons = walkthroughGuide.addons or 3,
             head = 0, body = 0, legs = 0, feet = 0
         })
-        hasOutfit = true
-    else
-        p.rewardsBox.rewardOutfitBox:hide()
+        outfitSlot.creaturePreview:show()
+        outfitSlot.itemPreview:hide()
+        outfitSlot:setTooltip(walkthroughGuide.name .. ' (Outfit / Addons / Mount)')
     end
 
     -- Item slots with Look Tooltip
@@ -440,8 +457,10 @@ function questTracker.updateWalkthroughDisplay()
     end
 
     for _, it in ipairs(itemsToShow) do
-        local slot = g_ui.createWidget('WalkthroughItemSlot', p.rewardsBox.rewardItemsContainer)
-        slot:setItemId(it.id)
+        local slot = g_ui.createWidget('WalkthroughRewardSlot', p.rewardsBox.rewardSlotsContainer)
+        slot.itemPreview:setItemId(it.id)
+        slot.itemPreview:show()
+        slot.creaturePreview:hide()
         if it.count and it.count > 1 then
             slot.countLabel:setText(tostring(it.count))
             slot.countLabel:show()
@@ -451,6 +470,10 @@ function questTracker.updateWalkthroughDisplay()
         local tip = questTracker.formatItemLook(it.id, it.count, it.name)
         slot:setTooltip(tip)
     end
+
+    -- Adjust width of container dynamically so text has maximum room
+    local countSlots = p.rewardsBox.rewardSlotsContainer:getChildCount()
+    p.rewardsBox.rewardSlotsContainer:setWidth(math.max(1, countSlots) * 54)
 
     -- Rewards summary text
     local rewDesc = {}
@@ -485,7 +508,7 @@ local function createGuideCard(guide)
     card.npcInfo:setText(locText)
 
     local desc = guide.description or ''
-    if #desc > 75 then desc = string.sub(desc, 1, 72) .. '...' end
+    if #desc > 85 then desc = string.sub(desc, 1, 82) .. '...' end
     card.details:setText(desc)
 
     -- Avatar setup
@@ -493,12 +516,12 @@ local function createGuideCard(guide)
     applyVisualToWidgets(card.previewBox.creaturePreview, card.previewBox.itemPreview, vis)
 
     -- Action Button 1: [Walkthrough]
-    card.actionButtons.btnWalkthrough.onClick = function()
+    card.btnWalkthrough.onClick = function()
         questTracker.showWalkthrough(guide, 1)
     end
 
     -- Action Button 2: [Mark on Map]
-    card.actionButtons.btnMarkMap.onClick = function()
+    card.btnMarkMap.onClick = function()
         local coords = guide.coords
         if guide.steps and guide.steps[1] then
             coords = guide.steps[1].targetCoords or guide.steps[1].npcCoords or coords
@@ -623,7 +646,6 @@ local function initTrackerMiniWindow()
 end
 
 local function updateTrackerMiniWindow()
-    if not trackerMiniWindow then end
     if not trackerMiniWindow then return end
 
     local contents = trackerMiniWindow.contentsPanel
@@ -696,7 +718,7 @@ local function ensureMainPanelButton()
         mainPanelButton = modules.game_mainpanel.addToggleButton(
             'questTrackerButton',
             tr('Quests & Walkthrough Guides'),
-            '/images/topbuttons/icon-questtracker-widget',
+            '/images/options/button_questguides',
             function() questTracker.toggleExplorer() end,
             false,
             6

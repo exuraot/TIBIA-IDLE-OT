@@ -1,7 +1,7 @@
 GuideCategoryButton < UIButton
   height: 26
   text-align: left
-  text-offset: 26 0
+  text-offset: 16 0
   font: verdana-11px-rounded
   color: #cccccc
   background-color: #1a222d
@@ -19,19 +19,32 @@ GuideCategoryButton < UIButton
     color: #ffd700
     border-color: #e5a720
 
-WalkthroughItemSlot < UIItem
-  size: 34 34
-  image-source: /images/ui/2pixel_up_frame_borderimage
-  image-border: 10
-  padding: 1
-  virtual: true
+WalkthroughRewardSlot < Panel
+  size: 48 48
+  image-source: /images/ui/outfits/minipanel
+  image-border: 15
+  padding: 3
+
+  UICreature
+    id: creaturePreview
+    size: 42 42
+    anchors.centerIn: parent
+    phantom: true
+    visible: false
+
+  UIItem
+    id: itemPreview
+    size: 38 38
+    anchors.centerIn: parent
+    virtual: true
+    visible: false
 
   Label
     id: countLabel
     anchors.bottom: parent.bottom
     anchors.right: parent.right
-    margin-right: 2
-    margin-bottom: -1
+    margin-right: 3
+    margin-bottom: 0
     font: verdana-11px-rounded
     color: #BFBFBF
     text-auto-resize: true
@@ -70,43 +83,39 @@ GuideCard < Panel
       virtual: true
       visible: false
 
-  Panel
-    id: actionButtons
-    width: 106
+  Button
+    id: btnWalkthrough
+    width: 104
+    height: 22
     anchors.right: parent.right
-    anchors.verticalCenter: parent.verticalCenter
-    margin-right: 16
+    anchors.top: parent.top
+    margin-right: 14
+    margin-top: 14
+    font: small-9px
+    text: Walkthrough
+    text-offset: 0 -1
+    color: #ffd700
 
-    Button
-      id: btnWalkthrough
-      width: 100
-      height: 22
-      anchors.horizontalCenter: parent.horizontalCenter
-      anchors.top: parent.top
-      font: small-9px
-      text: Walkthrough
-      text-offset: 0 -1
-      color: #ffd700
-
-    Button
-      id: btnMarkMap
-      width: 100
-      height: 22
-      anchors.horizontalCenter: parent.horizontalCenter
-      anchors.top: prev.bottom
-      margin-top: 5
-      font: small-9px
-      text: Mark on Map
-      text-offset: 0 -1
-      color: #00e0e0
+  Button
+    id: btnMarkMap
+    width: 104
+    height: 22
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-right: 14
+    margin-top: 6
+    font: small-9px
+    text: Mark on Map
+    text-offset: 0 -1
+    color: #00e0e0
 
   UIWidget
     id: categoryBadge
-    size: 58 16
-    anchors.right: actionButtons.left
+    size: 60 16
+    anchors.right: btnWalkthrough.left
     anchors.top: parent.top
-    margin-right: 12
-    margin-top: 4
+    margin-right: 14
+    margin-top: 6
     font: verdana-9px-bold
     text-align: center
     color: #C0C0C0
@@ -121,7 +130,7 @@ GuideCard < Panel
     anchors.top: parent.top
     margin-left: 10
     margin-right: 8
-    margin-top: 4
+    margin-top: 6
     font: verdana-11px-rounded
     color: #ffd700
     text-auto-resize: false
@@ -131,22 +140,23 @@ GuideCard < Panel
     id: details
     anchors.left: previewBox.right
     anchors.top: name.bottom
-    anchors.right: actionButtons.left
+    anchors.right: btnWalkthrough.left
     margin-left: 10
     margin-top: 4
-    margin-right: 12
+    margin-right: 14
     font: verdana-11px-rounded
     color: #aaaaaa
     text-wrap: true
+    height: 28
 
   Label
     id: npcInfo
     anchors.left: previewBox.right
-    anchors.right: actionButtons.left
+    anchors.right: btnWalkthrough.left
     anchors.bottom: parent.bottom
     margin-left: 10
-    margin-right: 12
-    margin-bottom: 4
+    margin-right: 14
+    margin-bottom: 6
     height: 16
     font: verdana-11px-rounded
     color: #00ffff
@@ -155,7 +165,7 @@ GuideCard < Panel
 GuideExplorerWindow < MainWindow
   id: guideExplorerWindow
   !text: tr('Quest & Guide Explorer')
-  size: 680 520
+  size: 780 540
   anchors.centerIn: parent
   @onEscape: self:hide()
 
@@ -188,7 +198,7 @@ GuideExplorerWindow < MainWindow
 
   Panel
     id: sidebar
-    width: 140
+    width: 160
     anchors.left: parent.left
     anchors.top: searchPanel.bottom
     anchors.bottom: footerPanel.top
@@ -297,7 +307,7 @@ GuideExplorerWindow < MainWindow
 QuestWalkthroughWindow < MainWindow
   id: questWalkthroughWindow
   !text: tr('Quest Walkthrough & In-Game Wiki')
-  size: 520 640
+  size: 540 700
   anchors.centerIn: parent
   @onEscape: self:hide()
 
@@ -544,14 +554,14 @@ QuestWalkthroughWindow < MainWindow
 
   Panel
     id: rewardsBox
-    height: 90
+    height: 124
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.bottom: footerPanel.top
-    margin-bottom: 6
+    margin-bottom: 8
     image-source: /images/ui/panel_flat
     image-border: 10
-    padding: 6
+    padding: 8
 
     Label
       id: rewardsTitle
@@ -565,48 +575,29 @@ QuestWalkthroughWindow < MainWindow
       text-auto-resize: true
 
     Panel
-      id: rewardOutfitBox
-      size: 40 40
+      id: rewardSlotsContainer
       anchors.left: parent.left
       anchors.top: rewardsTitle.bottom
       margin-left: 2
-      margin-top: 4
-      image-source: /images/ui/outfits/minipanel
-      image-border: 15
-      padding: 2
-      visible: false
-
-      UICreature
-        id: rewardCreature
-        size: 36 36
-        anchors.centerIn: parent
-        phantom: true
-
-    Panel
-      id: rewardItemsContainer
-      anchors.left: rewardOutfitBox.right
-      anchors.top: rewardsTitle.bottom
-      anchors.bottom: parent.bottom
-      margin-left: 6
-      margin-top: 4
-      margin-bottom: 2
-      width: 150
+      margin-top: 6
+      height: 52
+      width: 220
       layout:
         type: horizontalBox
-        spacing: 4
+        spacing: 6
 
     Label
       id: rewardsSummaryText
       font: verdana-11px-rounded
       color: #88ff88
-      anchors.left: rewardItemsContainer.right
+      anchors.left: rewardSlotsContainer.right
       anchors.right: parent.right
       anchors.top: rewardsTitle.bottom
       anchors.bottom: parent.bottom
-      margin-left: 10
+      margin-left: 14
       margin-right: 6
-      margin-top: 4
-      margin-bottom: 2
+      margin-top: 6
+      margin-bottom: 4
       text-wrap: true
       text-auto-resize: false
 
@@ -653,7 +644,7 @@ QuestTrackerMiniWindow < MiniWindow
   id: questTrackerMiniWindow
   !text: tr('Quest Tracker')
   height: 180
-  icon: /images/topbuttons/icon-questtracker-widget
+  icon: /images/options/button_questguides
   @onOpen: modules.game_questtracker.onMiniWindowOpen()
   @onClose: modules.game_questtracker.onMiniWindowClose()
 
@@ -663,8 +654,9 @@ QuestTrackerMiniWindow < MiniWindow
     anchors.left: miniwindowHeader.left
     margin-top: 2
     margin-left: 4
-    size: 12 12
-    image-source: /images/topbuttons/icon-questtracker-widget
+    size: 14 14
+    image-source: /images/options/button_questguides
+    image-clip: 0 0 20 20
     image-smooth: false
 
   Label
@@ -673,7 +665,7 @@ QuestTrackerMiniWindow < MiniWindow
     anchors.left: miniwindowHeader.left
     anchors.right: miniwindowHeader.right
     margin-top: 2
-    margin-left: 20
+    margin-left: 22
     margin-right: 50
     font: verdana-11px-monochrome
     height: 13

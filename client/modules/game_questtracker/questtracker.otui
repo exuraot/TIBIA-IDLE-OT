@@ -70,23 +70,43 @@ GuideCard < Panel
       virtual: true
       visible: false
 
-  Label
-    id: name
-    anchors.left: previewBox.right
-    anchors.top: parent.top
-    margin-left: 10
-    margin-top: 2
-    font: verdana-11px-rounded
-    color: #ffd700
-    text-auto-resize: true
+  Panel
+    id: actionButtons
+    width: 106
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 16
+
+    Button
+      id: btnWalkthrough
+      width: 100
+      height: 22
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      font: small-9px
+      text: Walkthrough
+      text-offset: 0 -1
+      color: #ffd700
+
+    Button
+      id: btnMarkMap
+      width: 100
+      height: 22
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: prev.bottom
+      margin-top: 5
+      font: small-9px
+      text: Mark on Map
+      text-offset: 0 -1
+      color: #00e0e0
 
   UIWidget
     id: categoryBadge
-    size: 60 16
-    anchors.left: name.right
+    size: 58 16
+    anchors.right: actionButtons.left
     anchors.top: parent.top
-    margin-left: 8
-    margin-top: 1
+    margin-right: 12
+    margin-top: 4
     font: verdana-9px-bold
     text-align: center
     color: #C0C0C0
@@ -95,13 +115,26 @@ GuideCard < Panel
     border-color: #3b5066
 
   Label
+    id: name
+    anchors.left: previewBox.right
+    anchors.right: categoryBadge.left
+    anchors.top: parent.top
+    margin-left: 10
+    margin-right: 8
+    margin-top: 4
+    font: verdana-11px-rounded
+    color: #ffd700
+    text-auto-resize: false
+    height: 16
+
+  Label
     id: details
     anchors.left: previewBox.right
     anchors.top: name.bottom
     anchors.right: actionButtons.left
     margin-left: 10
     margin-top: 4
-    margin-right: 10
+    margin-right: 12
     font: verdana-11px-rounded
     color: #aaaaaa
     text-wrap: true
@@ -112,67 +145,12 @@ GuideCard < Panel
     anchors.right: actionButtons.left
     anchors.bottom: parent.bottom
     margin-left: 10
-    margin-right: 8
-    margin-bottom: 2
+    margin-right: 12
+    margin-bottom: 4
     height: 16
     font: verdana-11px-rounded
     color: #00ffff
     text-auto-resize: false
-
-  Panel
-    id: actionButtons
-    width: 195
-    anchors.right: parent.right
-    anchors.top: parent.top
-    anchors.bottom: parent.bottom
-    margin-right: 24
-
-    Button
-      id: btnWalkthrough
-      width: 92
-      height: 22
-      anchors.left: parent.left
-      anchors.top: parent.top
-      margin-top: 4
-      font: small-9px
-      text: Walkthrough
-      text-offset: 0 -1
-      color: #ffd700
-
-    Button
-      id: btnMarkMap
-      width: 92
-      height: 22
-      anchors.left: prev.right
-      anchors.top: parent.top
-      margin-left: 6
-      margin-top: 4
-      font: small-9px
-      text: Mark on Map
-      text-offset: 0 -1
-      color: #00e0e0
-
-    Button
-      id: btnPin
-      width: 92
-      height: 22
-      anchors.left: parent.left
-      anchors.top: prev.bottom
-      margin-top: 6
-      font: small-9px
-      text: Pin to HUD
-      text-offset: 0 -1
-
-    Button
-      id: btnQuickDetails
-      width: 92
-      height: 22
-      anchors.left: prev.right
-      anchors.top: prev.top
-      margin-left: 6
-      font: small-9px
-      text: Details
-      text-offset: 0 -1
 
 GuideExplorerWindow < MainWindow
   id: guideExplorerWindow
@@ -319,13 +297,13 @@ GuideExplorerWindow < MainWindow
 QuestWalkthroughWindow < MainWindow
   id: questWalkthroughWindow
   !text: tr('Quest Walkthrough & In-Game Wiki')
-  size: 470 540
+  size: 520 640
   anchors.centerIn: parent
   @onEscape: self:hide()
 
   Panel
     id: headerBox
-    height: 60
+    height: 56
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: parent.top
@@ -335,7 +313,7 @@ QuestWalkthroughWindow < MainWindow
 
     Panel
       id: detailAvatarBox
-      size: 48 48
+      size: 46 46
       anchors.left: parent.left
       anchors.verticalCenter: parent.verticalCenter
       image-source: /images/ui/outfits/minipanel
@@ -375,18 +353,6 @@ QuestWalkthroughWindow < MainWindow
       margin-left: 10
       margin-top: 2
       text-auto-resize: true
-
-    Button
-      id: btnHeaderMarkMap
-      width: 96
-      height: 22
-      anchors.right: parent.right
-      anchors.verticalCenter: parent.verticalCenter
-      margin-right: 4
-      font: small-9px
-      text: Mark on Map
-      text-offset: 0 -1
-      color: #00e0e0
 
   UIWidget
     id: separatorTop
@@ -530,7 +496,7 @@ QuestWalkthroughWindow < MainWindow
 
       Button
         id: btnStepMarkMap
-        width: 90
+        width: 96
         height: 22
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
@@ -578,7 +544,7 @@ QuestWalkthroughWindow < MainWindow
 
   Panel
     id: rewardsBox
-    height: 72
+    height: 90
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.bottom: footerPanel.top
@@ -602,9 +568,9 @@ QuestWalkthroughWindow < MainWindow
       id: rewardOutfitBox
       size: 40 40
       anchors.left: parent.left
-      anchors.bottom: parent.bottom
+      anchors.top: rewardsTitle.bottom
       margin-left: 2
-      margin-bottom: 2
+      margin-top: 4
       image-source: /images/ui/outfits/minipanel
       image-border: 15
       padding: 2
@@ -622,7 +588,7 @@ QuestWalkthroughWindow < MainWindow
       anchors.top: rewardsTitle.bottom
       anchors.bottom: parent.bottom
       margin-left: 6
-      margin-top: 2
+      margin-top: 4
       margin-bottom: 2
       width: 150
       layout:
@@ -637,7 +603,8 @@ QuestWalkthroughWindow < MainWindow
       anchors.right: parent.right
       anchors.top: rewardsTitle.bottom
       anchors.bottom: parent.bottom
-      margin-left: 8
+      margin-left: 10
+      margin-right: 6
       margin-top: 4
       margin-bottom: 2
       text-wrap: true

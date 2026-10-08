@@ -21,6 +21,60 @@ local currentWalkthroughStep = 1
 local currentCategory = 'all'
 local searchQuery = ''
 
+-- Comprehensive NPC outfit mappings (LookTypes)
+local NPC_OUTFIT_MAP = {
+    ['kevin'] = 128,
+    ['kroox'] = 160,
+    ['henricus'] = 132,
+    ['markwin'] = 25,
+    ['luboo'] = 128,
+    ['hanna'] = 136,
+    ['elane'] = 137,
+    ['gregor'] = 131,
+    ['marvik'] = 144,
+    ['lynda'] = 138,
+    ['chester kahs'] = 131,
+    ['quentin'] = 133,
+    ['gorn'] = 128,
+    ['avar tar'] = 131,
+    ['jack fate'] = 128,
+    ['eremo'] = 130,
+    ['bozo'] = 273,
+    ['hrodmir'] = 143,
+    ['charlotta'] = 138,
+    ['eleonore'] = 140,
+    ['palimuth'] = 324,
+    ['maelyrra'] = 144,
+    ['melchior'] = 153,
+    ['pemaret'] = 128,
+    ['captain bluebear'] = 134,
+    ['captain fearless'] = 134,
+    ['sam'] = 131,
+    ['xodet'] = 130,
+    ['frodo'] = 128,
+    ['king tibianus'] = 332,
+    ['queen eloise'] = 331,
+    ['emperor kruzak'] = 66,
+    ['central temple'] = 133
+}
+
+-- Monster outfit mappings
+local MONSTER_OUTFIT_MAP = {
+    ['demon'] = 35,
+    ['banshee'] = 78,
+    ['the queen of the banshees'] = 78,
+    ['dragon'] = 34,
+    ['dragon lord'] = 39,
+    ['behemoth'] = 55,
+    ['giant spider'] = 38,
+    ['warlock'] = 130,
+    ['hero cave lever'] = 35,
+    ['blue djinn'] = 80,
+    ['green djinn'] = 51,
+    ['marid'] = 80,
+    ['efreet'] = 51
+}
+
 -- Direction helper
 local function getCompassDirection(dx, dy)
     if dx == 0 and dy < 0 then return 'North (N)'
@@ -63,6 +117,83 @@ local function loadDatabase()
             },
             entries = {}
         }
+    end
+end
+
+--[[=================================================
+=           Visual Resolution & Helper              =
+=================================================== ]]
+local function getGuideVisual(guide, step)
+    if not guide then return { type = 'item', itemId = 2815 } end
+
+    -- 1. Check step specific NPC / creature
+    if step then
+        if step.npcLookType and step.npcLookType > 0 then
+            return { type = 'creature', lookType = step.npcLookType, addons = step.addons or 0 }
+        elseif step.creatureLookType and step.creatureLookType > 0 then
+            return { type = 'creature', lookType = step.creatureLookType, addons = step.addons or 0 }
+        elseif step.npc then
+            local n = string.lower(step.npc)
+            if NPC_OUTFIT_MAP[n] then
+                return { type = 'creature', lookType = NPC_OUTFIT_MAP[n], addons = 0 }
+            elseif MONSTER_OUTFIT_MAP[n] then
+                return { type = 'creature', lookType = MONSTER_OUTFIT_MAP[n], addons = 0 }
+            end
+        end
+    end
+
+    -- 2. Check guide level lookTypes
+    if guide.creatureLookType and guide.creatureLookType > 0 then
+        return { type = 'creature', lookType = guide.creatureLookType, addons = guide.addons or 0 }
+    elseif guide.npcLookType and guide.npcLookType > 0 then
+        return { type = 'creature', lookType = guide.npcLookType, addons = guide.addons or 0 }
+    elseif guide.startNpc then
+        local n = string.lower(guide.startNpc)
+        if NPC_OUTFIT_MAP[n] then
+            return { type = 'creature', lookType = NPC_OUTFIT_MAP[n], addons = 0 }
+        elseif MONSTER_OUTFIT_MAP[n] then
+            return { type = 'creature', lookType = MONSTER_OUTFIT_MAP[n], addons = 0 }
+        end
+    end
+
+    -- 3. Check guide items (ensure NEVER wooden painting 2596)
+    if guide.rewardItemId and guide.rewardItemId > 0 and guide.rewardItemId ~= 2596 then
+        return { type = 'item', itemId = guide.rewardItemId }
+    elseif guide.requiredItems and #guide.requiredItems > 0 and guide.requiredItems[1].id and guide.requiredItems[1].id ~= 2596 then
+        return { type = 'item', itemId = guide.requiredItems[1].id }
+    elseif guide.iconItem and guide.iconItem > 0 and guide.iconItem ~= 1988 and guide.iconItem ~= 2596 then
+        return { type = 'item', itemId = guide.iconItem }
+    end
+
+    -- 4. Category-based robust fallbacks
+    if guide.category == 'mount' then
+        return { type = 'creature', lookType = 388, addons = 0 }
+    elseif guide.category == 'addon' then
+        return { type = 'creature', lookType = 128, addons = 3 }
+    elseif guide.category == 'access' then
+        return { type = 'creature', lookType = 131, addons = 0 }
+    elseif guide.category == 'quest' then
+        return { type = 'creature', lookType = 128, addons = 0 }
+    end
+
+    return { type = 'item', itemId = 2815 } -- Classic scroll
+end
+
+local function applyVisualToWidgets(creatureWidget, itemWidget, visual)
+    if not creatureWidget or not itemWidget then return end
+
+    if visual.type == 'creature' then
+        creatureWidget:setOutfit({
+            type = visual.lookType,
+            addons = visual.addons or 0,
+            head = 0, body = 0, legs = 0, feet = 0
+        })
+        creatureWidget:show()
+        itemWidget:hide()
+    else
+        itemWidget:setItemId(visual.itemId or 2815)
+        itemWidget:show()
+        creatureWidget:hide()
     end
 end
 
@@ -120,7 +251,7 @@ function questTracker.markOnMap(coords, description)
         end)
     end
 
-    -- Sound feedback (if sound exists)
+    -- Sound feedback
     pcall(function()
         if g_resources.fileExists("/sounds/click.ogg") and g_sounds then
             local ch = g_sounds.getChannel(SoundChannels.Interface)
@@ -153,18 +284,6 @@ local function createWalkthroughWindow()
     p.footerPanel.btnNextStepBottom.onClick = function()
         questTracker.navigateWalkthroughStep(1)
     end
-
-    -- Header Mark on Map
-    p.headerBox.btnHeaderMarkMap.onClick = function()
-        if walkthroughGuide then
-            local coords = walkthroughGuide.coords
-            if walkthroughGuide.steps and walkthroughGuide.steps[currentWalkthroughStep] then
-                local st = walkthroughGuide.steps[currentWalkthroughStep]
-                coords = st.targetCoords or st.npcCoords or coords
-            end
-            questTracker.markOnMap(coords, walkthroughGuide.name)
-        end
-    end
 end
 
 function questTracker.showWalkthrough(guide, initialStep)
@@ -181,34 +300,12 @@ function questTracker.showWalkthrough(guide, initialStep)
 
     -- Setup Header
     p.headerBox.detailTitle:setText(guide.name or 'Quest Guide')
-    local sub = string.format('%s  •  %s', string.upper(guide.category or 'Quest'), guide.city or 'Worldwide')
+    local sub = string.format('%s  |  %s', string.upper(guide.category or 'Quest'), guide.city or 'Worldwide')
     p.headerBox.detailSubtitle:setText(sub)
 
     -- Avatar in header
-    local hasCreature = false
-    local hasItem = false
-    if guide.creatureLookType and guide.creatureLookType > 0 then
-        p.headerBox.detailAvatarBox.detailCreature:setOutfit({
-            type = guide.creatureLookType,
-            addons = guide.addons or 3,
-            head = 0, body = 0, legs = 0, feet = 0
-        })
-        p.headerBox.detailAvatarBox.detailCreature:show()
-        p.headerBox.detailAvatarBox.detailItem:hide()
-        hasCreature = true
-    end
-    if not hasCreature and guide.requiredItems and #guide.requiredItems > 0 then
-        local firstItem = guide.requiredItems[1]
-        p.headerBox.detailAvatarBox.detailItem:setItemId(firstItem.id)
-        p.headerBox.detailAvatarBox.detailItem:show()
-        p.headerBox.detailAvatarBox.detailCreature:hide()
-        hasItem = true
-    end
-    if not hasCreature and not hasItem then
-        p.headerBox.detailAvatarBox.detailItem:setItemId(2596) -- Default letter/scroll icon
-        p.headerBox.detailAvatarBox.detailItem:show()
-        p.headerBox.detailAvatarBox.detailCreature:hide()
-    end
+    local vis = getGuideVisual(guide)
+    applyVisualToWidgets(p.headerBox.detailAvatarBox.detailCreature, p.headerBox.detailAvatarBox.detailItem, vis)
 
     questTracker.updateWalkthroughDisplay()
 end
@@ -253,15 +350,21 @@ function questTracker.updateWalkthroughDisplay()
 
     local st = steps[currentWalkthroughStep]
 
-    -- 1. Update Carousel Navigation Bar (Image 1 / Cyclopedia style)
+    -- 1. Update Carousel Navigation Bar
     p.stepNavBar.stepProgressLabel:setText(string.format('%d / %d', currentWalkthroughStep, totalSteps))
     p.stepNavBar.prevStepBtn:setEnabled(currentWalkthroughStep > 1)
     p.stepNavBar.nextStepBtn:setEnabled(currentWalkthroughStep < totalSteps)
     p.footerPanel.btnPrevStepBottom:setEnabled(currentWalkthroughStep > 1)
     p.footerPanel.btnNextStepBottom:setEnabled(currentWalkthroughStep < totalSteps)
 
-    local stepTitle = st.title or string.format('Step %d', currentWalkthroughStep)
-    p.stepTitleLabel:setText(string.format('Step %d: %s', currentWalkthroughStep, stepTitle))
+    -- Clean step title without repeating "Step X: Mission X:"
+    local rawTitle = st.title or ('Step ' .. currentWalkthroughStep)
+    local lTitle = string.lower(rawTitle)
+    if string.find(lTitle, '^step') or string.find(lTitle, '^mission') or string.find(lTitle, '^trial') then
+        p.stepTitleLabel:setText(rawTitle)
+    else
+        p.stepTitleLabel:setText(string.format('Step %d: %s', currentWalkthroughStep, rawTitle))
+    end
 
     -- 2. Step Target Box
     local targetCoords = st.targetCoords or st.npcCoords or walkthroughGuide.coords
@@ -276,28 +379,12 @@ function questTracker.updateWalkthroughDisplay()
     p.stepContentPanel.stepTargetBox.stepLocationLabel:setText(locStr)
 
     -- Step visual icon (creature or item)
-    if walkthroughGuide.creatureLookType and walkthroughGuide.creatureLookType > 0 then
-        p.stepContentPanel.stepTargetBox.stepCreatureBox.stepCreature:setOutfit({
-            type = walkthroughGuide.creatureLookType,
-            addons = walkthroughGuide.addons or 3,
-            head = 0, body = 0, legs = 0, feet = 0
-        })
-        p.stepContentPanel.stepTargetBox.stepCreatureBox.stepCreature:show()
-        p.stepContentPanel.stepTargetBox.stepCreatureBox.stepItem:hide()
-    elseif walkthroughGuide.requiredItems and #walkthroughGuide.requiredItems > 0 then
-        local it = walkthroughGuide.requiredItems[1]
-        p.stepContentPanel.stepTargetBox.stepCreatureBox.stepItem:setItemId(it.id)
-        p.stepContentPanel.stepTargetBox.stepCreatureBox.stepItem:show()
-        p.stepContentPanel.stepTargetBox.stepCreatureBox.stepCreature:hide()
-    else
-        p.stepContentPanel.stepTargetBox.stepCreatureBox.stepItem:setItemId(2596)
-        p.stepContentPanel.stepTargetBox.stepCreatureBox.stepItem:show()
-        p.stepContentPanel.stepTargetBox.stepCreatureBox.stepCreature:hide()
-    end
+    local stepVis = getGuideVisual(walkthroughGuide, st)
+    applyVisualToWidgets(p.stepContentPanel.stepTargetBox.stepCreatureBox.stepCreature, p.stepContentPanel.stepTargetBox.stepCreatureBox.stepItem, stepVis)
 
     -- Button [Mark on Map] on this step
     p.stepContentPanel.stepTargetBox.btnStepMarkMap.onClick = function()
-        questTracker.markOnMap(targetCoords, walkthroughGuide.name .. ' - ' .. stepTitle)
+        questTracker.markOnMap(targetCoords, walkthroughGuide.name .. ' - ' .. rawTitle)
     end
 
     -- 3. Step Instructions
@@ -319,7 +406,7 @@ function questTracker.updateWalkthroughDisplay()
     p.rewardsBox.rewardItemsContainer:destroyChildren()
 
     local hasOutfit = false
-    if walkthroughGuide.creatureLookType and walkthroughGuide.creatureLookType > 0 and (walkthroughGuide.category == 'addon' or walkthroughGuide.category == 'mount') then
+    if walkthroughGuide.creatureLookType and walkthroughGuide.creatureLookType > 0 and (walkthroughGuide.category == 'addon' or walkthroughGuide.category == 'mount' or walkthroughGuide.category == 'quest') then
         p.rewardsBox.rewardOutfitBox:show()
         p.rewardsBox.rewardOutfitBox.rewardCreature:setOutfit({
             type = walkthroughGuide.creatureLookType,
@@ -335,15 +422,20 @@ function questTracker.updateWalkthroughDisplay()
     local itemsToShow = {}
     if walkthroughGuide.rewards then
         for _, rew in ipairs(walkthroughGuide.rewards) do
-            if rew.id and rew.id > 0 then
+            if rew.id and rew.id > 0 and rew.id ~= 2596 then
                 table.insert(itemsToShow, { id = rew.id, count = rew.count or 1, name = rew.name })
             end
         end
     end
+    if #itemsToShow == 0 and walkthroughGuide.rewardItemId and walkthroughGuide.rewardItemId > 0 and walkthroughGuide.rewardItemId ~= 2596 then
+        table.insert(itemsToShow, { id = walkthroughGuide.rewardItemId, count = 1, name = walkthroughGuide.name })
+    end
     if #itemsToShow == 0 and walkthroughGuide.requiredItems then
         for i = 1, math.min(3, #walkthroughGuide.requiredItems) do
             local req = walkthroughGuide.requiredItems[i]
-            table.insert(itemsToShow, { id = req.id, count = req.count or 1, name = req.name })
+            if req.id and req.id ~= 2596 then
+                table.insert(itemsToShow, { id = req.id, count = req.count or 1, name = req.name })
+            end
         end
     end
 
@@ -368,7 +460,7 @@ function questTracker.updateWalkthroughDisplay()
         end
     end
     if #rewDesc > 0 then
-        p.rewardsBox.rewardsSummaryText:setText(table.concat(rewDesc, ' • '))
+        p.rewardsBox.rewardsSummaryText:setText(table.concat(rewDesc, '  |  '))
     else
         p.rewardsBox.rewardsSummaryText:setText(walkthroughGuide.description or 'Quest progression & unlocks.')
     end
@@ -386,9 +478,9 @@ local function createGuideCard(guide)
     local catBadge = string.upper(guide.category or 'QUEST')
     card.categoryBadge:setText(catBadge)
 
-    local locText = string.format('City: %s  •  Level: %d+', guide.city or 'Worldwide', guide.level or 1)
+    local locText = string.format('City: %s  |  Level: %d+', guide.city or 'Worldwide', guide.level or 1)
     if guide.startNpc then
-        locText = locText .. string.format('  •  NPC: %s', guide.startNpc)
+        locText = locText .. string.format('  |  NPC: %s', guide.startNpc)
     end
     card.npcInfo:setText(locText)
 
@@ -397,52 +489,21 @@ local function createGuideCard(guide)
     card.details:setText(desc)
 
     -- Avatar setup
-    local hasCreature = false
-    local hasItem = false
-    if guide.creatureLookType and guide.creatureLookType > 0 then
-        card.previewBox.creaturePreview:setOutfit({
-            type = guide.creatureLookType,
-            addons = guide.addons or 3,
-            head = 0, body = 0, legs = 0, feet = 0
-        })
-        card.previewBox.creaturePreview:show()
-        card.previewBox.itemPreview:hide()
-        hasCreature = true
-    end
-    if not hasCreature and guide.requiredItems and #guide.requiredItems > 0 then
-        card.previewBox.itemPreview:setItemId(guide.requiredItems[1].id)
-        card.previewBox.itemPreview:show()
-        card.previewBox.creaturePreview:hide()
-        hasItem = true
-    end
-    if not hasCreature and not hasItem then
-        card.previewBox.itemPreview:setItemId(2596)
-        card.previewBox.itemPreview:show()
-        card.previewBox.creaturePreview:hide()
-    end
+    local vis = getGuideVisual(guide)
+    applyVisualToWidgets(card.previewBox.creaturePreview, card.previewBox.itemPreview, vis)
 
-    -- Action Button 1: [Walkthrough] (The new interactive step-by-step window)
+    -- Action Button 1: [Walkthrough]
     card.actionButtons.btnWalkthrough.onClick = function()
         questTracker.showWalkthrough(guide, 1)
     end
 
-    -- Action Button 2: [Mark on Map] (Opens Cyclopedia directly!)
+    -- Action Button 2: [Mark on Map]
     card.actionButtons.btnMarkMap.onClick = function()
         local coords = guide.coords
         if guide.steps and guide.steps[1] then
             coords = guide.steps[1].targetCoords or guide.steps[1].npcCoords or coords
         end
         questTracker.markOnMap(coords, guide.name)
-    end
-
-    -- Action Button 3: [Pin to HUD]
-    card.actionButtons.btnPin.onClick = function()
-        questTracker.setTrackedGuide(guide)
-    end
-
-    -- Action Button 4: [Details]
-    card.actionButtons.btnQuickDetails.onClick = function()
-        questTracker.showWalkthrough(guide, 1)
     end
 
     return card
@@ -562,6 +623,7 @@ local function initTrackerMiniWindow()
 end
 
 local function updateTrackerMiniWindow()
+    if not trackerMiniWindow then end
     if not trackerMiniWindow then return end
 
     local contents = trackerMiniWindow.contentsPanel
@@ -578,7 +640,7 @@ local function updateTrackerMiniWindow()
 
     local ab = contents.activeBox
     ab.trackedTitle:setText(activeGuide.name or 'Active Mission')
-    ab.trackedCity:setText(string.format('%s  •  %s', string.upper(activeGuide.category or 'QUEST'), activeGuide.city or 'Worldwide'))
+    ab.trackedCity:setText(string.format('%s  |  %s', string.upper(activeGuide.category or 'QUEST'), activeGuide.city or 'Worldwide'))
 
     local targetStr = 'Target: ' .. (activeGuide.startNpc or 'Objective')
     if activeGuide.steps and activeGuide.steps[1] and activeGuide.steps[1].npc then
@@ -687,12 +749,4 @@ function terminate()
         questWalkthroughWindow:destroy()
         questWalkthroughWindow = nil
     end
-
-    if mainPanelButton then
-        mainPanelButton:destroy()
-        mainPanelButton = nil
-    end
 end
-
--- Export
-modules.game_questtracker = questTracker

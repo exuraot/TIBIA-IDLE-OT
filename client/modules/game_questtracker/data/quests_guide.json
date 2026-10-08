@@ -790,7 +790,7 @@
             "category": "quest",
             "level": 20,
             "npcLookType": 128,
-            "rewardItemId": 2078,
+            "rewardItemId": 2957,
             "description": "Earn substantial discounts on all boat & carpet travel, and use locked royal postboxes.",
             "lore": "The Royal Tibian Postal Service has connected the kingdom for centuries. Rising through the ranks from Assistant to Grand Postman grants immense travel privileges.",
             "startNpc": "Kevin",
@@ -803,17 +803,17 @@
             "dialogTranscript": "Player: \"hi\"\nNPC: \"Greetings, traveler! Welcome to the Post Office.\"\nPlayer: \"mission\"\nNPC: \"Do you want to join our noble courier guild and run your first delivery?\"\nPlayer: \"yes\"\nNPC: \"First, swear your postman oath and deliver this priority parcel to Kroox!\"",
             "requiredItems": [
                 {
-                    "id": 2331,
+                    "id": 3503,
                     "name": "Parcel",
                     "count": 1
                 },
                 {
-                    "id": 2330,
+                    "id": 3505,
                     "name": "Letter",
                     "count": 1
                 },
                 {
-                    "id": 2596,
+                    "id": 2856,
                     "name": "Present",
                     "count": 1
                 }
@@ -829,7 +829,18 @@
                 },
                 {
                     "type": "item",
-                    "name": "Post Horn & Postman Hat"
+                    "id": 2957,
+                    "name": "Post Horn (Item & Travel Privilege)"
+                },
+                {
+                    "type": "item",
+                    "id": 3504,
+                    "name": "Royal Stamped Parcel"
+                },
+                {
+                    "type": "item",
+                    "id": 3217,
+                    "name": "Letterbag"
                 }
             ],
             "steps": [
@@ -843,7 +854,8 @@
                         "x": 32568,
                         "y": 32018,
                         "z": 6
-                    }
+                    },
+                    "npcLookType": 128
                 },
                 {
                     "step": 2,
@@ -855,7 +867,8 @@
                         "x": 32651,
                         "y": 31887,
                         "z": 9
-                    }
+                    },
+                    "npcLookType": 160
                 },
                 {
                     "step": 3,
@@ -867,17 +880,19 @@
                         "x": 32416,
                         "y": 32145,
                         "z": 15
-                    }
+                    },
+                    "npcLookType": 25
                 }
-            ]
+            ],
+            "creatureLookType": 128
         },
         {
             "id": "quest_inquisition",
             "name": "The Inquisition Quest",
             "category": "quest",
             "level": 100,
-            "npcLookType": 130,
-            "rewardItemId": 8889,
+            "npcLookType": 132,
+            "rewardItemId": 8062,
             "description": "Purge the 7 Infernal Seals, unlock shortcut teleports, and earn top tier holy armor.",
             "lore": "High Inquisitor Henricus leads the sacred order against the underworld cults. Cleansing the 7 Seals allows permanent fast-travel shortcuts through the demonic underworld.",
             "startNpc": "Henricus",
@@ -903,7 +918,18 @@
             "rewards": [
                 {
                     "type": "item",
-                    "name": "Choice of Demon Hunter Armor / Master Archer's Armor / Royal Draken Mail"
+                    "id": 8062,
+                    "name": "Demon Hunter Armor"
+                },
+                {
+                    "type": "item",
+                    "id": 8060,
+                    "name": "Master Archer's Armor"
+                },
+                {
+                    "type": "item",
+                    "id": 8023,
+                    "name": "Emerald Sword"
                 },
                 {
                     "type": "outfit",
@@ -925,9 +951,11 @@
                         "x": 32316,
                         "y": 32267,
                         "z": 8
-                    }
+                    },
+                    "npcLookType": 132
                 }
-            ]
+            ],
+            "creatureLookType": 288
         },
         {
             "id": "quest_poi",
@@ -961,15 +989,23 @@
             "rewards": [
                 {
                     "type": "item",
-                    "name": "Pair of Soft Boots (Regenerates 12 HP & 12 MP per tick)"
+                    "id": 6529,
+                    "name": "Pair of Soft Boots (Regenerates 12 HP & 12 MP/tick)"
                 },
                 {
                     "type": "item",
-                    "name": "Backpack of Holding & Frozen Starlight"
+                    "id": 6527,
+                    "name": "The Avenger (Two-Handed Sword)"
                 },
                 {
                     "type": "item",
-                    "name": "Choice of Arcane Staff, Avenger or Arbalest"
+                    "id": 3341,
+                    "name": "Arcane Staff"
+                },
+                {
+                    "type": "item",
+                    "id": 3253,
+                    "name": "Backpack of Holding"
                 }
             ],
             "steps": [
@@ -984,7 +1020,8 @@
                         "z": 8
                     }
                 }
-            ]
+            ],
+            "creatureLookType": 35
         },
         {
             "id": "quest_banshee",
@@ -992,7 +1029,7 @@
             "category": "quest",
             "level": 60,
             "npcLookType": 78,
-            "rewardItemId": 2195,
+            "rewardItemId": 3079,
             "description": "Break the 7 mystical seals in Ghostlands to face the Queen. Rewards: Boots of Haste & Stealth Ring.",
             "lore": "The crypts beneath Ghostlands harbor the sorrowful Banshee Queen. Solving her 7 trials of logic, sacrifice and true path grants the prized Boots of Haste.",
             "startNpc": "The Queen of the Banshees",
@@ -1006,11 +1043,23 @@
             "rewards": [
                 {
                     "type": "item",
+                    "id": 3079,
                     "name": "Boots of Haste (+20 Speed)"
                 },
                 {
                     "type": "item",
-                    "name": "Stealth Ring, Stone Skin Amulet & 10,000 GP"
+                    "id": 3281,
+                    "name": "Giant Sword"
+                },
+                {
+                    "type": "item",
+                    "id": 3428,
+                    "name": "Tower Shield"
+                },
+                {
+                    "type": "item",
+                    "id": 3049,
+                    "name": "Stealth Ring"
                 }
             ],
             "steps": [
@@ -1025,14 +1074,15 @@
                         "z": 6
                     }
                 }
-            ]
+            ],
+            "creatureLookType": 78
         },
         {
             "id": "quest_annihilator",
             "name": "The Annihilator Quest",
             "category": "quest",
             "level": 100,
-            "rewardItemId": 2494,
+            "rewardItemId": 3388,
             "description": "The pinnacle 4-player team challenge against 6 Demons. Reward: Demon Armor, SoV or SCA.",
             "lore": "Four level 100+ heroes stand on four tiles, pulling the lever to be teleported into a narrow chamber surrounded by 6 enraged Demons.",
             "startNpc": "Hero Cave Lever",
@@ -1046,10 +1096,22 @@
             "rewards": [
                 {
                     "type": "item",
-                    "name": "Choice of Demon Armor, Sword of Valor (SoV) or Stonecutter Axe (SCA)"
+                    "id": 3388,
+                    "name": "Demon Armor (Arm: 16)"
                 },
                 {
                     "type": "item",
+                    "id": 3288,
+                    "name": "Magic Sword (Sword of Valor - Atk: 48, Def: 35)"
+                },
+                {
+                    "type": "item",
+                    "id": 3319,
+                    "name": "Stonecutter Axe (Atk: 50, Def: 30)"
+                },
+                {
+                    "type": "item",
+                    "id": 2993,
                     "name": "Annihilator Teddy Bear"
                 }
             ],
@@ -1065,15 +1127,16 @@
                         "z": 13
                     }
                 }
-            ]
+            ],
+            "creatureLookType": 35
         },
         {
             "id": "quest_djinn_war",
             "name": "The Djinn War (Green vs Blue)",
             "category": "quest",
             "level": 40,
-            "npcLookType": 128,
-            "rewardItemId": 2148,
+            "npcLookType": 153,
+            "rewardItemId": 3035,
             "description": "Choose your allegiance: Marid (Blue - Haroun) or Efreet (Green - Yaman) to trade rare treasures.",
             "lore": "An eternal feud between the noble Marid djinn and the ferocious Efreet djinn in the Ankrahmun peaks. Aligning with one grants entry to their fortress market.",
             "startNpc": "Melchior",
@@ -1087,11 +1150,13 @@
             "rewards": [
                 {
                     "type": "privilege",
-                    "name": "Trade access to Djinn rare equipment shops (weapons & armor)"
+                    "name": "Trade access to Djinn rare equipment shops"
                 },
                 {
                     "type": "item",
-                    "name": "Gem of Fate & 10,000 GP"
+                    "id": 3035,
+                    "count": 100,
+                    "name": "10,000 Gold Coins (100 Platinum)"
                 }
             ],
             "steps": [
@@ -1107,14 +1172,15 @@
                         "z": 7
                     }
                 }
-            ]
+            ],
+            "creatureLookType": 80
         },
         {
             "id": "quest_the_paradox_tower",
             "name": "The Paradox Tower",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Paradox Tower. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Paradox Tower recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1150,7 +1216,7 @@
             "name": "Spike Task",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Spike Task. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Spike Task recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1186,7 +1252,7 @@
             "name": "A Father's Burden",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for A Father's Burden. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of A Father's Burden recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1222,7 +1288,7 @@
             "name": "Bigfoot's Burden",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Bigfoot's Burden. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Bigfoot's Burden recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1258,7 +1324,7 @@
             "name": "Children of the Revolution",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Children of the Revolution. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Children of the Revolution recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1294,7 +1360,7 @@
             "name": "Factions",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Factions. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Factions recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1330,7 +1396,7 @@
             "name": "Friends and Traders",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Friends and Traders. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Friends and Traders recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1366,7 +1432,7 @@
             "name": "Hot Cuisine",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Hot Cuisine. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Hot Cuisine recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1402,7 +1468,7 @@
             "name": "In Service of Yalahar",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for In Service of Yalahar. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of In Service of Yalahar recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1438,7 +1504,7 @@
             "name": "Killing in the Name of...",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Killing in the Name of.... Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Killing in the Name of... recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1474,7 +1540,7 @@
             "name": "Outfit and Addon Quests",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Outfit and Addon Quests. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Outfit and Addon Quests recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1510,7 +1576,7 @@
             "name": "Sam's Old Backpack",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Sam's Old Backpack. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Sam's Old Backpack recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1546,7 +1612,7 @@
             "name": "Sea of Light",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Sea of Light. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Sea of Light recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1582,7 +1648,7 @@
             "name": "Secret Service",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Secret Service. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Secret Service recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1618,7 +1684,7 @@
             "name": "The Ancient Tombs",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Ancient Tombs. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Ancient Tombs recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1654,7 +1720,7 @@
             "name": "The Ape City",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Ape City. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Ape City recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1690,7 +1756,7 @@
             "name": "The Beginning",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Beginning. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Beginning recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1726,7 +1792,7 @@
             "name": "The Djinn War - Efreet Faction",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Djinn War - Efreet Faction. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Djinn War - Efreet Faction recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1762,7 +1828,7 @@
             "name": "The Djinn War - Marid Faction",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Djinn War - Marid Faction. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Djinn War - Marid Faction recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1798,7 +1864,7 @@
             "name": "The Hidden City of Beregar",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Hidden City of Beregar. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Hidden City of Beregar recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1834,7 +1900,7 @@
             "name": "The Ice Islands Quest",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Ice Islands Quest. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Ice Islands Quest recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1870,7 +1936,7 @@
             "name": "The Inquisition",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Inquisition. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Inquisition recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1906,7 +1972,7 @@
             "name": "The Postman Missions",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Postman Missions. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Postman Missions recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1942,7 +2008,7 @@
             "name": "The Shattered Isles",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Shattered Isles. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Shattered Isles recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -1978,7 +2044,7 @@
             "name": "The Thieves Guild",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Thieves Guild. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Thieves Guild recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2014,7 +2080,7 @@
             "name": "The Travelling Trader Quest",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Travelling Trader Quest. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Travelling Trader Quest recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2050,7 +2116,7 @@
             "name": "The Explorer Society",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Explorer Society. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Explorer Society recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2086,7 +2152,7 @@
             "name": "The Ultimate Challenges",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Ultimate Challenges. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Ultimate Challenges recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2122,7 +2188,7 @@
             "name": "The White Raven Monastery",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The White Raven Monastery. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The White Raven Monastery recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2158,7 +2224,7 @@
             "name": "Tibia Tales",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Tibia Tales. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Tibia Tales recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2194,7 +2260,7 @@
             "name": "Unnatural Selection",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Unnatural Selection. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Unnatural Selection recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2230,7 +2296,7 @@
             "name": "What a foolish Quest",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for What a foolish Quest. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of What a foolish Quest recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2266,7 +2332,7 @@
             "name": "Wrath of the Emperor",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Wrath of the Emperor. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Wrath of the Emperor recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2302,7 +2368,7 @@
             "name": "Oramond",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Oramond. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Oramond recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2338,7 +2404,7 @@
             "name": "Forgotten Knowledge",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Forgotten Knowledge. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Forgotten Knowledge recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2374,7 +2440,7 @@
             "name": "The First Dragon",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The First Dragon. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The First Dragon recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2410,7 +2476,7 @@
             "name": "Cults of Tibia",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Cults of Tibia. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Cults of Tibia recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2446,7 +2512,7 @@
             "name": "Dangerous Depths",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Dangerous Depths. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Dangerous Depths recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2482,7 +2548,7 @@
             "name": "Adventurers Guild",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Adventurers Guild. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Adventurers Guild recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2518,7 +2584,7 @@
             "name": "Dawnport",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Dawnport. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Dawnport recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2554,7 +2620,7 @@
             "name": "The Rookie Guard",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Rookie Guard. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Rookie Guard recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2590,7 +2656,7 @@
             "name": "The New Frontier",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The New Frontier. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The New Frontier recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2626,7 +2692,7 @@
             "name": "Spirithunters Quest",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Spirithunters Quest. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Spirithunters Quest recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2662,7 +2728,7 @@
             "name": "Threatened Dreams",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Threatened Dreams. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Threatened Dreams recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2698,7 +2764,7 @@
             "name": "Blood Brothers",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Blood Brothers. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Blood Brothers recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2734,7 +2800,7 @@
             "name": "Grave Danger",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Grave Danger. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Grave Danger recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2770,7 +2836,7 @@
             "name": "The Outlaw Camp",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Outlaw Camp. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Outlaw Camp recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2806,7 +2872,7 @@
             "name": "The Secret Library",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Secret Library. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Secret Library recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2842,7 +2908,7 @@
             "name": "The Dream Courts",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Dream Courts. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Dream Courts recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2878,7 +2944,7 @@
             "name": "No Rest for the Wicked",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for No Rest for the Wicked. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of No Rest for the Wicked recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2914,7 +2980,7 @@
             "name": "The Way of the Monk",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Way of the Monk. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Way of the Monk recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2950,7 +3016,7 @@
             "name": "Bloody Tusks Quest",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for Bloody Tusks Quest. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of Bloody Tusks Quest recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",
@@ -2986,7 +3052,7 @@
             "name": "The Order of the Lion",
             "category": "quest",
             "level": 50,
-            "iconItem": 1988,
+            "iconItem": 2815,
             "description": "Official questline for The Order of the Lion. Check your Quest Log for active objectives.",
             "lore": "The legendary trials of The Order of the Lion recorded in the kingdom's official quest chronicles.",
             "startNpc": "Central Temple",

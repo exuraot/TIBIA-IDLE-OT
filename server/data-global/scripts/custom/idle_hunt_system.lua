@@ -15,19 +15,15 @@ local STORAGE_LAST_QUICK_SELL = 889999
 local STORAGE_RECORD_EXP_BASE = 890000
 local STORAGE_RECORD_GP_BASE = 895000
 
-if not IDLE_ARENA_BLUEPRINT then
-	pcall(dofile, "data-global/scripts/custom/idle_arena_blueprint.lua")
-end
-
 -- Coordenadas da Arena Oficial IDLE Instanciada e Isolada
--- Réplica 100% fiel da sala de Thais (32378, 32206, 8) sem escadas nem acesso público
-local IDLE_ARENA_CENTER = Position(2500, 2500, 10)
+-- Subterrâneo de Thais (32378, 32206, 8) lacrada sem escadas e sem acesso pela rua
+local IDLE_ARENA_CENTER = Position(32378, 32206, 8)
 local IDLE_ARENA_BOUNDS = {
-	minX = 2492,
-	maxX = 2508,
-	minY = 2493,
-	maxY = 2508,
-	z = 10
+	minX = 32370,
+	maxX = 32386,
+	minY = 32198,
+	maxY = 32214,
+	z = 8
 }
 
 -- Posições das hunts unificadas na Arena Oficial
@@ -1022,27 +1018,43 @@ local function isInsideArena(pos)
 end
 
 local function ensureArenaTiles(bounds, groundFallbackId)
-	if IDLE_ARENA_BLUEPRINT then
-		for _, t in ipairs(IDLE_ARENA_BLUEPRINT) do
-			local pos = Position(t.x, t.y, t.z)
-			local tile = Tile(pos)
-			if not tile or not tile:getGround() then
-				if t.ground then
-					Game.createItem(t.ground, 1, pos)
-				end
+	-- 1. Remove qualquer escada ou objeto de saída da arena (32380, 32204, 8) para isolamento total
+	local ladderPos = Position(32380, 32204, 8)
+	local ladderTile = Tile(ladderPos)
+	if ladderTile then
+		local items = ladderTile:getItems()
+		if items then
+			for _, it in ipairs(items) do
+				it:remove()
 			end
-			tile = Tile(pos)
-			if tile and t.items then
-				for _, itemId in ipairs(t.items) do
-					if not tile:getItemById(itemId) then
-						Game.createItem(itemId, 1, pos)
-					end
+		end
+	end
+
+	-- 2. Lacra o bueiro na superfície (32380, 32204, 7) para impedir acesso público de fora
+	local streetTile = Tile(Position(32380, 32204, 7))
+	if streetTile then
+		local items = streetTile:getItems()
+		if items then
+			for _, it in ipairs(items) do
+				if it:getId() == 431 then
+					it:transform(430)
+				end
+				if it:getId() == 430 or it:getId() == 432 then
+					it:setActionId(65534)
 				end
 			end
 		end
-		return
 	end
 end
+
+-- Bloqueio do bueiro na superfície (Thais) via actionId 65534
+local sewerBlockAction = Action()
+function sewerBlockAction.onUse(player, item, fromPosition, target, toPosition, isHotkey)
+	player:sendCancelMessage("O bueiro está firmemente trancado e lacrado.")
+	return true
+end
+sewerBlockAction:aid(65534)
+sewerBlockAction:register()
 
 -- =========================================================================
 -- ENGINE DE SPAWN CONTÍNUO POR ONDAS (WAVES) NA SALA OFICIAL
@@ -1135,11 +1147,11 @@ local function spawnHuntWave(player, hunt, session)
 				offsetIndex = (offsetIndex % #offsets) + 1
 				local spawnPos = Position(pPos.x + off.x, pPos.y + off.y, pPos.z)
 
-				-- Clamping seguro dentro dos limites caminháveis da sala oficial instanciada (2500, 2500, 10)
-				if spawnPos.x < 2497 then spawnPos.x = 2498 end
-				if spawnPos.x > 2503 then spawnPos.x = 2502 end
-				if spawnPos.y < 2498 then spawnPos.y = 2499 end
-				if spawnPos.y > 2502 then spawnPos.y = 2501 end
+				-- Clamping seguro dentro dos limites caminháveis da sala oficial (32378, 32206, 8)
+				if spawnPos.x < 32375 then spawnPos.x = 32376 end
+				if spawnPos.x > 32381 then spawnPos.x = 32380 end
+				if spawnPos.y < 32204 then spawnPos.y = 32205 end
+				if spawnPos.y > 32208 then spawnPos.y = 32207 end
 
 				local monster = Game.createMonster(w.name, spawnPos, true, true)
 				if monster then

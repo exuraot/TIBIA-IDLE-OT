@@ -1054,8 +1054,31 @@ local function buildInstanceRoom(slot)
 
 	local cx, cy, cz = slot.center.x, slot.center.y, slot.center.z
 
-	-- Constrói arena: interior 9x7 (dx=-4..4, dy=-3..3) com chão 351 (cave dirt)
-	-- e paredes limítrofes (dx=-5, 5 ou dy=-4, 4) com item 5712 (cave rock wall)
+	-- 1. Cria lago de água subterrânea ao redor (dx=-14..14, dy=-11..11) cobrindo toda a visão da tela
+	for dx = -14, 14 do
+		for dy = -11, 11 do
+			-- Apenas nas coordenadas fora da caverna
+			if dx < -5 or dx > 5 or dy < -4 or dy > 4 then
+				local p = Position(cx + dx, cy + dy, cz)
+				local tile = Tile(p)
+				if not tile then
+					tile = Game.createTile(p)
+				end
+				if tile then
+					local g = tile:getGround()
+					if not g then
+						Game.createItem(4597, 1, p)
+					elseif g:getId() ~= 4597 then
+						g:transform(4597)
+					end
+				end
+			end
+		end
+	end
+
+	-- 2. Constrói a ilha da caverna:
+	-- Borda de paredes de pedra: dx=-5, 5 ou dy=-4, 4 com item 5712 (cave rock wall)
+	-- Interior 9x7 com bordas clássicas de terra (356..364) e centro 351 (cave dirt)
 	for dx = -5, 5 do
 		for dy = -4, 4 do
 			local p = Position(cx + dx, cy + dy, cz)
@@ -1074,9 +1097,34 @@ local function buildInstanceRoom(slot)
 			end
 
 			local isBorder = (dx == -5 or dx == 5 or dy == -4 or dy == 4)
+
+			-- Determina o ground apropriado com bordas naturais:
+			local groundId = 351
+			if not isBorder then
+				if dx == -4 and dy == -3 then
+					groundId = 363 -- Canto Noroeste
+				elseif dx == 4 and dy == -3 then
+					groundId = 364 -- Canto Nordeste
+				elseif dx == -4 and dy == 3 then
+					groundId = 361 -- Canto Sudoeste
+				elseif dx == 4 and dy == 3 then
+					groundId = 362 -- Canto Sudeste
+				elseif dy == -3 then
+					groundId = 356 -- Borda Norte
+				elseif dy == 3 then
+					groundId = 360 -- Borda Sul
+				elseif dx == -4 then
+					groundId = 358 -- Borda Oeste
+				elseif dx == 4 then
+					groundId = 359 -- Borda Leste
+				end
+			end
+
 			local g = tile and tile:getGround()
 			if not g then
-				Game.createItem(351, 1, p)
+				Game.createItem(groundId, 1, p)
+			else
+				g:transform(groundId)
 			end
 
 			if isBorder then

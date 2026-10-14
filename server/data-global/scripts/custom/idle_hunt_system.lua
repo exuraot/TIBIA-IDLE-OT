@@ -15,15 +15,19 @@ local STORAGE_LAST_QUICK_SELL = 889999
 local STORAGE_RECORD_EXP_BASE = 890000
 local STORAGE_RECORD_GP_BASE = 895000
 
--- Coordenadas da Arena Oficial IDLE em world.otbm (Local escolhido pelo jogador)
--- Centro exato: Position(32378, 32206, 8)
-local IDLE_ARENA_CENTER = Position(32378, 32206, 8)
+if not IDLE_ARENA_BLUEPRINT then
+	pcall(dofile, "data-global/scripts/custom/idle_arena_blueprint.lua")
+end
+
+-- Coordenadas da Arena Oficial IDLE Instanciada e Isolada
+-- Réplica 100% fiel da sala de Thais (32378, 32206, 8) sem escadas nem acesso público
+local IDLE_ARENA_CENTER = Position(2500, 2500, 10)
 local IDLE_ARENA_BOUNDS = {
-	minX = 32371,
-	maxX = 32385,
-	minY = 32200,
-	maxY = 32213,
-	z = 8
+	minX = 2492,
+	maxX = 2508,
+	minY = 2493,
+	maxY = 2508,
+	z = 10
 }
 
 -- Posições das hunts unificadas na Arena Oficial
@@ -1018,10 +1022,26 @@ local function isInsideArena(pos)
 end
 
 local function ensureArenaTiles(bounds, groundFallbackId)
-	-- Como a arena fica em world.otbm nas coordenadas oficiais (33039, 32706, 9),
-	-- todos os tiles já existem nativamente no mapa global.
-	-- Não geramos nenhum piso artificial nem areia.
-	return
+	if IDLE_ARENA_BLUEPRINT then
+		for _, t in ipairs(IDLE_ARENA_BLUEPRINT) do
+			local pos = Position(t.x, t.y, t.z)
+			local tile = Tile(pos)
+			if not tile or not tile:getGround() then
+				if t.ground then
+					Game.createItem(t.ground, 1, pos)
+				end
+			end
+			tile = Tile(pos)
+			if tile and t.items then
+				for _, itemId in ipairs(t.items) do
+					if not tile:getItemById(itemId) then
+						Game.createItem(itemId, 1, pos)
+					end
+				end
+			end
+		end
+		return
+	end
 end
 
 -- =========================================================================
@@ -1115,11 +1135,11 @@ local function spawnHuntWave(player, hunt, session)
 				offsetIndex = (offsetIndex % #offsets) + 1
 				local spawnPos = Position(pPos.x + off.x, pPos.y + off.y, pPos.z)
 
-				-- Clamping seguro dentro dos limites caminháveis da sala oficial (32378, 32206, 8)
-				if spawnPos.x < 32375 then spawnPos.x = 32376 end
-				if spawnPos.x > 32381 then spawnPos.x = 32380 end
-				if spawnPos.y < 32204 then spawnPos.y = 32205 end
-				if spawnPos.y > 32208 then spawnPos.y = 32207 end
+				-- Clamping seguro dentro dos limites caminháveis da sala oficial instanciada (2500, 2500, 10)
+				if spawnPos.x < 2497 then spawnPos.x = 2498 end
+				if spawnPos.x > 2503 then spawnPos.x = 2502 end
+				if spawnPos.y < 2498 then spawnPos.y = 2499 end
+				if spawnPos.y > 2502 then spawnPos.y = 2501 end
 
 				local monster = Game.createMonster(w.name, spawnPos, true, true)
 				if monster then

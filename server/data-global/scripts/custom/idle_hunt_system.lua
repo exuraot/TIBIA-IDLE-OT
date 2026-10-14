@@ -15,15 +15,15 @@ local STORAGE_LAST_QUICK_SELL = 889999
 local STORAGE_RECORD_EXP_BASE = 890000
 local STORAGE_RECORD_GP_BASE = 895000
 
--- Coordenadas da Arena Oficial IDLE em world.otbm (Centro Real da Câmara de Caverna)
--- Centro exato: Position(32993, 32690, 9) (8 sqms de piso livre para cada lado)
-local IDLE_ARENA_CENTER = Position(32993, 32690, 9)
+-- Coordenadas da Arena Oficial IDLE em world.otbm (Local escolhido pelo jogador)
+-- Centro exato: Position(32378, 32206, 8)
+local IDLE_ARENA_CENTER = Position(32378, 32206, 8)
 local IDLE_ARENA_BOUNDS = {
-	minX = 32984,
-	maxX = 33002,
-	minY = 32683,
-	maxY = 32697,
-	z = 9
+	minX = 32371,
+	maxX = 32385,
+	minY = 32200,
+	maxY = 32213,
+	z = 8
 }
 
 -- Posições das hunts unificadas na Arena Oficial
@@ -1115,11 +1115,11 @@ local function spawnHuntWave(player, hunt, session)
 				offsetIndex = (offsetIndex % #offsets) + 1
 				local spawnPos = Position(pPos.x + off.x, pPos.y + off.y, pPos.z)
 
-				-- Clamping seguro dentro dos limites caminháveis da câmara (32993, 32690, 9)
-				if spawnPos.x < 32988 then spawnPos.x = 32989 end
-				if spawnPos.x > 32998 then spawnPos.x = 32997 end
-				if spawnPos.y < 32686 then spawnPos.y = 32687 end
-				if spawnPos.y > 32694 then spawnPos.y = 32693 end
+				-- Clamping seguro dentro dos limites caminháveis da sala oficial (32378, 32206, 8)
+				if spawnPos.x < 32375 then spawnPos.x = 32376 end
+				if spawnPos.x > 32381 then spawnPos.x = 32380 end
+				if spawnPos.y < 32204 then spawnPos.y = 32205 end
+				if spawnPos.y > 32208 then spawnPos.y = 32207 end
 
 				local monster = Game.createMonster(w.name, spawnPos, true, true)
 				if monster then

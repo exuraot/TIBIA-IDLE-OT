@@ -15,18 +15,18 @@ local STORAGE_LAST_QUICK_SELL = 889999
 local STORAGE_RECORD_EXP_BASE = 890000
 local STORAGE_RECORD_GP_BASE = 895000
 
--- Coordenadas da Arena Oficial IDLE Instanciada e Isolada
--- Subterrâneo de Thais (32378, 32206, 8) lacrada sem escadas e sem acesso pela rua
-local IDLE_ARENA_CENTER = Position(32378, 32206, 8)
-local IDLE_ARENA_BOUNDS = {
-	minX = 32370,
-	maxX = 32386,
-	minY = 32198,
-	maxY = 32214,
-	z = 8
-}
+-- =========================================================================
+-- SISTEMA DE MULTI-INSTÂNCIAS IDLE POR SLOTS
+-- Cada jogador recebe uma sala privada 100% isolada a 60 SQMs de distância
+-- =========================================================================
+local IDLE_SLOT_BASE = Position(4000, 4000, 10)
+local IDLE_SLOT_SPACING = 60
+local MAX_IDLE_SLOTS = 30
 
--- Posições das hunts unificadas na Arena Oficial
+-- Posição fallback padrão
+local IDLE_ARENA_CENTER = IDLE_SLOT_BASE
+
+-- Posições das hunts unificadas
 local ROOM_POS_OFFICIAL = IDLE_ARENA_CENTER
 local ROOM_POS_EASY = ROOM_POS_OFFICIAL
 local ROOM_POS_MEDIUM = ROOM_POS_OFFICIAL
@@ -1008,29 +1008,153 @@ local function sendLootUpdateOpcode(player, huntId)
 end
 
 -- =========================================================================
--- INSTANCIAÇÃO E SEGURANÇA DA ARENA OFICIAL IDLE
+-- INSTANCIAÇÃO E SEGURANÇA DA ARENA MULTI-SLOT IDLE
+-- Cada jogador recebe um slot isolado a 60 SQMs sem colisão visual ou de combate
 -- =========================================================================
-local function isInsideArena(pos)
-	if not pos then return false end
-	return pos.x >= IDLE_ARENA_BOUNDS.minX and pos.x <= IDLE_ARENA_BOUNDS.maxX
-		and pos.y >= IDLE_ARENA_BOUNDS.minY and pos.y <= IDLE_ARENA_BOUNDS.maxY
-		and pos.z == IDLE_ARENA_BOUNDS.z
+local IDLE_INSTANCE_SLOTS = {}
+
+local function getSlotInfo(slotId)
+	if IDLE_INSTANCE_SLOTS[slotId] then
+		return IDLE_INSTANCE_SLOTS[slotId]
+	end
+
+	local col = (slotId - 1) % 10
+	local row = math.floor((slotId - 1) / 10)
+	local cx = IDLE_SLOT_BASE.x + (col * IDLE_SLOT_SPACING)
+	local cy = IDLE_SLOT_BASE.y + (row * IDLE_SLOT_SPACING)
+	local cz = IDLE_SLOT_BASE.z
+
+	local slot = {
+		id = slotId,
+		inUse = false,
+		playerId = nil,
+		center = Position(cx, cy, cz),
+		bounds = {
+			minX = cx - 6,
+			maxX = cx + 6,
+			minY = cy - 5,
+			maxY = cy + 5,
+			z = cz
+		},
+		spawnBounds = {
+			minX = cx - 3,
+			maxX = cx + 3,
+			minY = cy - 2,
+			maxY = cy + 2,
+			z = cz
+		},
+		built = false
+	}
+	IDLE_INSTANCE_SLOTS[slotId] = slot
+	return slot
 end
 
-local function ensureArenaTiles(bounds, groundFallbackId)
-	-- 1. Remove qualquer escada ou objeto de saída da arena (32380, 32204, 8) para isolamento total
-	local ladderPos = Position(32380, 32204, 8)
-	local ladderTile = Tile(ladderPos)
-	if ladderTile then
-		local items = ladderTile:getItems()
-		if items then
-			for _, it in ipairs(items) do
-				it:remove()
+local function buildInstanceRoom(slot)
+	if slot.built then return end
+
+	local cx, cy, cz = slot.center.x, slot.center.y, slot.center.z
+
+	-- Constrói arena: interior 9x7 (dx=-4..4, dy=-3..3) com chão 351 (cave dirt)
+	-- e paredes limítrofes (dx=-5, 5 ou dy=-4, 4) com item 5712 (cave rock wall)
+	for dx = -5, 5 do
+		for dy = -4, 4 do
+			local p = Position(cx + dx, cy + dy, cz)
+			local tile = Tile(p)
+			if not tile then
+				tile = Game.createTile(p)
+			end
+
+			if tile then
+				local items = tile:getItems()
+				if items then
+					for _, it in ipairs(items) do
+						it:remove()
+					end
+				end
+			end
+
+			local isBorder = (dx == -5 or dx == 5 or dy == -4 or dy == 4)
+			local g = tile and tile:getGround()
+			if not g then
+				Game.createItem(351, 1, p)
+			end
+
+			if isBorder then
+				tile = Tile(p)
+				if tile and not tile:getItemById(5712) then
+					Game.createItem(5712, 1, p)
+				end
 			end
 		end
 	end
 
-	-- 2. Substitui o buraco na superfície (32380, 32204, 7) por grama comum
+	slot.built = true
+end
+
+local function clearSlotMonsters(slot)
+	if not slot then return end
+	for x = slot.bounds.minX, slot.bounds.maxX do
+		for y = slot.bounds.minY, slot.bounds.maxY do
+			local tile = Tile(Position(x, y, slot.bounds.z))
+			if tile then
+				local creatures = tile:getCreatures()
+				if creatures then
+					for _, c in ipairs(creatures) do
+						if c:isMonster() then
+							c:getPosition():sendMagicEffect(CONST_ME_POFF)
+							c:remove()
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+local function allocateInstanceSlot(playerId)
+	for i = 1, MAX_IDLE_SLOTS do
+		local slot = getSlotInfo(i)
+		if not slot.inUse then
+			slot.inUse = true
+			slot.playerId = playerId
+			buildInstanceRoom(slot)
+			return slot
+		end
+	end
+	return nil
+end
+
+local function freeInstanceSlot(playerId)
+	for i = 1, MAX_IDLE_SLOTS do
+		local slot = IDLE_INSTANCE_SLOTS[i]
+		if slot and slot.playerId == playerId then
+			clearSlotMonsters(slot)
+			slot.inUse = false
+			slot.playerId = nil
+			return
+		end
+	end
+end
+
+local function getPlayerSlot(playerId)
+	for i = 1, MAX_IDLE_SLOTS do
+		local slot = IDLE_INSTANCE_SLOTS[i]
+		if slot and slot.playerId == playerId then
+			return slot
+		end
+	end
+	return nil
+end
+
+local function isInsideSlot(pos, slot)
+	if not pos or not slot then return false end
+	return pos.x >= slot.bounds.minX and pos.x <= slot.bounds.maxX
+		and pos.y >= slot.bounds.minY and pos.y <= slot.bounds.maxY
+		and pos.z == slot.bounds.z
+end
+
+local function ensureArenaTiles()
+	-- Substitui o buraco na superfície (32380, 32204, 7) por grama comum
 	local streetTile = Tile(Position(32380, 32204, 7))
 	if streetTile then
 		local items = streetTile:getItems()
@@ -1052,28 +1176,6 @@ local function ensureArenaTiles(bounds, groundFallbackId)
 	end
 end
 
--- =========================================================================
--- ENGINE DE SPAWN CONTÍNUO POR ONDAS (WAVES) NA SALA OFICIAL
--- =========================================================================
-local function clearArenaArea()
-	for x = IDLE_ARENA_BOUNDS.minX, IDLE_ARENA_BOUNDS.maxX do
-		for y = IDLE_ARENA_BOUNDS.minY, IDLE_ARENA_BOUNDS.maxY do
-			local tile = Tile(Position(x, y, IDLE_ARENA_BOUNDS.z))
-			if tile then
-				local creatures = tile:getCreatures()
-				if creatures then
-					for _, c in ipairs(creatures) do
-						if c:isMonster() then
-							c:getPosition():sendMagicEffect(CONST_ME_POFF)
-							c:remove()
-						end
-					end
-				end
-			end
-		end
-	end
-end
-
 local function clearHuntMonsters(session, huntPos)
 	if session and session.spawnedMonsters then
 		for _, mId in ipairs(session.spawnedMonsters) do
@@ -1086,7 +1188,9 @@ local function clearHuntMonsters(session, huntPos)
 		end
 		session.spawnedMonsters = {}
 	end
-	clearArenaArea()
+	if session and session.slot then
+		clearSlotMonsters(session.slot)
+	end
 end
 
 local function spawnHuntWave(player, hunt, session)
@@ -1094,8 +1198,11 @@ local function spawnHuntWave(player, hunt, session)
 	local pPos = player:getPosition()
 	session.spawnedMonsters = session.spawnedMonsters or {}
 
-	-- SEGURANÇA TOTAL: Impedir qualquer spawn caso o jogador não esteja na arena da caçada
-	if not isInsideArena(pPos) then
+	local slot = session.slot or getPlayerSlot(player:getId())
+	if not slot then return end
+
+	-- SEGURANÇA TOTAL: Impedir qualquer spawn caso o jogador não esteja no seu slot de instância
+	if not isInsideSlot(pPos, slot) then
 		return
 	end
 
@@ -1143,11 +1250,11 @@ local function spawnHuntWave(player, hunt, session)
 				offsetIndex = (offsetIndex % #offsets) + 1
 				local spawnPos = Position(pPos.x + off.x, pPos.y + off.y, pPos.z)
 
-				-- Clamping seguro dentro dos limites caminháveis da sala oficial (32378, 32206, 8)
-				if spawnPos.x < 32375 then spawnPos.x = 32376 end
-				if spawnPos.x > 32381 then spawnPos.x = 32380 end
-				if spawnPos.y < 32204 then spawnPos.y = 32205 end
-				if spawnPos.y > 32208 then spawnPos.y = 32207 end
+				-- Clamping seguro dentro dos limites da sala da instância
+				if spawnPos.x < slot.spawnBounds.minX then spawnPos.x = slot.spawnBounds.minX + 1 end
+				if spawnPos.x > slot.spawnBounds.maxX then spawnPos.x = slot.spawnBounds.maxX - 1 end
+				if spawnPos.y < slot.spawnBounds.minY then spawnPos.y = slot.spawnBounds.minY + 1 end
+				if spawnPos.y > slot.spawnBounds.maxY then spawnPos.y = slot.spawnBounds.maxY - 1 end
 
 				local monster = Game.createMonster(w.name, spawnPos, true, true)
 				if monster then
@@ -1199,14 +1306,18 @@ end
 local function stopIdleHunt(playerId, reason, isEmergency, skipTeleport)
 	local session = _G.OnIdleHunt[playerId]
 	local huntId = session and session.huntId or 1
+	local slot = session and session.slot or getPlayerSlot(playerId)
 
-	local hunt = getHuntById(huntId)
 	if session then
 		if session.event then
 			stopEvent(session.event)
 		end
-		clearHuntMonsters(session, hunt and hunt.pos)
+		clearHuntMonsters(session, slot and slot.center)
 		_G.OnIdleHunt[playerId] = nil
+	end
+
+	if slot then
+		freeInstanceSlot(playerId)
 	end
 
 	local player = Player(playerId)
@@ -1392,8 +1503,19 @@ local function startIdleHunt(player, huntId, pull)
 	local meetsAll = evaluateHuntRequirements(player, hunt)
 	local now = os.time()
 
+	-- Aloca um slot de instância exclusivo e privado para o jogador
+	local slot = allocateInstanceSlot(playerId)
+	if not slot then
+		player:sendTextMessage(MESSAGE_FAILURE, "[IDLE HUNT]: Todas as instâncias de caçada estão ocupadas no momento. Tente novamente em breve.")
+		return false
+	end
+
+	-- Limpa o slot antes do jogador entrar
+	clearSlotMonsters(slot)
+
 	_G.OnIdleHunt[playerId] = {
 		huntId = huntId,
+		slot = slot,
 		pull = pull,
 		startTime = now,
 		meetsRequirements = meetsAll,
@@ -1410,35 +1532,33 @@ local function startIdleHunt(player, huntId, pull)
 
 	local session = _G.OnIdleHunt[playerId]
 
-	-- Teleportar jogador para o centro da arena oficial da caçada
-	if hunt.pos then
-		-- Garante existência física dos tiles da arena antes do teleporte
-		ensureArenaTiles(IDLE_ARENA_BOUNDS, 104)
-
-		local targetTile = Tile(hunt.pos)
-		if not targetTile or not targetTile:getGround() then
-			player:sendTextMessage(MESSAGE_FAILURE, "[IDLE HUNT ERRO]: Não foi possível instanciar a arena da caçada.")
-			return false
-		end
-
-		local curPos = player:getPosition()
-		curPos:sendMagicEffect(CONST_ME_TELEPORT)
-		local teleportOk = player:teleportTo(hunt.pos)
-		if not teleportOk then
-			player:sendTextMessage(MESSAGE_FAILURE, "[IDLE HUNT ERRO]: Falha ao teleportar para a arena. Caçada cancelada por segurança.")
-			return false
-		end
-
-		hunt.pos:sendMagicEffect(CONST_ME_TELEPORT)
-		player:sendTextMessage(
-			MESSAGE_EVENT_ADVANCE,
-			string.format("[IDLE HUNT]: Você entrou na arena: %s!", hunt.name)
-		)
+	local targetTile = Tile(slot.center)
+	if not targetTile or not targetTile:getGround() then
+		freeInstanceSlot(playerId)
+		_G.OnIdleHunt[playerId] = nil
+		player:sendTextMessage(MESSAGE_FAILURE, "[IDLE HUNT ERRO]: Não foi possível instanciar a arena da caçada.")
+		return false
 	end
 
-	-- SEGURANÇA TOTAL: Bloqueio estrito de spawn caso o jogador não esteja na arena
+	local curPos = player:getPosition()
+	curPos:sendMagicEffect(CONST_ME_TELEPORT)
+	local teleportOk = player:teleportTo(slot.center)
+	if not teleportOk then
+		freeInstanceSlot(playerId)
+		_G.OnIdleHunt[playerId] = nil
+		player:sendTextMessage(MESSAGE_FAILURE, "[IDLE HUNT ERRO]: Falha ao teleportar para a arena. Caçada cancelada por segurança.")
+		return false
+	end
+
+	slot.center:sendMagicEffect(CONST_ME_TELEPORT)
+	player:sendTextMessage(
+		MESSAGE_EVENT_ADVANCE,
+		string.format("[IDLE HUNT]: Você entrou na arena instanciada #%d: %s!", slot.id, hunt.name)
+	)
+
+	-- SEGURANÇA TOTAL: Bloqueio estrito de spawn caso o jogador não esteja no slot
 	local playerPos = player:getPosition()
-	if not isInsideArena(playerPos) then
+	if not isInsideSlot(playerPos, slot) then
 		player:sendTextMessage(MESSAGE_FAILURE, "[IDLE HUNT ERRO]: O teleporte não foi concluído. Invocação de monstros bloqueada por segurança.")
 		stopIdleHunt(playerId, "Teleporte falhou.", false, false)
 		return false
@@ -2019,17 +2139,19 @@ end
 
 idleLogoutEvent:register()
 
--- Inicialização da Arena Oficial IDLE no Startup do Servidor
+-- Inicialização do Sistema Multi-Instâncias no Startup do Servidor
 local arenaStartupEvent = GlobalEvent("IdleHuntArenaInit")
 
 function arenaStartupEvent.onStartup()
 	addEvent(function()
-		ensureArenaTiles(IDLE_ARENA_BOUNDS, 104)
-		logger.info(string.format("[IDLE HUNT ARENA]: Official arena initialized at Center (%d,%d,%d) with bounds (%d,%d to %d,%d, Z:%d).",
-			IDLE_ARENA_CENTER.x, IDLE_ARENA_CENTER.y, IDLE_ARENA_CENTER.z,
-			IDLE_ARENA_BOUNDS.minX, IDLE_ARENA_BOUNDS.minY,
-			IDLE_ARENA_BOUNDS.maxX, IDLE_ARENA_BOUNDS.maxY,
-			IDLE_ARENA_BOUNDS.z
+		ensureArenaTiles()
+		-- Pré-cria os primeiros 5 slots de instâncias para inicialização instantânea
+		for i = 1, 5 do
+			local slot = getSlotInfo(i)
+			buildInstanceRoom(slot)
+		end
+		logger.info(string.format("[IDLE HUNT ARENA]: Multi-Instance system initialized (Base: %d,%d,%d | Spacing: %d | Max Slots: %d).",
+			IDLE_SLOT_BASE.x, IDLE_SLOT_BASE.y, IDLE_SLOT_BASE.z, IDLE_SLOT_SPACING, MAX_IDLE_SLOTS
 		))
 	end, 1000)
 	return true
@@ -2037,6 +2159,6 @@ end
 
 arenaStartupEvent:register()
 
-print(string.format("[IDLE HUNT SYSTEM]: Loaded successfully with Official Arena at (%d,%d,%d) and persistent Global Quick Sell.",
-	IDLE_ARENA_CENTER.x, IDLE_ARENA_CENTER.y, IDLE_ARENA_CENTER.z
+print(string.format("[IDLE HUNT SYSTEM]: Multi-Instance System Loaded (Base: %d,%d,%d | Spacing: %d | Max Slots: %d).",
+	IDLE_SLOT_BASE.x, IDLE_SLOT_BASE.y, IDLE_SLOT_BASE.z, IDLE_SLOT_SPACING, MAX_IDLE_SLOTS
 ))

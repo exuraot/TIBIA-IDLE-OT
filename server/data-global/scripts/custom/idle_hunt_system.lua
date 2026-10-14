@@ -1030,31 +1030,27 @@ local function ensureArenaTiles(bounds, groundFallbackId)
 		end
 	end
 
-	-- 2. Lacra o bueiro na superfície (32380, 32204, 7) para impedir acesso público de fora
+	-- 2. Substitui o buraco na superfície (32380, 32204, 7) por grama comum
 	local streetTile = Tile(Position(32380, 32204, 7))
 	if streetTile then
 		local items = streetTile:getItems()
 		if items then
 			for _, it in ipairs(items) do
-				if it:getId() == 431 then
-					it:transform(430)
-				end
-				if it:getId() == 430 or it:getId() == 432 then
-					it:setActionId(65534)
-				end
+				it:remove()
 			end
+		end
+
+		local adjTile = Tile(Position(32379, 32204, 7))
+		local grassGround = (adjTile and adjTile:getGround()) and adjTile:getGround():getId() or 4526
+
+		local g = streetTile:getGround()
+		if g then
+			g:transform(grassGround)
+		else
+			Game.createItem(grassGround, 1, Position(32380, 32204, 7))
 		end
 	end
 end
-
--- Bloqueio do bueiro na superfície (Thais) via actionId 65534
-local sewerBlockAction = Action()
-function sewerBlockAction.onUse(player, item, fromPosition, target, toPosition, isHotkey)
-	player:sendCancelMessage("O bueiro está firmemente trancado e lacrado.")
-	return true
-end
-sewerBlockAction:aid(65534)
-sewerBlockAction:register()
 
 -- =========================================================================
 -- ENGINE DE SPAWN CONTÍNUO POR ONDAS (WAVES) NA SALA OFICIAL

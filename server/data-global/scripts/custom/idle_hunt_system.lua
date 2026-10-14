@@ -15,10 +15,22 @@ local STORAGE_LAST_QUICK_SELL = 889999
 local STORAGE_RECORD_EXP_BASE = 890000
 local STORAGE_RECORD_GP_BASE = 895000
 
--- Coordenadas das Áreas IDLE Oficiais em world.otbm
-local ROOM_POS_EASY = Position(385, 754, 8)
-local ROOM_POS_MEDIUM = Position(421, 301, 11)
-local ROOM_POS_HARD = Position(440, 785, 11)
+-- Coordenadas da Arena Oficial IDLE em world.otbm (Global Map)
+-- Canto Superior Esquerdo: (33034, 32698, 9) até Canto Inferior Direito (33044, 32714, 9)
+local IDLE_ARENA_CENTER = Position(33039, 32706, 9)
+local IDLE_ARENA_BOUNDS = {
+	minX = 33034,
+	maxX = 33046,
+	minY = 32697,
+	maxY = 32715,
+	z = 9
+}
+
+-- Posições das hunts unificadas na Arena Oficial
+local ROOM_POS_OFFICIAL = IDLE_ARENA_CENTER
+local ROOM_POS_EASY = ROOM_POS_OFFICIAL
+local ROOM_POS_MEDIUM = ROOM_POS_OFFICIAL
+local ROOM_POS_HARD = ROOM_POS_OFFICIAL
 
 -- Helper de Formatação
 local function formatNumber(n)
@@ -996,64 +1008,29 @@ local function sendLootUpdateOpcode(player, huntId)
 end
 
 -- =========================================================================
+-- INSTANCIAÇÃO E SEGURANÇA DA ARENA OFICIAL IDLE
 -- =========================================================================
--- INSTANCIAÇÃO DINÂMICA DE ARENAS IDLE EM ÁREAS ISOLADAS DO MAPA
--- =========================================================================
-local function ensureArenaTiles(center, radius, groundId, wallId)
-	if not center then return end
-	radius = radius or 6
-	groundId = groundId or 104 -- Sand floor
-	wallId = wallId or 602     -- Rock wall barrier
+local function isInsideArena(pos)
+	if not pos then return false end
+	return pos.x >= IDLE_ARENA_BOUNDS.minX and pos.x <= IDLE_ARENA_BOUNDS.maxX
+		and pos.y >= IDLE_ARENA_BOUNDS.minY and pos.y <= IDLE_ARENA_BOUNDS.maxY
+		and pos.z == IDLE_ARENA_BOUNDS.z
+end
 
-	-- 1. Cria o chão caminhável do interior da arena
-	for x = center.x - radius, center.x + radius do
-		for y = center.y - radius, center.y + radius do
-			local pos = Position(x, y, center.z)
-			local tile = Tile(pos)
-			if not tile then
-				tile = Game.createTile(pos)
-			end
-			if tile and not tile:getGround() then
-				tile:addItem(groundId, 1, FLAG_NOLIMIT)
-			end
-		end
-	end
-
-	-- 2. Cria paredes de pedra no perímetro para limitar a sala
-	local outer = radius + 1
-	for x = center.x - outer, center.x + outer do
-		for _, y in ipairs({ center.y - outer, center.y + outer }) do
-			local pos = Position(x, y, center.z)
-			local tile = Tile(pos)
-			if not tile then tile = Game.createTile(pos) end
-			if tile then
-				if not tile:getGround() then tile:addItem(groundId, 1, FLAG_NOLIMIT) end
-				if not tile:getItemById(wallId) then tile:addItem(wallId, 1, FLAG_NOLIMIT) end
-			end
-		end
-	end
-	for y = center.y - outer, center.y + outer do
-		for _, x in ipairs({ center.x - outer, center.x + outer }) do
-			local pos = Position(x, y, center.z)
-			local tile = Tile(pos)
-			if not tile then tile = Game.createTile(pos) end
-			if tile then
-				if not tile:getGround() then tile:addItem(groundId, 1, FLAG_NOLIMIT) end
-				if not tile:getItemById(wallId) then tile:addItem(wallId, 1, FLAG_NOLIMIT) end
-			end
-		end
-	end
+local function ensureArenaTiles(bounds, groundFallbackId)
+	-- Como a arena fica em world.otbm nas coordenadas oficiais (33039, 32706, 9),
+	-- todos os tiles já existem nativamente no mapa global.
+	-- Não geramos nenhum piso artificial nem areia.
+	return
 end
 
 -- =========================================================================
--- ENGINE DE SPAWN CONTÍNUO POR ONDAS (WAVES) NA SALA INSTANCIADA
+-- ENGINE DE SPAWN CONTÍNUO POR ONDAS (WAVES) NA SALA OFICIAL
 -- =========================================================================
-local function clearArenaArea(centerPos, radius)
-	if not centerPos then return end
-	radius = radius or 8
-	for x = centerPos.x - radius, centerPos.x + radius do
-		for y = centerPos.y - radius, centerPos.y + radius do
-			local tile = Tile(Position(x, y, centerPos.z))
+local function clearArenaArea()
+	for x = IDLE_ARENA_BOUNDS.minX, IDLE_ARENA_BOUNDS.maxX do
+		for y = IDLE_ARENA_BOUNDS.minY, IDLE_ARENA_BOUNDS.maxY do
+			local tile = Tile(Position(x, y, IDLE_ARENA_BOUNDS.z))
 			if tile then
 				local creatures = tile:getCreatures()
 				if creatures then
@@ -1081,9 +1058,7 @@ local function clearHuntMonsters(session, huntPos)
 		end
 		session.spawnedMonsters = {}
 	end
-	if huntPos then
-		clearArenaArea(huntPos, 8)
-	end
+	clearArenaArea()
 end
 
 local function spawnHuntWave(player, hunt, session)
@@ -1092,11 +1067,8 @@ local function spawnHuntWave(player, hunt, session)
 	session.spawnedMonsters = session.spawnedMonsters or {}
 
 	-- SEGURANÇA TOTAL: Impedir qualquer spawn caso o jogador não esteja na arena da caçada
-	if hunt.pos then
-		local dist = math.max(math.abs(pPos.x - hunt.pos.x), math.abs(pPos.y - hunt.pos.y))
-		if pPos.z ~= hunt.pos.z or dist > 8 then
-			return
-		end
+	if not isInsideArena(pPos) then
+		return
 	end
 
 	-- Limpar IDs de monstros que já morreram
@@ -1142,6 +1114,12 @@ local function spawnHuntWave(player, hunt, session)
 				local off = offsets[offsetIndex] or { x = math.random(-2, 2), y = math.random(-2, 2) }
 				offsetIndex = (offsetIndex % #offsets) + 1
 				local spawnPos = Position(pPos.x + off.x, pPos.y + off.y, pPos.z)
+
+				-- Clamping seguro dentro dos limites caminháveis da sala oficial (Dark stone floor)
+				if spawnPos.x < 33037 then spawnPos.x = 33038 end
+				if spawnPos.x > 33043 then spawnPos.x = 33042 end
+				if spawnPos.y < 32699 then spawnPos.y = 32700 end
+				if spawnPos.y > 32713 then spawnPos.y = 32712 end
 
 				local monster = Game.createMonster(w.name, spawnPos, true, true)
 				if monster then
@@ -1404,10 +1382,10 @@ local function startIdleHunt(player, huntId, pull)
 
 	local session = _G.OnIdleHunt[playerId]
 
-	-- Teleportar jogador para o centro da arena instanciada da dificuldade
+	-- Teleportar jogador para o centro da arena oficial da caçada
 	if hunt.pos then
 		-- Garante existência física dos tiles da arena antes do teleporte
-		ensureArenaTiles(hunt.pos, 6, 104, 602)
+		ensureArenaTiles(IDLE_ARENA_BOUNDS, 104)
 
 		local targetTile = Tile(hunt.pos)
 		if not targetTile or not targetTile:getGround() then
@@ -1432,7 +1410,7 @@ local function startIdleHunt(player, huntId, pull)
 
 	-- SEGURANÇA TOTAL: Bloqueio estrito de spawn caso o jogador não esteja na arena
 	local playerPos = player:getPosition()
-	if hunt.pos and (playerPos.x ~= hunt.pos.x or playerPos.y ~= hunt.pos.y or playerPos.z ~= hunt.pos.z) then
+	if not isInsideArena(playerPos) then
 		player:sendTextMessage(MESSAGE_FAILURE, "[IDLE HUNT ERRO]: O teleporte não foi concluído. Invocação de monstros bloqueada por segurança.")
 		stopIdleHunt(playerId, "Teleporte falhou.", false, false)
 		return false
@@ -2013,19 +1991,24 @@ end
 
 idleLogoutEvent:register()
 
--- Inicialização das Arenas IDLE no Startup do Servidor
+-- Inicialização da Arena Oficial IDLE no Startup do Servidor
 local arenaStartupEvent = GlobalEvent("IdleHuntArenaInit")
 
 function arenaStartupEvent.onStartup()
 	addEvent(function()
-		ensureArenaTiles(ROOM_POS_EASY, 6, 104, 602)
-		ensureArenaTiles(ROOM_POS_MEDIUM, 6, 104, 602)
-		ensureArenaTiles(ROOM_POS_HARD, 6, 104, 602)
-		logger.info("[IDLE HUNT ARENAS]: 3 dynamic arenas initialized at Easy (385,754,8), Medium (421,301,11), Hard (440,785,11).")
+		ensureArenaTiles(IDLE_ARENA_BOUNDS, 104)
+		logger.info(string.format("[IDLE HUNT ARENA]: Official arena initialized at Center (%d,%d,%d) with bounds (%d,%d to %d,%d, Z:%d).",
+			IDLE_ARENA_CENTER.x, IDLE_ARENA_CENTER.y, IDLE_ARENA_CENTER.z,
+			IDLE_ARENA_BOUNDS.minX, IDLE_ARENA_BOUNDS.minY,
+			IDLE_ARENA_BOUNDS.maxX, IDLE_ARENA_BOUNDS.maxY,
+			IDLE_ARENA_BOUNDS.z
+		))
 	end, 1000)
 	return true
 end
 
 arenaStartupEvent:register()
 
-print("[IDLE HUNT SYSTEM]: Loaded successfully with 3 difficulty tiers (Easy/Medium/Hard) and persistent Global Quick Sell.")
+print(string.format("[IDLE HUNT SYSTEM]: Loaded successfully with Official Arena at (%d,%d,%d) and persistent Global Quick Sell.",
+	IDLE_ARENA_CENTER.x, IDLE_ARENA_CENTER.y, IDLE_ARENA_CENTER.z
+))

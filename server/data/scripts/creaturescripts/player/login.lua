@@ -204,7 +204,7 @@ function playerLoginGlobal.onLogin(player)
 	player:registerEvent("UpdatePlayerOnAdvancedLevel")
 	player:registerEvent("ExtendedOpcode")
 	player:registerEvent("IdleHuntExtendedOpcode")
-	player:registerEvent("IdleHuntLogout")
+	player:registerEvent("IdleHuntPlayerLogout")
 
 	if player:isUsingOtClient() then
 		addEvent(function(pid)

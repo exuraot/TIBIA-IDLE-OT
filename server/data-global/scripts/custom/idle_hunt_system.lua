@@ -1459,6 +1459,13 @@ local function idleCombatLoop(playerId, huntId)
 		return
 	end
 
+	-- Blindagem Anti-Fuga: Se o jogador saiu ou foi teleportado para fora da arena
+	local slot = session.slot or getPlayerSlot(playerId)
+	if not slot or not isInsideSlot(player:getPosition(), slot) then
+		stopIdleHunt(playerId, "Você deixou a arena da caçada.", false, true)
+		return
+	end
+
 	-- 1. Stamina IDLE
 	local curStamina = getPlayerIdleStamina(player)
 	if curStamina <= 0 then

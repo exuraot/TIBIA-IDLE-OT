@@ -688,21 +688,28 @@ QuestTrackerMiniWindow < MiniWindow
       id: emptyBox
       height: 100
       visible: true
-      layout: verticalBox
 
       Label
+        id: emptyTitle
         text: No Active Guide.
         text-align: center
         font: verdana-11px-rounded
         color: #888888
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
         margin-top: 15
 
       Label
+        id: emptySubtitle
         text: Open explorer to track Quests, Addons, and Mounts.
         text-align: center
         text-wrap: true
         font: verdana-11px-rounded
         color: #667788
+        anchors.top: emptyTitle.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
         margin-top: 4
 
       Button
@@ -710,6 +717,7 @@ QuestTrackerMiniWindow < MiniWindow
         text: Browse Guides
         width: 120
         height: 22
+        anchors.top: emptySubtitle.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         margin-top: 10
         font: small-9px
@@ -720,6 +728,7 @@ QuestTrackerMiniWindow < MiniWindow
       id: activeBox
       height: 140
       visible: false
+      layout: verticalBox
 
       Label
         id: trackedTitle

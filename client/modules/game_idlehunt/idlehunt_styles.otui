@@ -1,12 +1,13 @@
-DropSlotItem < Panel
-  size: 82 86
-  image-source: /images/ui/containerslot
-  image-border: 3
-  padding: 2
+DropSlotItem < FlatPanel
+  size: 84 88
+  padding: 3
 
   UIItem
     id: itemWidget
     size: 34 34
+    image-source: /images/ui/2pixel_up_frame_borderimage
+    image-border: 10
+    padding: 1
     anchors.top: parent.top
     anchors.horizontalCenter: parent.horizontalCenter
     margin-top: 4
@@ -16,33 +17,32 @@ DropSlotItem < Panel
   Label
     id: chanceLabel
     font: verdana-11px-rounded
-    color: #00ff88
+    color: #88ff88
     anchors.top: itemWidget.bottom
     anchors.horizontalCenter: parent.horizontalCenter
-    margin-top: 2
+    margin-top: 3
     text-auto-resize: true
 
   Label
     id: priceLabel
     font: verdana-11px-rounded
-    color: #ffd700
+    color: #dfb050
     anchors.top: chanceLabel.bottom
     anchors.horizontalCenter: parent.horizontalCenter
-    margin-top: 1
+    margin-top: 2
     text-auto-resize: true
 
-HuntCard < Panel
+HuntCard < FlatPanel
   height: 76
-  image-source: /images/ui/containerslot
-  image-border: 3
-  padding: 4
+  padding: 5
   margin-bottom: 4
 
   Panel
     id: monsterFrame
     size: 54 54
-    image-source: /images/ui/containerslot
-    image-border: 2
+    image-source: /images/ui/outfits/minipanel
+    image-border: 20
+    padding: 3
     anchors.left: parent.left
     anchors.verticalCenter: parent.verticalCenter
     margin-left: 2
@@ -56,7 +56,7 @@ HuntCard < Panel
   Label
     id: huntTitle
     font: verdana-11px-rounded
-    color: #ffd700
+    color: #dfdfdf
     anchors.top: parent.top
     anchors.left: monsterFrame.right
     margin-top: 2
@@ -66,7 +66,7 @@ HuntCard < Panel
   Label
     id: focusTag
     font: verdana-11px-rounded
-    color: #00ff88
+    color: #88ff88
     anchors.top: huntTitle.top
     anchors.left: huntTitle.right
     margin-left: 8
@@ -88,7 +88,7 @@ HuntCard < Panel
   Label
     id: huntCost
     font: verdana-11px-rounded
-    color: #e0bb66
+    color: #dfb050
     anchors.bottom: parent.bottom
     anchors.left: monsterFrame.right
     margin-left: 8
@@ -107,7 +107,7 @@ HuntCard < Panel
 
   Panel
     id: dropsShowcase
-    size: 96 30
+    size: 114 34
     anchors.right: configButton.left
     anchors.verticalCenter: parent.verticalCenter
     margin-right: 8
@@ -117,19 +117,28 @@ HuntCard < Panel
 
     UIItem
       id: dropItem1
-      size: 28 28
+      size: 34 34
+      image-source: /images/ui/2pixel_up_frame_borderimage
+      image-border: 10
+      padding: 1
       virtual: true
       phantom: false
 
     UIItem
       id: dropItem2
-      size: 28 28
+      size: 34 34
+      image-source: /images/ui/2pixel_up_frame_borderimage
+      image-border: 10
+      padding: 1
       virtual: true
       phantom: false
 
     UIItem
       id: dropItem3
-      size: 28 28
+      size: 34 34
+      image-source: /images/ui/2pixel_up_frame_borderimage
+      image-border: 10
+      padding: 1
       virtual: true
       phantom: false
 
@@ -137,23 +146,21 @@ HuntCard < Panel
     id: configButton
     !text: tr('Configurar')
     font: verdana-11px-rounded
-    color: #00ff88
+    color: #c0c0c0
     width: 95
-    height: 26
+    height: 24
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
-    margin-right: 6
+    margin-right: 4
 
-ElementBadge < Panel
-  size: 80 30
-  image-source: /images/ui/containerslot
-  image-border: 2
+ElementBadge < FlatPanel
+  size: 80 32
   padding: 2
 
   Label
     id: elementLabel
     font: verdana-11px-rounded
-    color: #e0e0e0
+    color: #c0c0c0
     anchors.top: parent.top
     anchors.horizontalCenter: parent.horizontalCenter
     margin-top: 1
@@ -162,22 +169,23 @@ ElementBadge < Panel
   Label
     id: valueLabel
     font: verdana-11px-rounded
-    color: #00ff88
+    color: #88ff88
     anchors.bottom: parent.bottom
     anchors.horizontalCenter: parent.horizontalCenter
     margin-bottom: 1
     text-auto-resize: true
 
-DropRowCheckItem < Panel
+DropRowCheckItem < FlatPanel
   height: 42
-  image-source: /images/ui/containerslot
-  image-border: 2
   padding: 3
   margin-bottom: 3
 
   UIItem
     id: itemWidget
-    size: 32 32
+    size: 34 34
+    image-source: /images/ui/2pixel_up_frame_borderimage
+    image-border: 10
+    padding: 1
     anchors.left: parent.left
     anchors.verticalCenter: parent.verticalCenter
     margin-left: 2
@@ -186,7 +194,7 @@ DropRowCheckItem < Panel
   Label
     id: itemNameLabel
     font: verdana-11px-rounded
-    color: #ffffff
+    color: #dfdfdf
     anchors.top: parent.top
     anchors.left: itemWidget.right
     anchors.right: keepCheckBox.left
@@ -198,7 +206,7 @@ DropRowCheckItem < Panel
   Label
     id: itemInfoLabel
     font: verdana-11px-rounded
-    color: #ffd700
+    color: #dfb050
     anchors.bottom: parent.bottom
     anchors.left: itemWidget.right
     anchors.right: keepCheckBox.left
@@ -219,16 +227,17 @@ DropRowCheckItem < Panel
     anchors.verticalCenter: parent.verticalCenter
     margin-right: 18
 
-DropRowItem < Panel
-  height: 40
-  image-source: /images/ui/containerslot
-  image-border: 2
+DropRowItem < FlatPanel
+  height: 42
   padding: 3
   margin-bottom: 3
 
   UIItem
     id: itemWidget
-    size: 32 32
+    size: 34 34
+    image-source: /images/ui/2pixel_up_frame_borderimage
+    image-border: 10
+    padding: 1
     anchors.left: parent.left
     anchors.verticalCenter: parent.verticalCenter
     margin-left: 2
@@ -237,7 +246,7 @@ DropRowItem < Panel
   Label
     id: itemNameLabel
     font: verdana-11px-rounded
-    color: #ffffff
+    color: #dfdfdf
     anchors.top: parent.top
     anchors.left: itemWidget.right
     margin-left: 8
@@ -247,7 +256,7 @@ DropRowItem < Panel
   Label
     id: itemInfoLabel
     font: verdana-11px-rounded
-    color: #ffd700
+    color: #dfb050
     anchors.bottom: parent.bottom
     anchors.left: itemWidget.right
     margin-left: 8
@@ -257,22 +266,24 @@ DropRowItem < Panel
   Button
     id: lockButton
     font: verdana-11px-rounded
+    color: #c0c0c0
     width: 140
     height: 22
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
     margin-right: 4
 
-LootCard < Panel
+LootCard < FlatPanel
   height: 48
-  image-source: /images/ui/containerslot
-  image-border: 3
   padding: 4
   margin-bottom: 4
 
   UIItem
     id: itemIcon
     size: 34 34
+    image-source: /images/ui/2pixel_up_frame_borderimage
+    image-border: 10
+    padding: 1
     anchors.left: parent.left
     anchors.verticalCenter: parent.verticalCenter
     margin-left: 4
@@ -281,7 +292,7 @@ LootCard < Panel
   Label
     id: itemName
     font: verdana-11px-rounded
-    color: #ffffff
+    color: #dfdfdf
     anchors.top: parent.top
     anchors.left: itemIcon.right
     margin-left: 10
@@ -291,7 +302,7 @@ LootCard < Panel
   Label
     id: statusLabel
     font: verdana-11px-rounded
-    color: #00ff88
+    color: #88ff88
     anchors.bottom: parent.bottom
     anchors.left: itemIcon.right
     margin-left: 10
@@ -301,23 +312,22 @@ LootCard < Panel
   Button
     id: lockButton
     font: verdana-11px-rounded
+    color: #c0c0c0
     width: 140
     height: 24
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
     margin-right: 8
 
-IdleSpellRow < Panel
-  height: 36
-  image-source: /images/ui/containerslot
-  image-border: 2
-  padding: 2
+IdleSpellRow < FlatPanel
+  height: 38
+  padding: 3
   margin-bottom: 2
 
   Label
     id: spellNameLabel
     font: verdana-11px-rounded
-    color: #ffffff
+    color: #dfdfdf
     anchors.top: parent.top
     anchors.left: parent.left
     margin-top: 2
@@ -327,7 +337,7 @@ IdleSpellRow < Panel
   Label
     id: spellWordsLabel
     font: verdana-11px-rounded
-    color: #00ff88
+    color: #88ff88
     anchors.bottom: parent.bottom
     anchors.left: parent.left
     margin-bottom: 2
@@ -343,16 +353,17 @@ IdleSpellRow < Panel
     margin-right: 8
     text-auto-resize: true
 
-IdleObjectRow < Panel
-  height: 38
-  image-source: /images/ui/containerslot
-  image-border: 2
-  padding: 2
+IdleObjectRow < FlatPanel
+  height: 40
+  padding: 3
   margin-bottom: 2
 
   UIItem
     id: objectIcon
-    size: 32 32
+    size: 34 34
+    image-source: /images/ui/2pixel_up_frame_borderimage
+    image-border: 10
+    padding: 1
     anchors.left: parent.left
     anchors.verticalCenter: parent.verticalCenter
     margin-left: 2
@@ -362,7 +373,7 @@ IdleObjectRow < Panel
   Label
     id: objectNameLabel
     font: verdana-11px-rounded
-    color: #ffffff
+    color: #dfdfdf
     anchors.top: parent.top
     anchors.left: objectIcon.right
     margin-top: 2
@@ -372,7 +383,7 @@ IdleObjectRow < Panel
   Label
     id: objectCostLabel
     font: verdana-11px-rounded
-    color: #ffd700
+    color: #dfb050
     anchors.bottom: parent.bottom
     anchors.left: objectIcon.right
     margin-bottom: 2

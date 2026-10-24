@@ -20,10 +20,8 @@ SupplyPopup < UIWidget
     margin-left: 4
     text-auto-resize: true
 
-ElementBadge < Panel
+ElementBadge < FlatPanel
   size: 74 30
-  image-source: /images/ui/containerslot
-  image-border: 2
   padding: 2
 
   Label
@@ -38,22 +36,23 @@ ElementBadge < Panel
   Label
     id: valueLabel
     font: verdana-11px-rounded
-    color: #00ff88
+    color: #88ff88
     anchors.bottom: parent.bottom
     anchors.horizontalCenter: parent.horizontalCenter
     margin-bottom: 1
     text-auto-resize: true
 
-HuntingDropRow < Panel
-  height: 40
-  image-source: /images/ui/containerslot
-  image-border: 2
-  padding: 2
+HuntingDropRow < FlatPanel
+  height: 42
+  padding: 3
   margin-bottom: 3
 
   UIItem
     id: itemWidget
-    size: 32 32
+    size: 34 34
+    image-source: /images/ui/2pixel_up_frame_borderimage
+    image-border: 10
+    padding: 1
     anchors.left: parent.left
     anchors.verticalCenter: parent.verticalCenter
     margin-left: 4
@@ -62,7 +61,7 @@ HuntingDropRow < Panel
   Label
     id: itemNameLabel
     font: verdana-11px-rounded
-    color: #ffffff
+    color: #dfdfdf
     anchors.top: parent.top
     anchors.left: itemWidget.right
     anchors.right: autoLootButton.left
@@ -74,7 +73,7 @@ HuntingDropRow < Panel
   Label
     id: itemInfoLabel
     font: verdana-11px-rounded
-    color: #ffd700
+    color: #dfb050
     anchors.bottom: parent.bottom
     anchors.left: itemWidget.right
     anchors.right: autoLootButton.left
@@ -91,7 +90,7 @@ HuntingDropRow < Panel
     margin-right: 6
     !text: tr('Loot: ON')
     font: verdana-11px-rounded
-    color: #00ff88
+    color: #88ff88
     tooltip: tr('Auto Loot: Ativado (Clique para ignorar este item nos monstros)')
 
   Button
@@ -105,16 +104,17 @@ HuntingDropRow < Panel
     $pressed:
       icon-offset: 1 1
 
-DropRowCheckItem < Panel
-  height: 40
-  image-source: /images/ui/containerslot
-  image-border: 2
-  padding: 2
+DropRowCheckItem < FlatPanel
+  height: 42
+  padding: 3
   margin-bottom: 3
 
   UIItem
     id: itemWidget
-    size: 32 32
+    size: 34 34
+    image-source: /images/ui/2pixel_up_frame_borderimage
+    image-border: 10
+    padding: 1
     anchors.left: parent.left
     anchors.verticalCenter: parent.verticalCenter
     margin-left: 2
@@ -123,7 +123,7 @@ DropRowCheckItem < Panel
   Label
     id: itemNameLabel
     font: verdana-11px-rounded
-    color: #ffffff
+    color: #dfdfdf
     anchors.top: parent.top
     anchors.left: itemWidget.right
     anchors.right: padlockButton.left
@@ -135,7 +135,7 @@ DropRowCheckItem < Panel
   Label
     id: itemInfoLabel
     font: verdana-11px-rounded
-    color: #ffd700
+    color: #dfb050
     anchors.bottom: parent.bottom
     anchors.left: itemWidget.right
     anchors.right: padlockButton.left
@@ -167,10 +167,8 @@ DropRowCheckItem < Panel
     anchors.verticalCenter: parent.verticalCenter
     margin-right: 18
 
-TipBox < Panel
+TipBox < FlatPanel
   height: 42
-  image-source: /images/ui/containerslot
-  image-border: 2
   padding: 4
 
   UIWidget
@@ -185,7 +183,7 @@ TipBox < Panel
     id: tipTitle
     !text: tr('[DICA]')
     font: verdana-11px-rounded
-    color: #ffd700
+    color: #dfb050
     anchors.left: tipIcon.right
     anchors.verticalCenter: parent.verticalCenter
     margin-left: 6
@@ -220,21 +218,19 @@ MainWindow
     anchors.fill: parent
     visible: true
 
-    Panel
+    FlatPanel
       id: staminaPanel
       anchors.top: parent.top
       anchors.left: parent.left
       anchors.right: parent.right
       height: 38
-      image-source: /images/ui/containerslot
-      image-border: 2
       padding: 4
 
       Label
         id: staminaLabel
         !text: tr('Stamina IDLE: 24h 00m')
         font: verdana-11px-rounded
-        color: #00ff88
+        color: #88ff88
         anchors.top: parent.top
         anchors.left: parent.left
         margin-left: 4
@@ -263,7 +259,7 @@ MainWindow
         margin-bottom: 2
         background-color: #00cc66
 
-    Panel
+    FlatPanel
       id: idleModeCard
       anchors.top: staminaPanel.bottom
       anchors.left: parent.left
@@ -271,8 +267,6 @@ MainWindow
       anchors.bottom: dashboardBottomBar.top
       margin-top: 8
       margin-bottom: 8
-      image-source: /images/ui/containerslot
-      image-border: 3
       padding: 12
       visible: true
 
@@ -280,7 +274,7 @@ MainWindow
         id: idleTitle
         !text: tr('PRONTO PARA INICIAR UMA CACADA IDLE')
         font: verdana-11px-rounded
-        color: #ffd700
+        color: #dfb050
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
         margin-top: 35
@@ -305,7 +299,7 @@ MainWindow
         id: openCatalogButton
         !text: tr('ORGANIZAR CACADA')
         font: verdana-11px-rounded
-        color: #00ff88
+        color: #88ff88
         size: 240 38
         anchors.centerIn: parent
 
@@ -319,7 +313,7 @@ MainWindow
         margin-right: 10
         height: 44
 
-    Panel
+    FlatPanel
       id: huntingCard
       anchors.top: staminaPanel.bottom
       anchors.left: parent.left
@@ -327,26 +321,23 @@ MainWindow
       anchors.bottom: dashboardBottomBar.top
       margin-top: 8
       margin-bottom: 8
-      image-source: /images/ui/containerslot
-      image-border: 3
       padding: 10
       visible: false
 
-      Panel
+      FlatPanel
         id: huntingHeader
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         height: 60
-        image-source: /images/ui/containerslot
-        image-border: 2
         padding: 4
 
         Panel
           id: activeMonsterFrame
-          size: 52 52
-          image-source: /images/ui/containerslot
-          image-border: 2
+          size: 54 54
+          image-source: /images/ui/outfits/minipanel
+          image-border: 20
+          padding: 3
           anchors.left: parent.left
           anchors.verticalCenter: parent.verticalCenter
           margin-left: 2
@@ -360,7 +351,7 @@ MainWindow
         Label
           id: activeHuntName
           font: verdana-11px-rounded
-          color: #ffd700
+          color: #dfb050
           anchors.top: parent.top
           anchors.left: activeMonsterFrame.right
           margin-left: 8
@@ -371,7 +362,7 @@ MainWindow
           id: huntStatusBadge
           !text: tr('[CACANDO AO VIVO]')
           font: verdana-11px-rounded
-          color: #00ff88
+          color: #88ff88
           anchors.top: parent.top
           anchors.left: activeHuntName.right
           margin-left: 8
@@ -393,29 +384,27 @@ MainWindow
           id: durationLabel
           !text: tr('Tempo de Hunt: 00:00')
           font: verdana-11px-rounded
-          color: #ffffff
+          color: #dfdfdf
           anchors.bottom: parent.bottom
           anchors.right: parent.right
           margin-right: 8
           margin-bottom: 4
           text-auto-resize: true
 
-      Panel
+      FlatPanel
         id: metricsGrid
         anchors.top: huntingHeader.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         margin-top: 8
         height: 64
-        image-source: /images/ui/containerslot
-        image-border: 2
         padding: 6
 
         Label
           id: xpSessionLabel
           !text: tr('EXP Sessao: +0')
           font: verdana-11px-rounded
-          color: #00ff88
+          color: #88ff88
           anchors.top: parent.top
           anchors.left: parent.left
           margin-left: 8
@@ -448,22 +437,20 @@ MainWindow
           id: goldEarnedLabel
           !text: tr('Lucro Estimado: 0 gp')
           font: verdana-11px-rounded
-          color: #ffd700
+          color: #dfb050
           anchors.bottom: parent.bottom
           anchors.right: parent.right
           margin-right: 8
           margin-bottom: 4
           text-auto-resize: true
 
-      Panel
+      FlatPanel
         id: autoSellPanel
         anchors.top: metricsGrid.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         margin-top: 6
         height: 28
-        image-source: /images/ui/containerslot
-        image-border: 2
         padding: 4
         tooltip: tr('A cada 10 minutos todos os itens que nao estiverem com o cadeado fechado serao vendidos e o dinheiro depositado diretamente no seu banco.')
 
@@ -471,7 +458,7 @@ MainWindow
           id: autoSellTitleLabel
           !text: tr('AUTO SELL:')
           font: verdana-11px-rounded
-          color: #ffd700
+          color: #dfb050
           anchors.left: parent.left
           anchors.verticalCenter: parent.verticalCenter
           margin-left: 6
@@ -481,7 +468,7 @@ MainWindow
           id: autoSellTimerLabel
           !text: tr('10:00')
           font: verdana-11px-rounded
-          color: #00ff88
+          color: #88ff88
           anchors.left: autoSellTitleLabel.right
           anchors.verticalCenter: parent.verticalCenter
           margin-left: 6
@@ -497,7 +484,7 @@ MainWindow
           margin-right: 6
           text-auto-resize: true
 
-      Panel
+      FlatPanel
         id: droppedLootCard
         anchors.top: autoSellPanel.bottom
         anchors.left: parent.left
@@ -505,15 +492,13 @@ MainWindow
         anchors.bottom: emergencyStopButton.top
         margin-top: 6
         margin-bottom: 6
-        image-source: /images/ui/containerslot
-        image-border: 2
         padding: 4
 
         Label
           id: lootSectionTitle
           !text: tr('Drops da Sessao & Controle de Venda (Cadeado: Fechado = Guardar | Aberto = Vender):')
           font: verdana-11px-rounded
-          color: #ffd700
+          color: #dfb050
           anchors.top: parent.top
           anchors.left: parent.left
           margin-left: 4
@@ -563,7 +548,7 @@ MainWindow
         id: quickSellButton
         !text: tr('Quick Sell')
         font: verdana-11px-rounded
-        color: #00ff88
+        color: #88ff88
         width: 130
         height: 26
         anchors.left: parent.left
@@ -631,7 +616,7 @@ MainWindow
         id: searchLabel
         !text: tr('Busca Inteligente:')
         font: verdana-11px-rounded
-        color: #ffd700
+        color: #dfb050
         anchors.right: huntSearchInput.left
         anchors.verticalCenter: parent.verticalCenter
         margin-right: 8
@@ -677,14 +662,14 @@ MainWindow
         id: filterObjProfit
         !text: tr('Lucro / GP')
         font: verdana-11px-rounded
-        color: #ffd700
+        color: #dfb050
         height: 22
 
       Button
         id: filterObjItems
         !text: tr('Coleta de Itens')
         font: verdana-11px-rounded
-        color: #00ff88
+        color: #88ff88
         height: 22
 
       Label
@@ -713,7 +698,7 @@ MainWindow
         id: filterCatEquip
         !text: tr('Equipamentos')
         font: verdana-11px-rounded
-        color: #ffffff
+        color: #dfdfdf
         height: 22
 
       Label
@@ -806,7 +791,7 @@ MainWindow
         id: detailsTitle
         !text: tr('Configurar Cacada')
         font: verdana-11px-rounded
-        color: #ffd700
+        color: #dfb050
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: backToCatalogBtn.right
         margin-left: 12
@@ -821,22 +806,21 @@ MainWindow
         margin-right: 6
         text-auto-resize: true
 
-    Panel
+    FlatPanel
       id: detailCreatureHeader
       anchors.top: detailsTopBar.bottom
       anchors.left: parent.left
       anchors.right: parent.right
       margin-top: 4
-      height: 52
-      image-source: /images/ui/containerslot
-      image-border: 3
+      height: 54
       padding: 4
 
       Panel
         id: detailCreatureFrame
-        size: 44 44
-        image-source: /images/ui/containerslot
-        image-border: 2
+        size: 48 48
+        image-source: /images/ui/outfits/minipanel
+        image-border: 20
+        padding: 3
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         margin-left: 2
@@ -850,7 +834,7 @@ MainWindow
       Label
         id: detailHuntName
         font: verdana-11px-rounded
-        color: #ffd700
+        color: #dfb050
         anchors.top: parent.top
         anchors.left: detailCreatureFrame.right
         margin-top: 2
@@ -860,7 +844,7 @@ MainWindow
       Label
         id: detailFocusTag
         font: verdana-11px-rounded
-        color: #00ff88
+        color: #88ff88
         anchors.top: detailHuntName.top
         anchors.left: detailHuntName.right
         margin-left: 8
@@ -879,7 +863,7 @@ MainWindow
         height: 18
         text-wrap: true
 
-    Panel
+    FlatPanel
       id: leftConfigPanel
       anchors.top: detailCreatureHeader.bottom
       anchors.left: parent.left
@@ -888,15 +872,13 @@ MainWindow
       margin-top: 6
       margin-right: 4
       margin-bottom: 6
-      image-source: /images/ui/containerslot
-      image-border: 2
       padding: 6
 
       Label
         id: diffTitle
         !text: tr('1. Dificuldade (Tamanho do Pull):')
         font: verdana-11px-rounded
-        color: #ffd700
+        color: #dfb050
         anchors.top: parent.top
         anchors.left: parent.left
         margin-left: 2
@@ -914,7 +896,7 @@ MainWindow
           id: diffEasyBtn
           !text: tr('Facil')
           font: verdana-11px-rounded
-          color: #00ff88
+          color: #88ff88
           width: 104
           height: 24
           anchors.left: parent.left
@@ -924,7 +906,7 @@ MainWindow
           id: diffMediumBtn
           !text: tr('Medio')
           font: verdana-11px-rounded
-          color: #ffd700
+          color: #dfb050
           width: 104
           height: 24
           anchors.horizontalCenter: parent.horizontalCenter
@@ -944,29 +926,27 @@ MainWindow
         id: wavesTitle
         !text: tr('2. Criaturas da Onda e Custos:')
         font: verdana-11px-rounded
-        color: #ffd700
+        color: #dfb050
         anchors.top: diffButtonsRow.bottom
         anchors.left: parent.left
         margin-top: 8
         margin-left: 2
         text-auto-resize: true
 
-      Panel
+      FlatPanel
         id: wavesBox
         anchors.top: wavesTitle.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         margin-top: 4
         height: 48
-        image-source: /images/ui/containerslot
-        image-border: 2
         padding: 4
 
         Label
           id: wavesSummaryLabel
           !text: tr('Onda: 3x Rotworm')
           font: verdana-11px-rounded
-          color: #ffffff
+          color: #dfdfdf
           anchors.top: parent.top
           anchors.left: parent.left
           margin-left: 4
@@ -988,7 +968,7 @@ MainWindow
         id: elementsTitle
         !text: tr('3. Fraquezas e Resistencias Elementais:')
         font: verdana-11px-rounded
-        color: #ffd700
+        color: #dfb050
         anchors.top: wavesBox.bottom
         anchors.left: parent.left
         margin-top: 8
@@ -1008,7 +988,7 @@ MainWindow
           cell-spacing: 4
           flow: true
 
-    Panel
+    FlatPanel
       id: rightLootPanel
       anchors.top: detailCreatureHeader.bottom
       anchors.left: parent.horizontalCenter
@@ -1017,8 +997,6 @@ MainWindow
       margin-top: 6
       margin-left: 4
       margin-bottom: 6
-      image-source: /images/ui/containerslot
-      image-border: 2
       padding: 6
 
       Panel
@@ -1032,7 +1010,7 @@ MainWindow
           id: lootTitle
           !text: tr('Loot Possivel:')
           font: verdana-11px-rounded
-          color: #ffd700
+          color: #dfb050
           anchors.left: parent.left
           anchors.verticalCenter: parent.verticalCenter
           margin-left: 2
@@ -1053,7 +1031,7 @@ MainWindow
           id: sellColHeader
           !text: tr('VENDER')
           font: verdana-11px-rounded
-          color: #ffd700
+          color: #dfb050
           anchors.right: parent.right
           anchors.verticalCenter: parent.verticalCenter
           margin-right: 10
@@ -1089,22 +1067,20 @@ MainWindow
       margin-bottom: 6
       height: 40
 
-    Panel
-      id: reqPanel
-      anchors.left: parent.left
-      anchors.right: parent.right
-      anchors.bottom: startHuntButton.top
-      margin-bottom: 8
-      height: 44
-      image-source: /images/ui/containerslot
-      image-border: 2
-      padding: 4
+    FlatPanel
+    id: reqPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: startHuntButton.top
+    margin-bottom: 8
+    height: 44
+    padding: 4
 
       Label
         id: reqSummaryLabel
         !text: tr('Requisitos de Sobrevivencia: Verificando...')
         font: verdana-11px-rounded
-        color: #00ff88
+        color: #88ff88
         anchors.top: parent.top
         anchors.left: parent.left
         margin-left: 4
@@ -1125,7 +1101,7 @@ MainWindow
       id: startHuntButton
       !text: tr('INICIAR CACADA IDLE')
       font: verdana-11px-rounded
-      color: #00ff88
+      color: #88ff88
       size: 240 32
       anchors.bottom: parent.bottom
       anchors.horizontalCenter: parent.horizontalCenter

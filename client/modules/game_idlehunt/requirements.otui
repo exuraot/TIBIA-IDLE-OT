@@ -4,24 +4,23 @@ MainWindow
   size: 460 380
   @onEscape: self:hide()
 
-  Panel
+  FlatPanel
     id: statusBanner
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
     height: 38
-    image-source: /images/ui/containerslot
-    image-border: 3
     padding: 4
 
     Label
       id: statusText
       !text: tr('Status: Calculating...')
       font: verdana-11px-rounded
+      color: #dfdfdf
       anchors.centerIn: parent
       text-auto-resize: true
 
-  Panel
+  FlatPanel
     id: checklistPanel
     anchors.top: statusBanner.bottom
     anchors.left: parent.left
@@ -29,8 +28,6 @@ MainWindow
     anchors.bottom: closeReqButton.top
     margin-top: 8
     margin-bottom: 8
-    image-source: /images/ui/containerslot
-    image-border: 3
     padding: 8
     layout:
       type: verticalBox
@@ -39,33 +36,37 @@ MainWindow
     Label
       id: lvlLabel
       font: verdana-11px-rounded
+      color: #c0c0c0
       text-auto-resize: true
 
     Label
       id: atkLabel
       font: verdana-11px-rounded
+      color: #c0c0c0
       text-auto-resize: true
 
     Label
       id: defLabel
       font: verdana-11px-rounded
+      color: #c0c0c0
       text-auto-resize: true
 
     Label
       id: bankLabel
       font: verdana-11px-rounded
+      color: #c0c0c0
       text-auto-resize: true
 
     Label
       id: potionsLabel
       font: verdana-11px-rounded
-      color: #ffd700
+      color: #dfb050
       text-auto-resize: true
 
     Label
       id: ruleNotice
       font: verdana-11px-rounded
-      color: #d0d0d0
+      color: #808080
       text-wrap: true
       margin-top: 10
       !text: tr('Rule: If you meet 100% of recommended requirements, automatic rescue activates at 10% HP. Otherwise, you face real risk of death!')
@@ -74,7 +75,9 @@ MainWindow
     id: startFromReqButton
     !text: tr('Start This Hunt')
     font: verdana-11px-rounded
+    color: #88ff88
     width: 150
+    height: 24
     anchors.left: parent.left
     anchors.bottom: parent.bottom
 
@@ -82,7 +85,9 @@ MainWindow
     id: closeReqButton
     !text: tr('Close')
     font: verdana-11px-rounded
+    color: #c0c0c0
     width: 90
+    height: 24
     anchors.right: parent.right
     anchors.bottom: parent.bottom
     @onClick: self:getParent():hide()
